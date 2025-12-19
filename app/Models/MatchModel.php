@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class MatchModel extends Model
+{
+    use HasFactory;
+
+    protected $table = 'matches';
+
+    protected $fillable = [
+        'home_team_id', 'away_team_id', 'group_id', 'stage', 
+        'home_score', 'away_score', 'match_date', 'venue', 'status',
+        'home_possession', 'away_possession', 'home_shots', 'away_shots',
+        'home_scorers', 'away_scorers', 'report', 'motm_player_id',
+        'referee', 'attendance'
+    ];
+
+    protected $casts = [
+        'match_date' => 'datetime',
+    ];
+
+    public function homeTeam()
+    {
+        return $this->belongsTo(Team::class, 'home_team_id');
+    }
+
+    public function awayTeam()
+    {
+        return $this->belongsTo(Team::class, 'away_team_id');
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    public function matchEvents()
+    {
+        return $this->hasMany(MatchEvent::class, 'match_id')->orderBy('minute', 'asc');
+    }
+
+    public function motmPlayer()
+    {
+        return $this->belongsTo(Player::class, 'motm_player_id');
+    }
+
+    public function lineups()
+    {
+        return $this->belongsToMany(Player::class, 'match_lineups', 'match_id', 'player_id')
+                    ->withPivot('team_id', 'is_captain', 'is_substitute', 'shirt_number', 'position_x', 'position_y')
+                    ->withTimestamps();
+    }
+}
