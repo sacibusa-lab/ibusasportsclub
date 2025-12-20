@@ -126,7 +126,19 @@ class TournamentController extends Controller
         $topCards = $this->statisticsService->getTopCards(10);
         $topMOTM = $this->statisticsService->getTopMOTM(10);
 
-        return view('stats', compact('topScorers', 'topAssists', 'topCleanSheets', 'topCards', 'topMOTM'));
+        // Team Stats
+        $topShots = $this->statisticsService->getTopTeamsByStat('shots', 5);
+        $topCorners = $this->statisticsService->getTopTeamsByStat('corners', 5);
+        $topOffsides = $this->statisticsService->getTopTeamsByStat('offsides', 5);
+        $topFouls = $this->statisticsService->getTopTeamsByStat('fouls', 5);
+        $topThrows = $this->statisticsService->getTopTeamsByStat('throw_ins', 5);
+        $topSaves = $this->statisticsService->getTopTeamsByStat('saves', 5);
+        $topGoalKicks = $this->statisticsService->getTopTeamsByStat('goal_kicks', 5);
+
+        return view('stats', compact(
+            'topScorers', 'topAssists', 'topCleanSheets', 'topCards', 'topMOTM',
+            'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks'
+        ));
     }
 
     public function teams()

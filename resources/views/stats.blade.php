@@ -211,5 +211,169 @@
         @endif
 
     </div>
+
+    <!-- Team Leaderboards Header -->
+    <div class="mt-24 mb-12 flex items-center gap-6">
+        <div class="h-1 bg-secondary w-24"></div>
+        <h2 class="text-4xl font-black text-primary uppercase italic tracking-tighter">Team Leaderboards</h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        
+        <!-- Most Shots -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-indigo-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">Most Shots</h3>
+                <span class="text-xl">🚀</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topShots as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-primary italic">{{ $team->total_stat }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Most Corners -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-indigo-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">Corner Kicks</h3>
+                <span class="text-xl">🚩</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topCorners as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-primary italic">{{ $team->total_stat }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Most Fouls -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-rose-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">Fouls</h3>
+                <span class="text-xl">⚠️</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topFouls as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-primary italic">{{ $team->total_stat }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Offsides -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-indigo-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">Offsides</h3>
+                <span class="text-xl">🏁</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topOffsides as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-primary italic">{{ $team->total_stat }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Throw-ins -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-indigo-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">Throw-ins</h3>
+                <span class="text-xl">👐</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topThrows as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-primary italic">{{ $team->total_stat }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- GK Saves -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-indigo-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">GK Saves</h3>
+                <span class="text-xl">🧱</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topSaves as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-primary italic">{{ $team->total_stat }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Goal Kicks -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-indigo-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">Goal Kicks</h3>
+                <span class="text-xl">🦵</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topGoalKicks as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-primary italic">{{ $team->total_stat }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+    </div>
 </div>
 @endsection

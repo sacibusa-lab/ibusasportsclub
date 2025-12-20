@@ -217,32 +217,89 @@
 
             <!-- Match Stats -->
             <div class="grid grid-cols-2 gap-12 bg-zinc-50 p-8 rounded-3xl border border-zinc-100 mt-12">
+                <!-- Home Stats -->
                 <div class="space-y-6">
-                    <div class="text-center">
+                    <div class="text-center pb-4 border-b border-zinc-100">
                         <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Home Score</label>
                         <input type="number" name="home_score" value="{{ $match->home_score }}" class="w-24 bg-white border border-zinc-200 p-4 rounded-2xl font-black text-primary text-3xl text-center focus:ring-2 focus:ring-secondary outline-none transition shadow-sm" min="0">
                     </div>
-                    <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest">Possession %</label>
-                        <input type="number" name="home_possession" value="{{ $match->home_possession }}" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary text-xs" min="0" max="100">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest">Shots</label>
-                        <input type="number" name="home_shots" value="{{ $match->home_shots }}" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary text-xs" min="0">
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Possession %</label>
+                            <input type="number" name="home_possession" value="{{ $match->home_possession }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0" max="100">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Shots</label>
+                            <input type="number" name="home_shots" value="{{ $match->home_shots }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Corners</label>
+                            <input type="number" name="home_corners" value="{{ $match->home_corners }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Offsides</label>
+                            <input type="number" name="home_offsides" value="{{ $match->home_offsides }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Fouls</label>
+                            <input type="number" name="home_fouls" value="{{ $match->home_fouls }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Throw-ins</label>
+                            <input type="number" name="home_throw_ins" value="{{ $match->home_throw_ins }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">GK Saves</label>
+                            <input type="number" name="home_saves" value="{{ $match->home_saves }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Goal Kicks</label>
+                            <input type="number" name="home_goal_kicks" value="{{ $match->home_goal_kicks }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
                     </div>
                 </div>
+
+                <!-- Away Stats -->
                 <div class="space-y-6">
-                    <div class="text-center">
+                    <div class="text-center pb-4 border-b border-zinc-100">
                         <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Away Score</label>
                         <input type="number" name="away_score" value="{{ $match->away_score }}" class="w-24 bg-white border border-zinc-200 p-4 rounded-2xl font-black text-primary text-3xl text-center focus:ring-2 focus:ring-secondary outline-none transition shadow-sm" min="0">
                     </div>
-                    <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest">Possession %</label>
-                        <input type="number" name="away_possession" value="{{ $match->away_possession }}" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary text-xs" min="0" max="100">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest">Shots</label>
-                        <input type="number" name="away_shots" value="{{ $match->away_shots }}" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary text-xs" min="0">
+
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Possession %</label>
+                            <input type="number" name="away_possession" value="{{ $match->away_possession }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0" max="100">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Shots</label>
+                            <input type="number" name="away_shots" value="{{ $match->away_shots }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Corners</label>
+                            <input type="number" name="away_corners" value="{{ $match->away_corners }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Offsides</label>
+                            <input type="number" name="away_offsides" value="{{ $match->away_offsides }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Fouls</label>
+                            <input type="number" name="away_fouls" value="{{ $match->away_fouls }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Throw-ins</label>
+                            <input type="number" name="away_throw_ins" value="{{ $match->away_throw_ins }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">GK Saves</label>
+                            <input type="number" name="away_saves" value="{{ $match->away_saves }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Goal Kicks</label>
+                            <input type="number" name="away_goal_kicks" value="{{ $match->away_goal_kicks }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
                     </div>
                 </div>
             </div>

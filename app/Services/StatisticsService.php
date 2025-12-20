@@ -93,4 +93,27 @@ class StatisticsService
             ->take($limit)
             ->get();
     }
+
+    public function getTopTeamsByStat($stat, $limit = 10)
+    {
+        $teams = \App\Models\Team::all();
+        
+        foreach ($teams as $team) {
+            $homeStat = MatchModel::where('home_team_id', $team->id)
+                ->where('status', 'finished')
+                ->where('stage', '!=', 'novelty')
+                ->sum('home_' . $stat);
+                
+            $awayStat = MatchModel::where('away_team_id', $team->id)
+                ->where('status', 'finished')
+                ->where('stage', '!=', 'novelty')
+                ->sum('away_' . $stat);
+                
+            $team->total_stat = $homeStat + $awayStat;
+        }
+
+        return $teams->filter(function($team) {
+            return $team->total_stat > 0;
+        })->sortByDesc('total_stat')->take($limit);
+    }
 }
