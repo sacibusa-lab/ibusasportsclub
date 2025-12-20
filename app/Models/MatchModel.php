@@ -12,8 +12,8 @@ class MatchModel extends Model
     protected $table = 'matches';
 
     protected $fillable = [
-        'home_team_id', 'away_team_id', 'group_id', 'stage', 
-        'home_score', 'away_score', 'match_date', 'venue', 'status',
+        'home_team_id', 'away_team_id', 'group_id', 'stage', 'matchday',
+        'home_score', 'away_score', 'match_date', 'venue', 'broadcaster_logo', 'status',
         'home_possession', 'away_possession', 'home_shots', 'away_shots',
         'home_scorers', 'away_scorers', 'report', 'motm_player_id',
         'referee', 'attendance'

@@ -67,16 +67,37 @@ class TournamentController extends Controller
         return view('fixtures', compact('fixtures', 'noveltyFixtures'));
     }
 
-    public function results()
+    public function results(Request $request)
     {
-        $allResults = MatchModel::where('status', 'finished')
+        $matchdayId = $request->query('matchday');
+        $teamId = $request->query('team');
+        
+        $query = MatchModel::where('status', 'finished');
+        
+        if ($matchdayId) {
+            $query->where('matchday', $matchdayId);
+        }
+
+        if ($teamId) {
+            $query->where(function($q) use ($teamId) {
+                $q->where('home_team_id', $teamId)->orWhere('away_team_id', $teamId);
+            });
+        }
+
+        $allResults = $query->with(['homeTeam', 'awayTeam'])
             ->orderBy('match_date', 'desc')
             ->get();
             
-        $results = $allResults->where('stage', '!=', 'novelty');
+        $resultsGrouped = $allResults->where('stage', '!=', 'novelty')->groupBy(function($match) {
+            return $match->match_date->format('Y-m-d');
+        });
+        
         $noveltyResults = $allResults->where('stage', 'novelty');
+        
+        $matchdays = MatchModel::whereNotNull('matchday')->distinct()->pluck('matchday')->sortDesc();
+        $teams = Team::orderBy('name')->get();
             
-        return view('results', compact('results', 'noveltyResults'));
+        return view('results', compact('resultsGrouped', 'noveltyResults', 'matchdays', 'teams', 'matchdayId', 'teamId'));
     }
 
     public function knockout()
