@@ -25,7 +25,12 @@ Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
 // Interview Routes
 Route::get('/interviews/{id}', [\App\Http\Controllers\InterviewController::class, 'show'])->name('interviews.show');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+// Auth Routes
+Route::get('/login', [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/teams', [AdminController::class, 'teams'])->name('teams');
     Route::post('/teams', [AdminController::class, 'storeTeam'])->name('teams.store');
@@ -73,7 +78,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('players')->name('players.')->group(function() {
         Route::get('/', [\App\Http\Controllers\Admin\AdminPlayerController::class, 'index'])->name('index');
         Route::post('/', [\App\Http\Controllers\Admin\AdminPlayerController::class, 'store'])->name('store');
-        Route::put('/{id}', [\App\Http\Controllers\Admin\AdminPlayerController::class, 'update'])->name('index');
         Route::put('/{id}', [\App\Http\Controllers\Admin\AdminPlayerController::class, 'update'])->name('update');
         Route::delete('/{id}', [\App\Http\Controllers\Admin\AdminPlayerController::class, 'destroy'])->name('destroy');
     });

@@ -131,12 +131,17 @@
                 <h1 class="text-3xl font-black text-primary tracking-tighter uppercase">@yield('title')</h1>
                 <p class="text-zinc-400 text-sm font-medium">Tournament Management Dashboard</p>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-6">
                 <div class="text-right">
-                    <span class="block text-xs font-black text-primary uppercase">LC Admin</span>
-                    <span class="block text-[10px] text-zinc-400 font-bold">Authorized Session</span>
+                    <span class="block text-xs font-black text-primary uppercase">{{ auth()->user()->name }}</span>
+                    <span class="block text-[10px] text-zinc-400 font-bold uppercase tracking-widest">{{ auth()->user()->email }}</span>
                 </div>
-                <div class="w-10 h-10 bg-zinc-200 rounded-full"></div>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="w-10 h-10 bg-rose-500 text-white rounded-xl flex items-center justify-center hover:bg-rose-600 transition shadow-lg" title="Logout">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    </button>
+                </form>
             </div>
         </header>
 
