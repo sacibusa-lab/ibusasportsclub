@@ -11,15 +11,32 @@
     newPlayer: { team_id: '', team_name: '' },
     editPlayer: { id: '', name: '', shirt_number: '', position: 'FWD', team_id: '', team_name: '', image_url: '', full_image_url: '' },
     openEdit(team) {
-        this.editTeam = { ...team, manager: team.manager || '', stadium_name: team.stadium_name || '', primary_color: team.primary_color || '#000000' };
+        this.editTeam = { 
+            id: team.id, 
+            name: team.name, 
+            manager: team.manager || '', 
+            stadium_name: team.stadium_name || '', 
+            primary_color: team.primary_color || '#000000',
+            group_id: team.group_id,
+            logo_url: team.logo_url
+        };
         this.editModal = true;
     },
-    openAddPlayer(team) {
-        this.newPlayer = { team_id: team.id, team_name: team.name };
+    openAddPlayer(id, name) {
+        this.newPlayer = { team_id: id, team_name: name };
         this.playerModal = true;
     },
-    openEditPlayer(player, team) {
-        this.editPlayer = { ...player, team_name: team.name };
+    openEditPlayer(player, teamName) {
+        this.editPlayer = { 
+            id: player.id,
+            name: player.name,
+            shirt_number: player.shirt_number,
+            position: player.position,
+            team_id: player.team_id,
+            team_name: teamName,
+            image_url: player.image_url,
+            full_image_url: player.full_image_url
+        };
         this.editPlayerModal = true;
     }
 }">
@@ -89,10 +106,10 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button title="Add Player" @click='openAddPlayer(@json($team))' class="w-7 h-7 flex items-center justify-center bg-white rounded-lg text-emerald-500 hover:bg-emerald-500 hover:text-white transition shadow-sm border border-zinc-100">
+                                <button title="Add Player" @click="openAddPlayer({{ $team->id }}, '{{ addslashes($team->name) }}')" class="w-7 h-7 flex items-center justify-center bg-white rounded-lg text-emerald-500 hover:bg-emerald-500 hover:text-white transition shadow-sm border border-zinc-100">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                                 </button>
-                                <button title="Edit Team" @click='openEdit(@json($team))' class="w-7 h-7 flex items-center justify-center bg-white rounded-lg text-zinc-400 hover:text-primary transition shadow-sm border border-zinc-100">
+                                <button title="Edit Team" @click="openEdit({ id: {{ $team->id }}, name: '{{ addslashes($team->name) }}', manager: '{{ addslashes($team->manager) }}', stadium_name: '{{ addslashes($team->stadium_name) }}', primary_color: '{{ $team->primary_color }}', group_id: {{ $team->group_id }}, logo_url: '{{ $team->logo_url }}' })" class="w-7 h-7 flex items-center justify-center bg-white rounded-lg text-zinc-400 hover:text-primary transition shadow-sm border border-zinc-100">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </button>
                                 <form action="{{ route('admin.teams.destroy', $team->id) }}" method="POST" onsubmit="return confirm('Remove this team?')">
@@ -120,7 +137,7 @@
                                     <span class="text-[8px] font-black text-zinc-300">#{{ $player->shirt_number }} {{ $player->position }}</span>
                                 </div>
                                 <div class="flex items-center opacity-0 group-hover:opacity-100 transition">
-                                    <button @click='openEditPlayer(@json($player), @json($team))' class="p-1 text-zinc-300 hover:text-primary"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+                                    <button @click="openEditPlayer({ id: {{ $player->id }}, name: '{{ addslashes($player->name) }}', shirt_number: {{ $player->shirt_number ?? 'null' }}, position: '{{ $player->position }}', team_id: {{ $player->team_id }}, image_url: '{{ $player->image_url }}', full_image_url: '{{ $player->full_image_url }}' }, '{{ addslashes($team->name) }}')" class="p-1 text-zinc-300 hover:text-primary"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
                                     <form action="{{ route('admin.players.destroy', $player->id) }}" method="POST" onsubmit="return confirm('Remove player?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="p-1 text-zinc-300 hover:text-red-500"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>

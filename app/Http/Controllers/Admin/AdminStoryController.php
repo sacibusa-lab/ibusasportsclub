@@ -73,10 +73,15 @@ class AdminStoryController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'link_url' => 'nullable|url',
+            'expires_at' => 'nullable|date',
+            'duration' => 'required|in:24h,permanent',
+            'items' => 'nullable|array',
+            'items.*.type' => 'required|in:image,video',
+            'items.*.link_url' => 'nullable|url',
+            'items.*.order' => 'required|integer',
             'media' => 'nullable|array',
             'media.*' => 'file|mimetypes:image/jpeg,image/png,image/jpg,image/gif,video/mp4,video/quicktime|max:20480',
-            'type' => 'required|in:image,video',
-            'duration' => 'required|in:24h,permanent',
+            'new_items_type' => 'required_with:media|in:image,video',
         ]);
 
         $story = Story::findOrFail($id);
@@ -90,6 +95,18 @@ class AdminStoryController extends Controller
             'expires_at' => $expiresAt,
         ]);
 
+        // Update existing items
+        if ($request->has('items')) {
+            foreach ($request->items as $itemId => $itemData) {
+                StoryItem::where('id', $itemId)->where('story_id', $story->id)->update([
+                    'type' => $itemData['type'],
+                    'link_url' => $itemData['link_url'],
+                    'order' => $itemData['order'],
+                ]);
+            }
+        }
+
+        // Handle new media uploads
         if ($request->hasFile('media')) {
             $lastOrder = $story->items()->max('order') ?? -1;
             foreach ($request->file('media') as $index => $file) {
@@ -98,15 +115,16 @@ class AdminStoryController extends Controller
                 StoryItem::create([
                     'story_id' => $story->id,
                     'media_url' => $mediaUrl,
-                    'type' => $validated['type'],
+                    'type' => $validated['new_items_type'],
                     'order' => $lastOrder + $index + 1,
                 ]);
-
-                // Update thumbnail if it was empty
-                if (!$story->thumbnail_url) {
-                    $story->update(['thumbnail_url' => $mediaUrl]);
-                }
             }
+        }
+
+        // Refresh thumbnail from the first item
+        $firstItem = $story->items()->orderBy('order')->first();
+        if ($firstItem) {
+            $story->update(['thumbnail_url' => $firstItem->media_url]);
         }
 
         return redirect()->route('admin.stories.index')->with('success', 'Story updated successfully.');

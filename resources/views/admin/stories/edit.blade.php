@@ -82,7 +82,7 @@
                         
                         <div class="space-y-2 pt-4">
                             <label class="text-[9px] font-black text-white/40 uppercase tracking-widest">Type for new items</label>
-                            <select name="type" class="w-full bg-white/10 border border-white/10 p-3 rounded-xl font-bold text-white outline-none transition uppercase text-[10px]" required>
+                            <select name="new_items_type" class="w-full bg-white/10 border border-white/10 p-3 rounded-xl font-bold text-white outline-none transition uppercase text-[10px]" required>
                                 <option value="image" class="text-primary">Image</option>
                                 <option value="video" class="text-primary">Video</option>
                             </select>
@@ -98,33 +98,57 @@
             <!-- Main Content: Slides -->
             <div class="space-y-6">
                 <h3 class="text-xs font-black text-primary uppercase tracking-widest">Current Slides ({{ $story->items->count() }})</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div class="grid gap-6">
                     @foreach($story->items as $item)
-                    <div class="group relative aspect-[9/16] bg-zinc-100 rounded-2xl overflow-hidden border border-zinc-100 shadow-sm">
-                        @if($item->type === 'image')
-                        <img src="{{ $item->media_url }}" class="w-full h-full object-cover">
-                        @else
-                        <video src="{{ $item->media_url }}" class="w-full h-full object-cover"></video>
-                        @endif
-                        
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center p-4">
-                            <form action="{{ route('admin.stories.items.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Remove this slide?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-rose-500 text-white p-3 rounded-full hover:scale-110 transition shadow-lg">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    <div class="bg-white rounded-3xl p-6 border border-zinc-100 shadow-sm flex flex-col md:flex-row gap-6 group">
+                        <!-- Preview -->
+                        <div class="relative w-full md:w-32 aspect-[9/16] bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 shrink-0">
+                            @if($item->type === 'image')
+                            <img src="{{ $item->media_url }}" class="w-full h-full object-cover">
+                            @else
+                            <video src="{{ $item->media_url }}" class="w-full h-full object-cover"></video>
+                            @endif
+                            
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center p-4">
+                                <button type="button" 
+                                        onclick="if(confirm('Remove this slide?')) { document.getElementById('delete-item-form').action = '{{ route('admin.stories.items.destroy', $item->id) }}'; document.getElementById('delete-item-form').submit(); }"
+                                        class="bg-rose-500 text-white p-2.5 rounded-full hover:scale-110 transition shadow-lg">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
-                            </form>
+                            </div>
                         </div>
-                        
-                        <div class="absolute top-2 left-2 px-2 py-0.5 bg-black/50 backdrop-blur-md rounded text-[8px] font-black text-white uppercase tracking-widest">
-                            #{{ $loop->iteration }}
+
+                        <!-- Controls -->
+                        <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Order</label>
+                                <input type="number" name="items[{{ $item->id }}][order]" value="{{ $item->order }}" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[11px]" required>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Type</label>
+                                <select name="items[{{ $item->id }}][type]" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-[10px]" required>
+                                    <option value="image" {{ $item->type === 'image' ? 'selected' : '' }}>Image</option>
+                                    <option value="video" {{ $item->type === 'video' ? 'selected' : '' }}>Video</option>
+                                </select>
+                            </div>
+
+                            <div class="sm:col-span-2 space-y-2">
+                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Slide Link (Optional)</label>
+                                <input type="url" name="items[{{ $item->id }}][link_url]" value="{{ $item->link_url }}" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[11px]" placeholder="https://...">
+                            </div>
                         </div>
                     </div>
                     @endforeach
                 </div>
             </div>
         </div>
+    </form>
+
+    <!-- Global Delete Form -->
+    <form id="delete-item-form" method="POST" class="hidden">
+        @csrf
+        @method('DELETE')
     </form>
 </div>
 @endsection

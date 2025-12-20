@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Story extends Model
 {
     protected $fillable = [
-        'title', 'media_url', 'thumbnail_url', 'type', 'link_url', 'is_active', 'expires_at'
+        'title', 'thumbnail_url', 'link_url', 'is_active', 'expires_at'
     ];
 
     protected $casts = [
