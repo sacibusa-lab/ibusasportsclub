@@ -48,10 +48,10 @@
         }
     </style>
 </head>
-<body class="antialiased min-h-screen" style="background-color: #e5e7eb;">
+<body class="antialiased min-h-screen" style="background-color: #e5e7eb;" x-data="{ mobileMenuOpen: false }">
     <!-- Top Utility Bar -->
     <div class="bg-white border-b border-zinc-100 hidden md:block">
-        <div class="max-w-[1400px] mx-auto px-6 h-10 flex items-center justify-between text-[11px] font-medium text-zinc-500">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-10 flex items-center justify-between text-[11px] font-medium text-zinc-500">
             <div class="flex gap-6">
                 <a href="#" class="hover:text-primary transition">Community Championship</a>
                 <a href="#" class="hover:text-primary transition">About Us</a>
@@ -66,20 +66,20 @@
 
     <!-- Main Header -->
     <header class="bg-white sticky top-0 z-50 border-b border-zinc-100">
-        <div class="max-w-[1400px] mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-12">
-                <a href="{{ route('home') }}" class="flex items-center gap-2">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 md:h-20 flex items-center justify-between">
+            <div class="flex items-center gap-6 lg:gap-12">
+                <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0">
                     @if(isset($siteSettings['site_logo']))
-                    <img src="{{ $siteSettings['site_logo'] }}" class="h-12 w-auto object-contain">
+                    <img src="{{ $siteSettings['site_logo'] }}" class="h-10 md:h-12 w-auto object-contain">
                     @else
-                    <div class="w-10 h-12 bg-primary flex items-center justify-center rounded-b-lg shadow-lg">
-                        <span class="text-secondary font-black text-xs leading-none">{{ $siteSettings['site_short_name'] }}</span>
+                    <div class="w-8 h-10 md:w-10 md:h-12 bg-primary flex items-center justify-center rounded-b-lg shadow-lg">
+                        <span class="text-secondary font-black text-[10px] md:text-xs leading-none">{{ $siteSettings['site_short_name'] }}</span>
                     </div>
                     @endif
-                    <span class="text-primary font-black text-xl italic tracking-tighter hidden lg:block">{{ $siteSettings['site_name'] }}</span>
+                    <span class="text-primary font-black text-lg md:text-xl italic tracking-tighter hidden sm:block">{{ $siteSettings['site_name'] }}</span>
                 </a>
 
-                <nav class="hidden md:flex items-center gap-8 text-[15px] font-bold text-primary">
+                <nav class="hidden md:flex items-center gap-4 lg:gap-8 text-[14px] lg:text-[15px] font-bold text-primary">
                     <a href="{{ route('home') }}" class="hover:text-secondary transition {{ request()->routeIs('home') ? 'text-secondary' : '' }}">Home</a>
                     <a href="{{ route('fixtures') }}" class="hover:text-secondary transition {{ request()->routeIs('fixtures') ? 'text-secondary' : '' }}">Matches</a>
                     <a href="{{ route('results') }}" class="hover:text-secondary transition {{ request()->routeIs('results') ? 'text-secondary' : '' }}">Results</a>
@@ -91,16 +91,46 @@
                 </nav>
             </div>
 
-            <div class="flex items-center gap-4">
-                <a href="{{ route('admin.dashboard') }}" class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-primary-light transition">Sign In</a>
+            <div class="flex items-center gap-2 md:gap-4">
+                <a href="{{ route('admin.dashboard') }}" class="hidden sm:block bg-primary text-white text-[10px] md:text-xs font-bold px-4 py-2 rounded-full hover:bg-primary-light transition">Sign In</a>
+                
+                <!-- Mobile Menu Button -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-primary hover:bg-zinc-50 rounded-lg transition">
+                    <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div x-show="mobileMenuOpen" 
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-4"
+             class="md:hidden bg-white border-b border-zinc-100 absolute w-full z-40"
+             style="display: none;">
+            <nav class="flex flex-col p-4 gap-2 text-sm font-bold text-primary">
+                <a href="{{ route('home') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('home') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Home</a>
+                <a href="{{ route('fixtures') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('fixtures') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Matches</a>
+                <a href="{{ route('results') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('results') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Results</a>
+                <a href="{{ route('table') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('table') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Table</a>
+                <a href="{{ route('knockout') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('knockout') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Knockout</a>
+                <a href="{{ route('stats') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('stats') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Stats</a>
+                <a href="{{ route('news.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('news.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">News</a>
+                <a href="{{ route('teams') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('teams') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Teams</a>
+                <hr class="my-2 border-zinc-100">
+                <a href="{{ route('admin.dashboard') }}" class="p-3 bg-primary text-white text-center rounded-xl font-black uppercase tracking-widest text-[10px]">Sign In</a>
+            </nav>
         </div>
     </header>
 
     <!-- News Ticker Placeholder -->
     <div class="bg-white border-b border-zinc-100">
-        <div class="max-w-[1400px] mx-auto px-6 py-3 flex items-center gap-4 text-xs font-bold text-zinc-600 overflow-x-auto no-scrollbar whitespace-nowrap">
-            <span class="text-secondary">LATEST:</span>
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex items-center gap-4 text-[10px] md:text-xs font-bold text-zinc-600 overflow-x-auto no-scrollbar whitespace-nowrap">
+            <span class="text-secondary shrink-0">LATEST:</span>
             <a href="#" class="hover:underline">Final round approaching as Dragons top Group A</a>
             <span class="text-zinc-200">|</span>
             <a href="#" class="hover:underline">New youth academy opens this weekend</a>
@@ -109,7 +139,7 @@
         </div>
     </div>
 
-    <main class="max-w-[1400px] mx-auto px-6 py-8">
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
         @yield('content')
     </main>
 
