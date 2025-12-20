@@ -28,9 +28,13 @@ class AppServiceProvider extends ServiceProvider
                 $defaults = [
                     'site_name' => 'LOCAL CHAMPIONSHIP',
                     'site_short_name' => 'LC',
+                    'contact_email' => 'admin@tournament.com',
                     'primary_color' => '#3d195b',
                     'secondary_color' => '#00ff85',
                     'accent_color' => '#ff005a',
+                    'current_season' => date('Y'),
+                    'footer_text' => 'Local Community Football Championship. Built with Laravel. Not affiliated with the Premier League.',
+                    'copyright_text' => '© ' . date('Y') . ' Local Community Football Championship.',
                 ];
 
                 $siteSettings = array_merge($defaults, $siteSettings);
