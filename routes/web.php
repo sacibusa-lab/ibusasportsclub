@@ -92,6 +92,16 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::delete('/{id}', [\App\Http\Controllers\Admin\AdminInterviewController::class, 'destroy'])->name('destroy');
     });
 
+    // Admin Stories Routes
+    Route::prefix('stories')->name('stories.')->group(function() {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminStoryController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\AdminStoryController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Admin\AdminStoryController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\AdminStoryController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\AdminStoryController::class, 'destroy'])->name('destroy');
+        Route::delete('/items/{id}', [\App\Http\Controllers\Admin\AdminStoryController::class, 'destroyItem'])->name('items.destroy');
+    });
+
     // Admin Settings Routes
     Route::get('/settings', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings.index');
     Route::put('/settings', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('settings.update');

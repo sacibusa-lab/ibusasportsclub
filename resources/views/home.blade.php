@@ -1,6 +1,10 @@
 @extends('layout')
 
 @section('content')
+@if(count($stories) > 0)
+    @include('components.stories')
+@endif
+
 <!-- Upcoming Matches Carousel (Full Width) -->
 <div class="col-span-12 mb-8 -mx-4 sm:mx-0">
     <h2 class="text-xl md:text-2xl font-black text-primary uppercase tracking-tighter mb-6 px-4 sm:px-0">Next Matches</h2>

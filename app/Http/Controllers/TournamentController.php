@@ -11,6 +11,8 @@ use App\Services\TournamentService;
 use App\Services\StatisticsService;
 use Illuminate\Http\Request;
 
+use App\Models\Story;
+
 class TournamentController extends Controller
 {
     protected $tournamentService;
@@ -37,7 +39,15 @@ class TournamentController extends Controller
             ->limit(4)
             ->get();
 
-        return view('home', compact('upcomingMatch', 'upcomingMatches', 'latestResult', 'heroPost', 'trendingPosts'));
+        $stories = Story::with('items')
+            ->where('is_active', true)
+            ->where(function($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('home', compact('upcomingMatch', 'upcomingMatches', 'latestResult', 'heroPost', 'trendingPosts', 'stories'));
     }
 
     public function table()
