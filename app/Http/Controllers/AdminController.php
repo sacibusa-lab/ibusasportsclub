@@ -30,7 +30,7 @@ class AdminController extends Controller
     public function teams()
     {
         $groups = Group::all();
-        $teams = Team::all();
+        $teams = Team::with('players')->get();
         return view('admin.teams', compact('groups', 'teams'));
     }
 
