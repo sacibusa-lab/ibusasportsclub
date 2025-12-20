@@ -3,7 +3,7 @@
 @section('title', $match->homeTeam->name . ' vs ' . $match->awayTeam->name)
 
 @section('content')
-<div x-data="{ tab: 'recap' }" class="max-w-4xl mx-auto space-y-6 md:space-y-8 pb-24">
+<div x-data="{ tab: 'recap' }" class="max-w-6xl mx-auto space-y-6 md:space-y-8 pb-24">
     <!-- Breadcrumbs -->
     <nav class="flex text-[9px] md:text-[10px] font-bold text-zinc-400 uppercase tracking-widest gap-2 overflow-x-auto no-scrollbar whitespace-nowrap px-4 md:px-0">
         <a href="{{ route('home') }}" class="hover:text-primary transition">Home</a>
@@ -196,8 +196,8 @@
                     </div>
 
                     <!-- Row-Based Green Horizontal Pitch -->
-                <div class="relative bg-white border border-zinc-200 rounded-3xl md:rounded-[2.5rem] overflow-x-auto no-scrollbar shadow-2xl mb-8 md:mb-12 p-2 md:p-4">
-                    <div class="relative aspect-[4/3] md:aspect-video min-w-[500px] md:min-w-0 bg-emerald-600 rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-emerald-500 overflow-hidden shadow-inner">
+                <div class="relative bg-white border border-zinc-200 rounded-3xl md:rounded-[1.5rem] overflow-x-auto no-scrollbar shadow-2xl mb-8 md:mb-12 p-2 md:p-4">
+                    <div class="relative aspect-[4/3] md:aspect-[16/10] min-w-[500px] md:min-w-0 bg-emerald-600 rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-emerald-500 overflow-hidden shadow-inner">
                         <!-- Field Markings -->
                         <div class="absolute inset-0 pointer-events-none opacity-20">
                             <div class="absolute inset-2 md:inset-4 border-2 border-white rounded-xl md:rounded-2xl"></div>

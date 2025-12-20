@@ -68,6 +68,17 @@
 
             <div class="grid grid-cols-2 gap-8">
                 <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Matchday</label>
+                    <input type="number" name="matchday" value="{{ $match->matchday }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="e.g. 1">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Broadcaster Logo URL</label>
+                    <input type="text" name="broadcaster_logo" value="{{ $match->broadcaster_logo }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="https://example.com/logo.png">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8">
+                <div class="space-y-2">
                     <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Referee</label>
                     <input type="text" name="referee" value="{{ $match->referee }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="Who is the Ref?">
                 </div>

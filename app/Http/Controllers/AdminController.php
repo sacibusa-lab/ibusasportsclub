@@ -224,6 +224,8 @@ class AdminController extends Controller
             'away_team_id' => 'required|exists:teams,id',
             'match_date' => 'required|date',
             'venue' => 'nullable|string',
+            'matchday' => 'nullable|integer|min:0',
+            'broadcaster_logo' => 'nullable|string',
             'stage' => 'required|in:group,semifinal,final,novelty',
             'status' => 'required|in:upcoming,finished',
             'home_score' => 'nullable|integer|min:0',
@@ -261,6 +263,8 @@ class AdminController extends Controller
             'away_team_id' => $request->away_team_id,
             'match_date' => $request->match_date,
             'venue' => $request->venue,
+            'matchday' => $request->matchday,
+            'broadcaster_logo' => $request->broadcaster_logo,
             'stage' => $request->stage,
             'group_id' => $request->stage === 'group' ? $homeTeam->group_id : null,
             'status' => $request->status,
@@ -290,31 +294,28 @@ class AdminController extends Controller
             'attendance' => $request->attendance,
         ]);
 
-        // Process Lineups (Robust Laravel-only Approach)
-        $syncData = [];
-        $positions = self::$pitchPositions;
-
+        // Process Lineups
         if ($request->has('lineup')) {
+            $syncData = [];
+            $positions = self::$pitchPositions;
+
             foreach ($request->lineup as $playerId => $data) {
                 if ($data['status'] === 'start' || $data['status'] === 'sub') {
                     $isSub = $data['status'] === 'sub';
                     $posKey = $data['position'] ?? null;
                     $coords = ($posKey && isset($positions[$posKey])) ? $positions[$posKey] : ['x' => null, 'y' => null];
                     
-                    // Scale and Offset X for own-half rendering
                     $player = \App\Models\Player::find($playerId);
                     if ($coords['x']) {
                         if ($player && (string)$player->team_id === (string)$request->home_team_id) {
-                            // Home team: 0% to 45% (Left half)
                             $coords['x'] = $coords['x'] * 0.45;
                         } else {
-                            // Away team: 55% to 100% (Right half, flipped)
                             $coords['x'] = 100 - ($coords['x'] * 0.45);
                         }
                     }
 
                     $syncData[$playerId] = [
-                        'team_id' => $player->team_id ?? ($playerId % 2 == 0 ? $request->home_team_id : $request->away_team_id), // Fallback safety
+                        'team_id' => $player->team_id ?? ($playerId % 2 == 0 ? $request->home_team_id : $request->away_team_id),
                         'is_substitute' => $isSub,
                         'position_x' => $coords['x'],
                         'position_y' => $coords['y'],
@@ -322,10 +323,9 @@ class AdminController extends Controller
                     ];
                 }
             }
-        }
-
-        if (!empty($syncData)) {
+            // Always sync even if empty, to allow clearing
             $match->lineups()->sync($syncData);
+
         } elseif ($request->lineups_json) {
             $lineups = json_decode($request->lineups_json, true);
             $syncData = [];
@@ -347,7 +347,7 @@ class AdminController extends Controller
             $this->tournamentService->updateStandings($match->group);
         }
 
-        return redirect()->route('admin.fixtures')->with('success', 'Fixture updated successfully.');
+        return back()->with('success', 'Fixture updated successfully.');
     }
 
     public function destroyFixture($id)
