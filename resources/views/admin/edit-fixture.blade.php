@@ -108,10 +108,10 @@
                                             $savedX = $pLineup->pivot->position_x ?? null;
                                             $savedY = $pLineup->pivot->position_y ?? null;
                                             
-                                            // Identify position from coords for selection
-                                            $currentPos = 'GK'; // Default if GK coords
+                                            // Identify position from coords for selection (Using new 0.45 scaling)
+                                            $currentPos = 'GK';
                                             foreach($positions as $key => $coords) {
-                                                if ($coords['x'] == $savedX && $coords['y'] == $savedY) { $currentPos = $key; break; }
+                                                if (round($coords['x'] * 0.45, 1) == round($savedX, 1) && $coords['y'] == $savedY) { $currentPos = $key; break; }
                                             }
                                         @endphp
                                         <tr class="group hover:bg-white transition">
@@ -170,10 +170,10 @@
                                             $savedX = $pLineup->pivot->position_x ?? null;
                                             $savedY = $pLineup->pivot->position_y ?? null;
                                             
-                                            // Identify position from coords (Reverse mapping for away team means 100-x)
+                                            // Identify position from coords (Reverse mapping for away team using 0.45 scaling)
                                             $currentPos = 'GK';
                                             foreach($positions as $key => $coords) {
-                                                if ((100 - $coords['x']) == $savedX && $coords['y'] == $savedY) { $currentPos = $key; break; }
+                                                if (round(100 - ($coords['x'] * 0.45), 1) == round($savedX, 1) && $coords['y'] == $savedY) { $currentPos = $key; break; }
                                             }
                                         @endphp
                                         <tr class="group hover:bg-white transition">

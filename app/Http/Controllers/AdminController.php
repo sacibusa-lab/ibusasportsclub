@@ -301,10 +301,16 @@ class AdminController extends Controller
                     $posKey = $data['position'] ?? null;
                     $coords = ($posKey && isset($positions[$posKey])) ? $positions[$posKey] : ['x' => null, 'y' => null];
                     
-                    // Flip X for away team (Horizontal Pitch)
+                    // Scale and Offset X for own-half rendering
                     $player = \App\Models\Player::find($playerId);
-                    if ($player && (string)$player->team_id === (string)$request->away_team_id && $coords['x']) {
-                        $coords['x'] = 100 - $coords['x'];
+                    if ($coords['x']) {
+                        if ($player && (string)$player->team_id === (string)$request->home_team_id) {
+                            // Home team: 0% to 45% (Left half)
+                            $coords['x'] = $coords['x'] * 0.45;
+                        } else {
+                            // Away team: 55% to 100% (Right half, flipped)
+                            $coords['x'] = 100 - ($coords['x'] * 0.45);
+                        }
                     }
 
                     $syncData[$playerId] = [
