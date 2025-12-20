@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Local Tournament')</title>
+    @if(isset($siteSettings['favicon']))
+    <link rel="icon" href="{{ $siteSettings['favicon'] }}" type="image/x-icon">
+    @endif
     <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -180,8 +183,9 @@
     @endif
 
     <footer class="bg-zinc-900 text-zinc-500 py-12 mt-20">
-        <div class="max-w-6xl mx-auto px-4 text-center text-sm">
-            <p>© 2025 Local Community Football Championship. Built with Laravel. Not affiliated with the Premier League.</p>
+        <div class="max-w-6xl mx-auto px-4 text-center text-sm space-y-4">
+            <p>{{ $siteSettings['footer_text'] }}</p>
+            <p class="text-zinc-600 text-[11px] font-bold uppercase tracking-widest">{{ $siteSettings['copyright_text'] }}</p>
         </div>
     </footer>
 </body>

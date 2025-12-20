@@ -29,6 +29,8 @@ class AdminSettingsController extends Controller
             'secondary_color' => '#00ff85',
             'accent_color' => '#ff005a',
             'current_season' => date('Y'),
+            'footer_text' => 'Local Community Football Championship. Built with Laravel. Not affiliated with the Premier League.',
+            'copyright_text' => '© ' . date('Y') . ' Local Community Football Championship.',
         ];
 
         foreach ($defaults as $key => $value) {
@@ -42,15 +44,18 @@ class AdminSettingsController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->except(['_token', '_method', 'site_logo']);
+        $data = $request->except(['_token', '_method', 'site_logo', 'favicon', 'site_icon']);
 
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
-        if ($request->hasFile('site_logo')) {
-            $logoUrl = $this->imageService->upload($request->file('site_logo'), 'branding');
-            Setting::updateOrCreate(['key' => 'site_logo'], ['value' => $logoUrl]);
+        $imageFields = ['site_logo', 'favicon', 'site_icon'];
+        foreach ($imageFields as $field) {
+            if ($request->hasFile($field)) {
+                $url = $this->imageService->upload($request->file($field), 'branding');
+                Setting::updateOrCreate(['key' => $field], ['value' => $url]);
+            }
         }
 
         return back()->with('success', 'Settings updated successfully.');

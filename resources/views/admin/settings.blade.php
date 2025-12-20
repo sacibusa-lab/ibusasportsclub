@@ -91,7 +91,57 @@
             </div>
         </div>
 
-        <div class="flex items-center justify-end gap-4 pt-4">
+        <!-- Files & Icons -->
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
+            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-8 border-b border-zinc-50 pb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Files & Icons
+            </h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">Favicon (.ico or .png)</label>
+                    <div class="flex items-center gap-4">
+                        @if(isset($settings['favicon']))
+                        <div class="w-12 h-12 bg-zinc-50 rounded-xl border border-zinc-100 flex items-center justify-center p-2">
+                            <img src="{{ $settings['favicon'] }}" class="max-w-full max-h-full object-contain">
+                        </div>
+                        @endif
+                        <input type="file" name="favicon" class="flex-1 bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary text-[10px]" accept="image/x-icon,image/png">
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">Site Icon (Small App Icon)</label>
+                    <div class="flex items-center gap-4">
+                        @if(isset($settings['site_icon']))
+                        <div class="w-12 h-12 bg-zinc-50 rounded-xl border border-zinc-100 flex items-center justify-center p-2">
+                            <img src="{{ $settings['site_icon'] }}" class="max-w-full max-h-full object-contain">
+                        </div>
+                        @endif
+                        <input type="file" name="site_icon" class="flex-1 bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary text-[10px]" accept="image/*">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer & Legal -->
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
+            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-8 border-b border-zinc-50 pb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                Footer & Legal
+            </h3>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">Footer Description</label>
+                    <textarea name="footer_text" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs h-24">{{ $settings['footer_text'] }}</textarea>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">Copyright Text</label>
+                    <input type="text" name="copyright_text" value="{{ $settings['copyright_text'] }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-4 pt-4 pb-12">
             <button type="submit" class="bg-primary text-secondary font-black px-12 py-5 rounded-2xl hover:bg-primary-light transition uppercase tracking-widest text-xs shadow-xl flex items-center gap-3">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 Publish Changes
