@@ -1,3 +1,4 @@
+@extends('layout')
 @section('content')
 <!-- Premium PL Header -->
 <div class="relative overflow-hidden bg-primary mb-8 -mx-4 sm:-mx-6 md:-mx-12">
@@ -11,6 +12,7 @@
 
 <div class="max-w-[1400px] mx-auto space-y-8 md:space-y-12 pb-12 md:pb-24">
     
+
     <!-- Filter Bar Emulation -->
     <div class="flex flex-wrap items-center gap-2 md:gap-3 bg-white p-3 md:p-4 rounded-xl border border-zinc-100 shadow-sm">
         <div class="px-3 py-1.5 md:px-4 md:py-2 bg-zinc-50 rounded-lg border border-zinc-200 text-[9px] md:text-[11px] font-black text-primary uppercase tracking-widest flex items-center gap-2 cursor-pointer hover:bg-zinc-100 transition">
@@ -28,7 +30,7 @@
     <div class="space-y-4 md:space-y-6">
         <h2 class="text-xl md:text-2xl font-black text-primary uppercase italic tracking-tighter border-l-4 border-secondary pl-4">{{ $groupName }}</h2>
         
-        <div class="relative group">
+        <div class="relative">
             <!-- Scroll Indicator Mobile -->
             <div class="md:hidden absolute -top-4 right-0 flex items-center gap-1 text-[8px] font-black text-zinc-300 uppercase tracking-widest">
                 <span>Scroll</span>
