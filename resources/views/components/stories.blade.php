@@ -248,8 +248,11 @@
                                 </p>
                             </div>
                         </template>
-                        
-                         <template x-if="groups[groupIndex]?.link_url || groups[groupIndex]?.items[itemIndex]?.link_url">
+                    </div>
+
+                    <!-- Story Link -->
+                    <div class="absolute bottom-0 left-0 right-0 p-8 z-[115]">
+                        <template x-if="groups[groupIndex]?.link_url || groups[groupIndex]?.items[itemIndex]?.link_url">
                             <div class="flex flex-col items-center gap-4">
                                 <a :href="groups[groupIndex]?.link_url || groups[groupIndex]?.items[itemIndex]?.link_url" target="_blank" class="w-full bg-[#0066FF] text-white font-black py-4 rounded-xl uppercase text-[11px] tracking-widest hover:bg-white hover:text-[#0066FF] transition duration-300 shadow-2xl flex items-center justify-center gap-2">
                                     <span>Read More Here!</span>
