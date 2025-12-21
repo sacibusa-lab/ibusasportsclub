@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
-        <form action="{{ route('admin.news.update', $post->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form id="articleForm" action="{{ route('admin.news.update', $post->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
             
@@ -48,7 +48,10 @@
 
             <div class="space-y-2">
                 <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Content</label>
-                <textarea name="content" rows="12" class="w-full bg-zinc-50 border border-zinc-100 p-6 rounded-2xl font-medium text-zinc-700 focus:ring-2 focus:ring-primary outline-none transition text-sm leading-relaxed" placeholder="Write article content here..." required>{{ $post->content }}</textarea>
+                <div class="bg-zinc-50 rounded-2xl border border-zinc-100 overflow-hidden">
+                    <input type="hidden" name="content" id="contentInput">
+                    <div id="editor" class="min-h-[400px] bg-zinc-50 font-medium text-zinc-700 text-sm leading-relaxed">{!! $post->content !!}</div>
+                </div>
             </div>
 
             <div class="space-y-2">
@@ -82,4 +85,61 @@
         </form>
     </div>
 </div>
+
+@push('styles')
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-toolbar.ql-snow {
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        border-bottom: 1px solid #f4f4f5;
+        background: #fafafa;
+        padding: 12px;
+    }
+    .ql-container.ql-snow {
+        border: none;
+        font-family: inherit;
+    }
+    .ql-editor {
+        min-height: 400px;
+        font-size: 14px;
+        color: #3f3f46;
+    }
+    .ql-editor.ql-blank::before {
+        color: #a1a1aa;
+        font-style: normal;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    var quill = new Quill('#editor', {
+        theme: 'snow',
+        placeholder: 'Write article content here...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link'],
+                ['clean']
+            ]
+        }
+    });
+
+    document.getElementById('articleForm').onsubmit = function() {
+        var content = document.querySelector('input[name=content]');
+        content.value = quill.root.innerHTML;
+        
+        if (quill.getText().trim().length === 0) {
+            alert('Please enter some content for the article.');
+            return false;
+        }
+    };
+</script>
+@endpush
 @endsection

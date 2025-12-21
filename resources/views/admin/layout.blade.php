@@ -39,6 +39,7 @@
             }
         }
     </script>
+    @stack('styles')
 </head>
 <body class="antialiased bg-zinc-100 flex min-h-screen">
     
@@ -161,5 +162,6 @@
         @yield('content')
     </main>
 
+    @stack('scripts')
 </body>
 </html>

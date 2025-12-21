@@ -30,9 +30,34 @@
         </div>
         @endif
 
-        <div class="prose prose-zinc prose-lg max-w-none text-zinc-600 font-medium leading-loose">
-            {!! nl2br(e($post->content)) !!}
+        <div class="prose prose-zinc prose-lg max-w-none text-zinc-600 font-medium leading-loose news-content">
+            {!! $post->content !!}
         </div>
+
+        <style>
+            .news-content h1, .news-content h2, .news-content h3 {
+                color: var(--primary);
+                font-weight: 900;
+                text-transform: uppercase;
+                letter-spacing: -0.05em;
+                margin-top: 2rem;
+                margin-bottom: 1rem;
+                font-style: italic;
+            }
+            .news-content h1 { font-size: 2.25rem; }
+            .news-content h2 { font-size: 1.875rem; }
+            .news-content h3 { font-size: 1.5rem; }
+            .news-content p { margin-bottom: 1.5rem; }
+            .news-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+            .news-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1.5rem; }
+            .news-content blockquote {
+                border-left: 4px solid var(--secondary);
+                padding-left: 1.5rem;
+                font-style: italic;
+                color: var(--primary);
+                margin: 2rem 0;
+            }
+        </style>
 
         @if($post->match)
         <div class="bg-white rounded-[2rem] p-8 shadow-xl border border-zinc-100 space-y-6 relative overflow-hidden group">
