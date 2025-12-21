@@ -64,23 +64,43 @@ class AdminSettingsController extends Controller
     public function fixStorage()
     {
         try {
-            // Attempt standard link
-            \Illuminate\Support\Facades\Artisan::call('storage:link');
-            $message = \Illuminate\Support\Facades\Artisan::output();
+            $message = "";
+            $publicStorage = public_path('storage');
+            
+            // 1. Remove existing link/folder if it exists
+            if (file_exists($publicStorage) || is_link($publicStorage)) {
+                if (is_link($publicStorage)) {
+                    unlink($publicStorage);
+                    $message .= "Removed existing symlink. ";
+                } else {
+                    // It's a directory, might be a failed upload or manual copy
+                    \Illuminate\Support\Facades\File::deleteDirectory($publicStorage);
+                    $message .= "Removed existing storage directory. ";
+                }
+            }
 
-            // Additional manual check for cPanel public_html
+            // 2. Attempt standard link
+            \Illuminate\Support\Facades\Artisan::call('storage:link');
+            $message .= \Illuminate\Support\Facades\Artisan::output();
+
+            // 3. Additional manual check for cPanel public_html (if different from public_path)
             $publicHtml = base_path('../public_html/storage');
             $storagePath = storage_path('app/public');
 
-            if (is_dir(base_path('../public_html')) && !file_exists($publicHtml)) {
+            if (is_dir(base_path('../public_html')) && public_path() !== base_path('../public_html')) {
+                if (file_exists($publicHtml) || is_link($publicHtml)) {
+                    if (is_link($publicHtml)) unlink($publicHtml);
+                    else \Illuminate\Support\Facades\File::deleteDirectory($publicHtml);
+                }
+                
                 if (symlink($storagePath, $publicHtml)) {
                     $message .= " | Created symlink for public_html/storage";
                 }
             }
 
-            return back()->with('success', 'Storage link attempt completed: ' . $message);
+            return back()->with('success', 'Storage link reset completed: ' . $message);
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to link storage: ' . $e->getMessage());
+            return back()->with('error', 'Failed to reset storage link: ' . $e->getMessage());
         }
     }
 }
