@@ -45,7 +45,8 @@
                             <option value="GK">Goalkeeper (GK)</option>
                             <option value="DEF">Defender (DEF)</option>
                             <option value="MID">Midfielder (MID)</option>
-                            <option value="FWD" selected>Forward (FWD)</option>
+                            <option value="FWD">Forward (FWD)</option>
+                            <option value="CF" selected>Center Forward (CF)</option>
                         </select>
                     </div>
 
@@ -100,7 +101,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="text-[9px] font-black px-2 py-1 rounded {{ $player->position === 'GK' ? 'bg-yellow-100 text-yellow-700' : ($player->position === 'FWD' ? 'bg-red-100 text-red-700' : 'bg-primary/10 text-primary') }} uppercase tracking-widest">{{ $player->position }}</span>
+                                <span class="text-[9px] font-black px-2 py-1 rounded {{ $player->position === 'GK' ? 'bg-yellow-100 text-yellow-700' : (in_array($player->position, ['FWD', 'CF']) ? 'bg-red-100 text-red-700' : 'bg-primary/10 text-primary') }} uppercase tracking-widest">{{ $player->position }}</span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="text-xs font-bold text-zinc-500 uppercase tracking-tighter">{{ $player->team->name }}</span>
@@ -160,6 +161,7 @@
                         <option value="DEF">Defender (DEF)</option>
                         <option value="MID">Midfielder (MID)</option>
                         <option value="FWD">Forward (FWD)</option>
+                        <option value="CF">Center Forward (CF)</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-2 gap-4">

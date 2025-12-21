@@ -458,6 +458,87 @@
                         sub.style.display = 'none';
                     }
                 }
+
+                document.getElementById('matchEventForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const form = this;
+                    const formData = new FormData(form);
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.textContent;
+
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Adding Event...';
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Add row to table
+                            const tbody = document.getElementById('eventsTimelineBody');
+                            const event = data.event;
+                            
+                            // Remove empty row if exists
+                            const emptyRow = tbody.querySelector('.italic');
+                            if (emptyRow) emptyRow.closest('tr').remove();
+
+                            const newRow = `
+                                <tr class="text-[11px] font-bold text-primary animate-fade-in transition bg-emerald-50/30">
+                                    <td class="px-6 py-3">${event.minute}'</td>
+                                    <td class="px-6 py-3">
+                                        <span class="uppercase tracking-tighter">${event.type}</span>
+                                    </td>
+                                    <td class="px-6 py-3 uppercase">${event.team}</td>
+                                    <td class="px-6 py-3 flex items-center gap-2">
+                                        ${event.player_image 
+                                            ? `<img src="${event.player_image}" class="w-6 h-6 rounded-full object-cover border border-zinc-100">`
+                                            : `<div class="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center text-[8px] text-zinc-400 uppercase">${event.initial}</div>`
+                                        }
+                                        <div class="flex flex-col">
+                                            <span>${event.player_name}</span>
+                                            ${event.extra ? `<span class="text-[8px] text-zinc-400">${event.extra}</span>` : ''}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-3 text-right">
+                                        <form action="${event.delete_url}" method="POST" onsubmit="return confirm('Remove this event?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-accent hover:text-red-700 transition">✕</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            `;
+                            
+                            tbody.insertAdjacentHTML('afterbegin', newRow);
+                            
+                            // Clear inputs
+                            form.reset();
+                            updateEventFields(document.getElementById('eventTypeSelector').value);
+                            
+                            // Show toast or alert
+                            const alert = document.createElement('div');
+                            alert.className = "fixed bottom-8 right-8 bg-primary text-secondary px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl z-[100] animate-bounce";
+                            alert.textContent = "Event Added Successfully!";
+                            document.body.appendChild(alert);
+                            setTimeout(() => alert.remove(), 3000);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Something went wrong. Please try again.');
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalBtnText;
+                    });
+                });
+
                 // Initial call to set correct state
                 document.addEventListener('DOMContentLoaded', () => {
                     updateEventFields(document.getElementById('eventTypeSelector').value);
@@ -475,7 +556,7 @@
                             <th class="px-6 py-3 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-50">
+                <tbody id="eventsTimelineBody" class="divide-y divide-zinc-50">
                         @forelse($match->matchEvents as $event)
                         <tr class="text-[11px] font-bold text-primary">
                             <td class="px-6 py-3">{{ $event->minute }}'</td>

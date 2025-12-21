@@ -30,7 +30,7 @@ class AdminPlayerController extends Controller
             'team_id' => 'required|exists:teams,id',
             'players' => 'required|array|min:1',
             'players.*.name' => 'required|string|max:255',
-            'players.*.position' => 'required|in:GK,DEF,MID,FWD',
+            'players.*.position' => 'required|in:GK,DEF,MID,FWD,CF',
             'players.*.shirt_number' => 'nullable|integer|min:1|max:99',
             'players.*.image' => 'nullable|image|max:2048',
             'players.*.full_image' => 'nullable|image|max:3072',
@@ -65,7 +65,7 @@ class AdminPlayerController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'team_id' => 'required|exists:teams,id',
-            'position' => 'required|in:GK,DEF,MID,FWD',
+            'position' => 'required|in:GK,DEF,MID,FWD,CF',
             'shirt_number' => 'nullable|integer|min:1|max:99',
             'image' => 'nullable|image|max:2048',
             'full_image' => 'nullable|image|max:3072',

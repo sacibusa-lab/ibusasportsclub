@@ -207,6 +207,7 @@ class AdminController extends Controller
         'RW'   => ['x' => 85, 'y' => 80],
         'ST1'  => ['x' => 85, 'y' => 38],
         'ST2'  => ['x' => 85, 'y' => 62],
+        'CF'   => ['x' => 92, 'y' => 50],
     ];
 
     public function editFixture($id)
@@ -396,7 +397,7 @@ class AdminController extends Controller
             $imageUrl = $imageUrl ?? $player->image_url;
         }
 
-        MatchEvent::create([
+        $event = MatchEvent::create([
             'match_id' => $matchId,
             'team_id' => $request->team_id,
             'player_id' => $request->player_id,
@@ -407,6 +408,28 @@ class AdminController extends Controller
             'event_type' => $request->event_type,
             'minute' => $request->minute,
         ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Event added successfully.',
+                'event' => [
+                    'id' => $event->id,
+                    'minute' => $event->minute,
+                    'type' => str_replace('_', ' ', $event->event_type),
+                    'team' => $event->team->name,
+                    'player_name' => $event->player_name,
+                    'player_image' => $event->player_image_url ?: null,
+                    'initial' => substr($event->player_name, 0, 1),
+                    'extra' => $event->event_type == 'goal' && $event->assistant 
+                                ? 'assist: ' . $event->assistant->name 
+                                : ($event->event_type == 'sub_on' && $event->relatedPlayer 
+                                    ? 'replacing: ' . $event->relatedPlayer->name 
+                                    : null),
+                    'delete_url' => route('admin.events.destroy', $event->id)
+                ]
+            ]);
+        }
 
         return back()->with('success', 'Event added successfully.');
     }
