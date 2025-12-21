@@ -16,7 +16,7 @@ class MatchModel extends Model
         'home_score', 'away_score', 'match_date', 'venue', 'broadcaster_logo', 'status',
         'home_possession', 'away_possession', 'home_shots', 'away_shots',
         'home_corners', 'away_corners', 'home_offsides', 'away_offsides',
-        'home_fouls', 'away_fouls', 'home_throw_ins', 'away_throw_ins',
+        'home_fouls', 'away_fouls', 'home_free_kicks', 'away_free_kicks', 'home_throw_ins', 'away_throw_ins',
         'home_saves', 'away_saves', 'home_goal_kicks', 'away_goal_kicks',
         'home_scorers', 'away_scorers', 'report', 'motm_player_id',
         'referee', 'attendance'

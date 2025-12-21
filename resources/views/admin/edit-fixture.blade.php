@@ -257,6 +257,10 @@
                             <input type="number" name="home_fouls" value="{{ $match->home_fouls }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
                         </div>
                         <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Free Kicks</label>
+                            <input type="number" name="home_free_kicks" value="{{ $match->home_free_kicks }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
                             <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Throw-ins</label>
                             <input type="number" name="home_throw_ins" value="{{ $match->home_throw_ins }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
                         </div>
@@ -298,6 +302,10 @@
                         <div class="space-y-1">
                             <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Fouls</label>
                             <input type="number" name="away_fouls" value="{{ $match->away_fouls }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Free Kicks</label>
+                            <input type="number" name="away_free_kicks" value="{{ $match->away_free_kicks }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
                         </div>
                         <div class="space-y-1">
                             <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Throw-ins</label>

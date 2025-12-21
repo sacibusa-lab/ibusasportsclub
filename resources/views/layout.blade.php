@@ -47,6 +47,9 @@
             animation: gradient-xy 15s ease infinite;
         }
     </style>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>
 <body class="antialiased min-h-screen" style="background-color: #e5e7eb;" x-data="{ mobileMenuOpen: false }">
     <!-- Top Utility Bar -->

@@ -122,17 +122,27 @@
                     <div class="w-3 md:w-4 h-4 md:h-5 bg-yellow-400 rounded-sm shadow-sm rotate-6"></div>
                     @elseif($event->event_type === 'red_card')
                     <div class="w-3 md:w-4 h-4 md:h-5 bg-red-600 rounded-sm shadow-sm rotate-6"></div>
-                    @elseif($event->event_type === 'substitution')
+                    @elseif($event->event_type === 'sub_on')
                     <div class="flex flex-col items-end">
                         <div class="flex items-center gap-2">
                              <span class="text-[10px] text-emerald-500 font-bold">IN</span>
                              <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
-                             <div class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-emerald-500 text-sm md:text-base">⬆</div>
+                             <div class="w-4 h-4 md:w-5 md:h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px]">⬆</div>
                         </div>
+                        @if($event->relatedPlayer)
                         <div class="flex items-center gap-2 mt-0.5">
-                             <span class="text-[9px] text-zinc-400 font-bold italic">{{ $event->relatedPlayer->name ?? 'Unknown' }}</span>
+                             <span class="text-[9px] text-zinc-400 font-bold italic">{{ $event->relatedPlayer->name }}</span>
                              <span class="text-[9px] text-rose-500 font-bold">OUT</span>
-                             <div class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-rose-500 text-sm md:text-base">⬇</div>
+                             <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
+                        </div>
+                        @endif
+                    </div>
+                    @elseif($event->event_type === 'sub_off' && !$match->matchEvents->where('event_type', 'sub_on')->where('minute', $event->minute)->where('team_id', $event->team_id)->first())
+                    <div class="flex flex-col items-end">
+                         <div class="flex items-center gap-2">
+                             <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
+                             <span class="text-[10px] text-rose-500 font-bold">OUT</span>
+                             <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
                         </div>
                     </div>
                     @endif
@@ -153,17 +163,27 @@
                     <div class="w-3 md:w-4 h-4 md:h-5 bg-yellow-400 rounded-sm shadow-sm -rotate-6"></div>
                     @elseif($event->event_type === 'red_card')
                     <div class="w-3 md:w-4 h-4 md:h-5 bg-red-600 rounded-sm shadow-sm -rotate-6"></div>
-                    @elseif($event->event_type === 'substitution')
+                    @elseif($event->event_type === 'sub_on')
                     <div class="flex flex-col items-start">
                         <div class="flex items-center gap-2">
-                             <div class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-emerald-500 text-sm md:text-base">⬆</div>
+                             <div class="w-4 h-4 md:w-5 md:h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px]">⬆</div>
                              <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
                              <span class="text-[10px] text-emerald-500 font-bold">IN</span>
                         </div>
+                        @if($event->relatedPlayer)
                         <div class="flex items-center gap-2 mt-0.5">
-                             <div class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-rose-500 text-sm md:text-base">⬇</div>
+                             <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
                              <span class="text-[9px] text-rose-500 font-bold">OUT</span>
-                             <span class="text-[9px] text-zinc-400 font-bold italic">{{ $event->relatedPlayer->name ?? 'Unknown' }}</span>
+                             <span class="text-[9px] text-zinc-400 font-bold italic">{{ $event->relatedPlayer->name }}</span>
+                        </div>
+                        @endif
+                    </div>
+                    @elseif($event->event_type === 'sub_off' && !$match->matchEvents->where('event_type', 'sub_on')->where('minute', $event->minute)->where('team_id', $event->team_id)->first())
+                    <div class="flex flex-col items-start">
+                         <div class="flex items-center gap-2">
+                             <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
+                             <span class="text-[10px] text-rose-500 font-bold">OUT</span>
+                             <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
                         </div>
                     </div>
                     @else
@@ -198,7 +218,7 @@
     </div>
 
     <!-- LINEUPS TAB -->
-    <div x-show="tab === 'lineups'">
+    <div x-show="tab === 'lineups'" x-cloak>
         @php
             $eventsByPlayer = $match->matchEvents->groupBy('player_id');
             $homeStartingXI = $match->lineups->where('pivot.team_id', $match->home_team_id)->where('pivot.is_substitute', false);
@@ -287,7 +307,7 @@
                                     <div class="text-center">
                                         <div class="flex flex-col items-center">
                                             <span class="text-[7px] md:text-[8px] font-black text-white/60 leading-none">#{{ $player->pivot->shirt_number ?? $player->shirt_number }}</span>
-                                            <span class="text-[8px] md:text-[10px] font-black text-white uppercase tracking-tighter drop-shadow-md">{{ Str::afterLast($player->name, ' ') }}</span>
+                                            <span class="text-[8px] md:text-[10px] font-black text-white uppercase tracking-tighter drop-shadow-md">{{ \Illuminate\Support\Str::afterLast($player->name, ' ') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -524,25 +544,27 @@
             </div>
         </div>
     </div>
+</div>
+</div>
 
     <!-- STATS TAB -->
-    <div x-show="tab === 'stats'">
+    <div x-show="tab === 'stats'" x-cloak>
         <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-6 md:p-8 space-y-6 md:space-y-10">
             <h3 class="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest border-b border-zinc-50 pb-4">Match Statistics</h3>
             
             @php
                 $stats = [
-                    ['Possession', 'home_possession', 'away_possession', '%'],
-                    ['Shots', 'home_shots', 'away_shots', ''],
-                    ['Offside', 'home_offsides', 'away_offsides', ''],
-                    ['Corner', 'home_corners', 'away_corners', ''],
-                    ['Throw-ins', 'home_throw_ins', 'away_throw_ins', ''],
-                    ['Fouls', 'home_fouls', 'away_fouls', ''],
-                    // Using Fouls as a base for Free Kicks since they are often missing in basic stats
-                    ['Goal-Kicks', 'home_goal_kicks', 'away_goal_kicks', ''],
-                    ['Saves', 'home_saves', 'away_saves', ''],
-                    ['Yellow Cards', function($m) { return $m->matchEvents->where('event_type', 'yellow_card')->where('team_id', $m->home_team_id)->count(); }, function($m) { return $m->matchEvents->where('event_type', 'yellow_card')->where('team_id', $m->away_team_id)->count(); }, ''],
-                    ['Red Cards', function($m) { return $m->matchEvents->where('event_type', 'red_card')->where('team_id', $m->home_team_id)->count(); }, function($m) { return $m->matchEvents->where('event_type', 'red_card')->where('team_id', $m->away_team_id)->count(); }, ''],
+                    ['Possession', $match->home_possession, $match->away_possession, '%'],
+                    ['Shots', $match->home_shots, $match->away_shots, ''],
+                    ['Offside', $match->home_offsides, $match->away_offsides, ''],
+                    ['Corner', $match->home_corners, $match->away_corners, ''],
+                    ['Free Kicks', $match->home_free_kicks, $match->away_free_kicks, ''],
+                    ['Throw-ins', $match->home_throw_ins, $match->away_throw_ins, ''],
+                    ['Fouls', $match->home_fouls, $match->away_fouls, ''],
+                    ['Goal-Kicks', $match->home_goal_kicks, $match->away_goal_kicks, ''],
+                    ['Saves', $match->home_saves, $match->away_saves, ''],
+                    ['Yellow Cards', $match->matchEvents->where('event_type', 'yellow_card')->where('team_id', $match->home_team_id)->count(), $match->matchEvents->where('event_type', 'yellow_card')->where('team_id', $match->away_team_id)->count(), ''],
+                    ['Red Cards', $match->matchEvents->where('event_type', 'red_card')->where('team_id', $match->home_team_id)->count(), $match->matchEvents->where('event_type', 'red_card')->where('team_id', $match->away_team_id)->count(), ''],
                 ];
             @endphp
 
@@ -550,8 +572,8 @@
                 @foreach($stats as $stat)
                     @php
                         $label = $stat[0];
-                        $homeVal = is_callable($stat[1]) ? $stat[1]($match) : ($match->{$stat[1]} ?? 0);
-                        $awayVal = is_callable($stat[2]) ? $stat[2]($match) : ($match->{$stat[2]} ?? 0);
+                        $homeVal = $stat[1] ?? 0;
+                        $awayVal = $stat[2] ?? 0;
                         $suffix = $stat[3];
                         $total = ($homeVal + $awayVal) ?: 100;
                         $homePercent = ($homeVal / $total) * 100;
@@ -574,7 +596,7 @@
     </div>
 
     <!-- INFO TAB -->
-    <div x-show="tab === 'info'">
+    <div x-show="tab === 'info'" x-cloak>
         <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
              <div class="space-y-1.5 md:space-y-2">
                 <label class="block text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest">Date & Time</label>
