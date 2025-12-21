@@ -20,8 +20,8 @@ class ImageService
         // Store on the 'public' disk
         $path = $file->store($folder, 'public');
 
-        // Return the relative storage path for better portability
-        return '/storage/' . $path;
+        // Return the public URL using asset() for better portability
+        return asset('storage/' . $path);
     }
 
     /**
@@ -34,9 +34,9 @@ class ImageService
     {
         if (!$url) return;
 
-        // Path is usually /storage/folder/file.ext
-        // We need to strip /storage/ to get the relative disk path
-        $path = str_replace('/storage/', '', $url);
+        // Extract the path after 'storage/' regardless of domain
+        $parts = explode('/storage/', $url);
+        $path = end($parts);
         $path = ltrim($path, '/');
 
         if (Storage::disk('public')->exists($path)) {

@@ -148,5 +148,27 @@
             </button>
         </div>
     </form>
+    
+    <!-- Maintenance Section -->
+    <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
+        <h3 class="text-xs font-black text-rose-500 uppercase tracking-widest mb-8 border-b border-rose-50 pb-4 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            System Maintenance
+        </h3>
+        <div class="space-y-6">
+            <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+                <div>
+                    <h4 class="text-xs font-black text-primary uppercase italic">Fix Storage Link</h4>
+                    <p class="text-[10px] text-zinc-400 font-bold uppercase mt-1">Run this if images are not showing on your live site (cPanel)</p>
+                </div>
+                <form action="{{ route('admin.fix-storage') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="bg-white text-primary border border-zinc-200 font-black px-6 py-3 rounded-xl hover:bg-zinc-100 transition uppercase tracking-widest text-[10px] shadow-sm">
+                        Fix Now
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

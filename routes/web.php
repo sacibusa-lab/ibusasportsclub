@@ -105,4 +105,5 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Admin Settings Routes
     Route::get('/settings', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'index'])->name('settings.index');
     Route::put('/settings', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('settings.update');
+    Route::post('/fix-storage', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'fixStorage'])->name('fix-storage');
 });

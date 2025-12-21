@@ -60,4 +60,27 @@ class AdminSettingsController extends Controller
 
         return back()->with('success', 'Settings updated successfully.');
     }
+
+    public function fixStorage()
+    {
+        try {
+            // Attempt standard link
+            \Illuminate\Support\Facades\Artisan::call('storage:link');
+            $message = \Illuminate\Support\Facades\Artisan::output();
+
+            // Additional manual check for cPanel public_html
+            $publicHtml = base_path('../public_html/storage');
+            $storagePath = storage_path('app/public');
+
+            if (is_dir(base_path('../public_html')) && !file_exists($publicHtml)) {
+                if (symlink($storagePath, $publicHtml)) {
+                    $message .= " | Created symlink for public_html/storage";
+                }
+            }
+
+            return back()->with('success', 'Storage link attempt completed: ' . $message);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to link storage: ' . $e->getMessage());
+        }
+    }
 }
