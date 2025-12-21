@@ -242,7 +242,28 @@
     <!-- LINEUPS TAB -->
     <div x-show="tab === 'lineups'" x-cloak>
         @php
-            $eventsByPlayer = $match->matchEvents->groupBy('player_id');
+            $eventsByPlayer = collect();
+            foreach($match->matchEvents as $event) {
+                if($event->player_id) {
+                    if(!$eventsByPlayer->has($event->player_id)) $eventsByPlayer->put($event->player_id, collect());
+                    $eventsByPlayer->get($event->player_id)->push($event);
+                }
+                
+                // If it's a substitution, the related player (OUT player) also needs a virtual event
+                if($event->event_type === 'sub_on' && $event->related_player_id) {
+                    if(!$eventsByPlayer->has($event->related_player_id)) $eventsByPlayer->put($event->related_player_id, collect());
+                    
+                    // Create a virtual sub_off event for the player leaving
+                    $virtualSubOff = (object)[
+                        'event_type' => 'sub_off',
+                        'minute' => $event->minute,
+                        'player_id' => $event->related_player_id,
+                        'match_id' => $event->match_id
+                    ];
+                    $eventsByPlayer->get($event->related_player_id)->push($virtualSubOff);
+                }
+            }
+
             $homeStartingXI = $match->lineups->where('pivot.team_id', $match->home_team_id)->where('pivot.is_substitute', false);
             $awayStartingXI = $match->lineups->where('pivot.team_id', $match->away_team_id)->where('pivot.is_substitute', false);
             $homeSubs = $match->lineups->where('pivot.team_id', $match->home_team_id)->where('pivot.is_substitute', true);
@@ -291,7 +312,7 @@
 
                         <!-- Players -->
                         @foreach($match->lineups as $player)
-                            @if(!$player->pivot->is_substitute && $player->pivot->position_x && $player->pivot->position_y)
+                            @if($player->pivot->position_x && $player->pivot->position_y)
                             <div class="absolute transform -translate-x-1/2 -translate-y-1/2 z-10"
                                     style="left: {{ $player->pivot->position_x }}%; top: {{ $player->pivot->position_y }}%;">
                                 
@@ -403,7 +424,9 @@
                                             @elseif($event->event_type == 'red_card')
                                                 <div class="w-1.5 h-2.5 bg-red-600 rounded-sm" title="Red Card {{ $event->minute }}'"></div>
                                             @elseif($event->event_type == 'sub_off')
-                                                <span class="text-[10px] text-red-500 font-black" title="Off {{ $event->minute }}'">⬇</span>
+                                                <div class="flex items-center justify-center w-3 h-3 md:w-3.5 md:h-3.5 bg-rose-500 rounded-full text-white text-[7px] md:text-[8px] font-black shadow-sm" title="Off {{ $event->minute }}'">⬇</div>
+                                            @elseif($event->event_type == 'sub_on')
+                                                <div class="flex items-center justify-center w-3 h-3 md:w-3.5 md:h-3.5 bg-emerald-500 rounded-full text-white text-[7px] md:text-[8px] font-black shadow-sm" title="On {{ $event->minute }}'">➜</div>
                                             @endif
                                         @endforeach
                                     </div>
@@ -437,7 +460,9 @@
                                             @elseif($event->event_type == 'red_card')
                                                 <div class="w-1.5 h-2.5 bg-red-600 rounded-sm" title="Red Card {{ $event->minute }}'"></div>
                                             @elseif($event->event_type == 'sub_off')
-                                                <span class="text-[10px] text-red-500 font-black" title="Off {{ $event->minute }}'">⬇</span>
+                                                <div class="flex items-center justify-center w-3 h-3 md:w-3.5 md:h-3.5 bg-rose-500 rounded-full text-white text-[7px] md:text-[8px] font-black shadow-sm" title="Off {{ $event->minute }}'">⬇</div>
+                                            @elseif($event->event_type == 'sub_on')
+                                                <div class="flex items-center justify-center w-3 h-3 md:w-3.5 md:h-3.5 bg-emerald-500 rounded-full text-white text-[7px] md:text-[8px] font-black shadow-sm" title="On {{ $event->minute }}'">➜</div>
                                             @endif
                                         @endforeach
                                     </div>
@@ -485,8 +510,14 @@
                                     <div class="flex items-center gap-2">
                                         @if($pEvents->where('event_type', 'sub_on')->first())
                                             <div class="flex items-center gap-1.5">
-                                                <span class="text-green-500 font-bold scale-x-[-1]">➜</span>
+                                                <div class="flex items-center justify-center w-5 h-5 bg-emerald-500 rounded-full text-white text-[10px] font-black shadow-sm">⬆</div>
                                                 <span class="text-[9px] font-black text-zinc-400">{{ $pEvents->where('event_type', 'sub_on')->first()->minute }}'</span>
+                                            </div>
+                                        @endif
+                                        @if($pEvents->where('event_type', 'sub_off')->first())
+                                            <div class="flex items-center gap-1.5">
+                                                <div class="flex items-center justify-center w-5 h-5 bg-rose-500 rounded-full text-white text-[10px] font-black shadow-sm">⬇</div>
+                                                <span class="text-[9px] font-black text-zinc-400">{{ $pEvents->where('event_type', 'sub_off')->first()->minute }}'</span>
                                             </div>
                                         @endif
                                         @if($pEvents->whereIn('event_type', ['goal', 'penalty'])->count() > 0)
@@ -522,8 +553,14 @@
                                     <div class="flex items-center gap-2">
                                         @if($pEvents->where('event_type', 'sub_on')->first())
                                             <div class="flex items-center gap-1.5">
-                                                <span class="text-green-500 font-bold scale-x-[-1]">➜</span>
+                                                <div class="flex items-center justify-center w-5 h-5 bg-emerald-500 rounded-full text-white text-[10px] font-black shadow-sm">⬆</div>
                                                 <span class="text-[9px] font-black text-zinc-400">{{ $pEvents->where('event_type', 'sub_on')->first()->minute }}'</span>
+                                            </div>
+                                        @endif
+                                        @if($pEvents->where('event_type', 'sub_off')->first())
+                                            <div class="flex items-center gap-1.5">
+                                                <div class="flex items-center justify-center w-5 h-5 bg-rose-500 rounded-full text-white text-[10px] font-black shadow-sm">⬇</div>
+                                                <span class="text-[9px] font-black text-zinc-400">{{ $pEvents->where('event_type', 'sub_off')->first()->minute }}'</span>
                                             </div>
                                         @endif
                                         @if($pEvents->whereIn('event_type', ['goal', 'penalty'])->count() > 0)
