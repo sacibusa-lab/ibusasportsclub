@@ -310,18 +310,45 @@
 
                                         <!-- Event Badges -->
                                         @php $playerEvents = collect($eventsByPlayer->get($player->id, [])); @endphp
-                                        <div class="absolute -bottom-1 -right-1 flex flex-col gap-0.5 items-center z-20">
+                                        <div class="absolute -bottom-1 -right-1 flex flex-col gap-1 items-end z-20">
                                             @if($playerEvents->whereIn('event_type', ['goal', 'penalty'])->count() > 0)
-                                                <div class="w-4 h-4 md:w-5 md:h-5 bg-white rounded-full flex items-center justify-center shadow-md border border-zinc-100">
+                                                <div class="w-4 h-4 md:w-5 md:h-5 bg-white rounded-full flex items-center justify-center shadow-md border border-zinc-100 mb-0.5">
                                                     <span class="text-[8px] md:text-[9px]">⚽</span>
+                                                    @if($playerEvents->whereIn('event_type', ['goal', 'penalty'])->count() > 1)
+                                                        <span class="absolute -top-1 -right-1 bg-primary text-white text-[6px] w-2.5 h-2.5 rounded-full flex items-center justify-center border border-white font-black">{{ $playerEvents->whereIn('event_type', ['goal', 'penalty'])->count() }}</span>
+                                                    @endif
                                                 </div>
                                             @endif
-                                            @if($playerEvents->where('event_type', 'yellow_card')->count() > 0)
-                                                <div class="w-2.5 h-3.5 md:w-3 md:h-4 bg-yellow-400 rounded-sm shadow-md border border-white/50"></div>
-                                            @endif
-                                            @if($playerEvents->where('event_type', 'red_card')->count() > 0)
-                                                <div class="w-2.5 h-3.5 md:w-3 md:h-4 bg-red-600 rounded-sm shadow-md border border-white/50"></div>
-                                            @endif
+
+                                            <div class="flex flex-col gap-0.5 items-end">
+                                                @foreach($playerEvents->where('event_type', 'yellow_card') as $card)
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-[7px] md:text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{{ $card->minute }}'</span>
+                                                        <div class="w-2 h-3 md:w-2.5 md:h-3.5 bg-yellow-400 rounded-sm shadow-md border border-white/50"></div>
+                                                    </div>
+                                                @endforeach
+
+                                                @foreach($playerEvents->where('event_type', 'red_card') as $card)
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-[7px] md:text-[8px] font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{{ $card->minute }}'</span>
+                                                        <div class="w-2 h-3 md:w-2.5 md:h-3.5 bg-red-600 rounded-sm shadow-md border border-white/50"></div>
+                                                    </div>
+                                                @endforeach
+
+                                                @foreach($playerEvents->where('event_type', 'sub_off') as $sub)
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-[7px] md:text-[8px] font-black text-rose-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{{ $sub->minute }}'</span>
+                                                        <div class="w-3.5 h-3.5 md:w-4 md:h-4 bg-rose-500 rounded-full flex items-center justify-center text-white text-[8px] md:text-[9px] shadow-md border border-white/30 font-black">⬇</div>
+                                                    </div>
+                                                @endforeach
+                                                
+                                                @foreach($playerEvents->where('event_type', 'sub_on') as $sub)
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-[7px] md:text-[8px] font-black text-emerald-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{{ $sub->minute }}'</span>
+                                                        <div class="w-3.5 h-3.5 md:w-4 md:h-4 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[8px] md:text-[9px] shadow-md border border-white/30 font-black scale-x-[-1]">➜</div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
                                     </div>
                                     

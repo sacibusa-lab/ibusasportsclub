@@ -62,15 +62,24 @@ class StatisticsService
         $gks = Player::where('position', 'GK')->with('team')->get();
         
         foreach ($gks as $gk) {
-            $homeCleanSheets = MatchModel::where('home_team_id', $gk->team_id)
-                ->where('status', 'finished')
+            $baseQuery = MatchModel::where('status', 'finished')
                 ->where('stage', '!=', 'novelty')
+                ->where(function($q) use ($gk) {
+                    $q->whereHas('lineups', function($lq) use ($gk) {
+                        $lq->where('players.id', $gk->id)
+                           ->where('match_lineups.is_substitute', false);
+                    })
+                    ->orWhereHas('matchEvents', function($eq) use ($gk) {
+                        $eq->where('player_id', $gk->id)
+                           ->where('event_type', 'sub_on');
+                    });
+                });
+
+            $homeCleanSheets = (clone $baseQuery)->where('home_team_id', $gk->team_id)
                 ->where('away_score', 0)
                 ->count();
                 
-            $awayCleanSheets = MatchModel::where('away_team_id', $gk->team_id)
-                ->where('status', 'finished')
-                ->where('stage', '!=', 'novelty')
+            $awayCleanSheets = (clone $baseQuery)->where('away_team_id', $gk->team_id)
                 ->where('home_score', 0)
                 ->count();
                 
