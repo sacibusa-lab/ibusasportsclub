@@ -312,7 +312,7 @@
 
                         <!-- Players -->
                         @foreach($match->lineups as $player)
-                            @if($player->pivot->position_x && $player->pivot->position_y)
+                            @if(!$player->pivot->is_substitute && $player->pivot->position_x && $player->pivot->position_y)
                             <div class="absolute transform -translate-x-1/2 -translate-y-1/2 z-10"
                                     style="left: {{ $player->pivot->position_x }}%; top: {{ $player->pivot->position_y }}%;">
                                 
@@ -360,13 +360,6 @@
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-[7px] md:text-[8px] font-black text-rose-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{{ $sub->minute }}'</span>
                                                         <div class="w-3.5 h-3.5 md:w-4 md:h-4 bg-rose-500 rounded-full flex items-center justify-center text-white text-[8px] md:text-[9px] shadow-md border border-white/30 font-black">⬇</div>
-                                                    </div>
-                                                @endforeach
-                                                
-                                                @foreach($playerEvents->where('event_type', 'sub_on') as $sub)
-                                                    <div class="flex items-center gap-1">
-                                                        <span class="text-[7px] md:text-[8px] font-black text-emerald-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{{ $sub->minute }}'</span>
-                                                        <div class="w-3.5 h-3.5 md:w-4 md:h-4 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[8px] md:text-[9px] shadow-md border border-white/30 font-black scale-x-[-1]">➜</div>
                                                     </div>
                                                 @endforeach
                                             </div>
