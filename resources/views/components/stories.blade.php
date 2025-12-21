@@ -239,10 +239,10 @@
                     </div>
 
                     <!-- Story Caption -->
-                    <div class="absolute bottom-0 left-0 right-0 p-8 z-[115]">
+                    <div class="absolute inset-x-0 bottom-32 flex items-center justify-center px-8 z-[115]">
                         <template x-if="groups[groupIndex]?.items[itemIndex]?.caption">
-                            <div class="mb-4 text-center">
-                                <p class="text-base font-black leading-relaxed drop-shadow-2xl"
+                            <div class="inline-block px-6 py-3 bg-black/80 rounded-xl backdrop-blur-sm">
+                                <p class="text-lg font-black leading-tight text-center uppercase tracking-wide"
                                    :style="'color: ' + (groups[groupIndex]?.items[itemIndex]?.caption_color || '#FFFFFF')"
                                    x-text="groups[groupIndex]?.items[itemIndex]?.caption">
                                 </p>
