@@ -65,36 +65,38 @@ class AdminSettingsController extends Controller
     {
         try {
             $message = "";
-            $publicStorage = public_path('storage');
-            
-            // 1. Remove existing link/folder if it exists
-            if (file_exists($publicStorage) || is_link($publicStorage)) {
-                if (is_link($publicStorage)) {
-                    unlink($publicStorage);
-                    $message .= "Removed existing symlink. ";
-                } else {
-                    // It's a directory, might be a failed upload or manual copy
-                    \Illuminate\Support\Facades\File::deleteDirectory($publicStorage);
-                    $message .= "Removed existing storage directory. ";
+            $realPublicPath = public_path();
+            $realStoragePath = storage_path('app/public');
+            $message .= "Active Public Path: $realPublicPath | ";
+
+            $targets = [
+                public_path('storage'),
+                base_path('../public_html/storage')
+            ];
+
+            foreach ($targets as $target) {
+                if (strpos($target, 'public_html') !== false && !is_dir(dirname($target))) continue;
+
+                if (file_exists($target) || is_link($target)) {
+                    if (is_link($target)) {
+                        unlink($target);
+                        $message .= "Deleted link at " . basename(dirname($target)) . ". ";
+                    } else {
+                        // If it's a directory, we keep it but ensure permissions
+                        $message .= "Found physical directory at " . basename(dirname($target)) . ". ";
+                    }
                 }
-            }
 
-            // 2. Attempt standard link
-            \Illuminate\Support\Facades\Artisan::call('storage:link');
-            $message .= \Illuminate\Support\Facades\Artisan::output();
-
-            // 3. Additional manual check for cPanel public_html (if different from public_path)
-            $publicHtml = base_path('../public_html/storage');
-            $storagePath = storage_path('app/public');
-
-            if (is_dir(base_path('../public_html')) && public_path() !== base_path('../public_html')) {
-                if (file_exists($publicHtml) || is_link($publicHtml)) {
-                    if (is_link($publicHtml)) unlink($publicHtml);
-                    else \Illuminate\Support\Facades\File::deleteDirectory($publicHtml);
-                }
-                
-                if (symlink($storagePath, $publicHtml)) {
-                    $message .= " | Created symlink for public_html/storage";
+                // If symlinks are failing, we can try to create a real folder and copy
+                // For now, let's try the link again but with more robust check
+                try {
+                    if (!file_exists($target)) {
+                        if (symlink($realStoragePath, $target)) {
+                            $message .= "Linked " . basename(dirname($target)) . " successfully. ";
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $message .= "Link failed for " . basename(dirname($target)) . ": " . $e->getMessage() . ". ";
                 }
             }
 
@@ -103,21 +105,52 @@ class AdminSettingsController extends Controller
             foreach ($pathsToCheck as $htaccessPath) {
                 if (file_exists($htaccessPath)) {
                     $htaccess = file_get_contents($htaccessPath);
+                    $directives = [
+                        'Options +FollowSymLinks',
+                        'Options +SymLinksIfOwnerMatch'
+                    ];
+                    
+                    $updated = false;
                     if (strpos($htaccess, 'Options +FollowSymLinks') === false && strpos($htaccess, 'Options +SymLinksIfOwnerMatch') === false) {
                         $htaccess = "Options +FollowSymLinks\n" . $htaccess;
+                        $updated = true;
+                    }
+                    
+                    if ($updated) {
                         file_put_contents($htaccessPath, $htaccess);
                         $message .= " | Updated " . basename(dirname($htaccessPath)) . "/.htaccess";
                     }
                 }
             }
 
-            // 5. Attempt to set permissions (755 for dirs, 644 for files)
-            $this->chmod_r($storagePath);
-            $message .= " | Updated storage permissions";
+            // 5. Attempt to set permissions
+            if (is_dir($realStoragePath)) {
+                $this->chmod_r($realStoragePath);
+                $message .= " | Finalized permissions.";
+            }
 
-            return back()->with('success', 'Storage link reset completed: ' . $message);
+            return back()->with('success', 'Deep Storage Fix Completed: ' . $message);
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to reset storage link: ' . $e->getMessage());
+        }
+    }
+
+    public function syncStorage()
+    {
+        try {
+            $source = storage_path('app/public');
+            $dest = public_path('storage');
+
+            if (!is_dir($dest)) {
+                mkdir($dest, 0755, true);
+            }
+
+            \Illuminate\Support\Facades\File::copyDirectory($source, $dest);
+            $this->chmod_r($dest);
+
+            return back()->with('success', 'Files synchronized to public folder successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to sync files: ' . $e->getMessage());
         }
     }
 

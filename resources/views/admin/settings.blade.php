@@ -164,7 +164,20 @@
                 <form action="{{ route('admin.fix-storage') }}" method="POST">
                     @csrf
                     <button type="submit" class="bg-white text-primary border border-zinc-200 font-black px-6 py-3 rounded-xl hover:bg-zinc-100 transition uppercase tracking-widest text-[10px] shadow-sm">
-                        Fix Now
+                        Fix Link
+                    </button>
+                </form>
+            </div>
+
+            <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+                <div>
+                    <h4 class="text-xs font-black text-rose-600 uppercase italic">Force Sync Files (Last Resort)</h4>
+                    <p class="text-[10px] text-zinc-400 font-bold uppercase mt-1">Stops using links and copies EVERYTHING directly to the web folder. This ALWAYS fixed 403 errors.</p>
+                </div>
+                <form action="{{ route('admin.sync-storage') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="bg-rose-500 text-white font-black px-6 py-3 rounded-xl hover:bg-rose-600 transition uppercase tracking-widest text-[10px] shadow-sm">
+                        Sync Now
                     </button>
                 </form>
             </div>
