@@ -8,7 +8,7 @@
     playerModal: false,
     editPlayerModal: false,
     editTeam: { id: '', name: '', manager: '', stadium_name: '', primary_color: '', group_id: '', logo_url: '' },
-    newPlayer: { team_id: '', team_name: '' },
+    newPlayer: { team_id: '', team_name: '', players: [{ name: '', shirt_number: '', position: 'FWD' }] },
     editPlayer: { id: '', name: '', shirt_number: '', position: 'FWD', team_id: '', team_name: '', image_url: '', full_image_url: '' },
     openEdit(team) {
         this.editTeam = { 
@@ -23,8 +23,20 @@
         this.editModal = true;
     },
     openAddPlayer(id, name) {
-        this.newPlayer = { team_id: id, team_name: name };
+        this.newPlayer = { 
+            team_id: id, 
+            team_name: name, 
+            players: [{ name: '', shirt_number: '', position: 'FWD' }] 
+        };
         this.playerModal = true;
+    },
+    addPlayerRow() {
+        this.newPlayer.players.push({ name: '', shirt_number: '', position: 'FWD' });
+    },
+    removePlayerRow(index) {
+        if (this.newPlayer.players.length > 1) {
+            this.newPlayer.players.splice(index, 1);
+        }
     },
     openEditPlayer(player, teamName) {
         this.editPlayer = { 
@@ -220,17 +232,16 @@
         </div>
     </div>
 
-    <!-- Add Player Modal -->
     <div x-show="playerModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">
-        <div @click.away="playerModal = false" class="bg-white rounded-3xl p-8 shadow-2xl border border-zinc-100 w-full max-w-md animate-scale-in">
-            <div class="flex items-center justify-between mb-8">
+        <div @click.away="playerModal = false" class="bg-white rounded-3xl p-8 shadow-2xl border border-zinc-100 w-full max-w-2xl animate-scale-in max-h-[90vh] overflow-y-auto no-scrollbar">
+            <div class="flex items-center justify-between mb-8 sticky top-0 bg-white pb-4 z-10 border-b border-zinc-50">
                 <div>
-                    <h3 class="text-xl font-black text-primary uppercase italic tracking-tighter leading-none">Add Player</h3>
+                    <h3 class="text-xl font-black text-primary uppercase italic tracking-tighter leading-none">Add Players</h3>
                     <p class="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2" x-text="'Joining ' + newPlayer.team_name"></p>
                 </div>
                 <button @click="playerModal = false" class="text-zinc-400 hover:text-primary transition">✕</button>
             </div>
-            <form action="{{ route('admin.players.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="{{ route('admin.players.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                 @csrf
                 @if ($errors->any())
                     <div class="p-4 bg-rose-50 text-rose-500 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-rose-100">
@@ -242,36 +253,53 @@
                     </div>
                 @endif
                 <input type="hidden" name="team_id" :value="newPlayer.team_id">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Full Name</label>
-                        <input type="text" name="name" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="e.g. ERLING HAALAND" required>
+                
+                <template x-for="(player, index) in newPlayer.players" :key="index">
+                    <div class="p-6 bg-zinc-50 rounded-2xl border border-zinc-100 space-y-4 relative">
+                        <div class="flex items-center justify-between mb-2">
+                             <span class="text-[10px] font-black text-zinc-300 uppercase tracking-widest" x-text="'Player #' + (index + 1)"></span>
+                             <button type="button" @click="removePlayerRow(index)" x-show="newPlayer.players.length > 1" class="text-[9px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-700 transition">Remove</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Full Name</label>
+                                <input type="text" :name="'players['+index+'][name]'" x-model="player.name" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="e.g. ERLING HAALAND" required>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Shirt #</label>
+                                <input type="number" :name="'players['+index+'][shirt_number]'" x-model="player.shirt_number" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="9" min="1" max="99">
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Position</label>
+                            <select :name="'players['+index+'][position]'" x-model="player.position" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" required>
+                                <option value="GK">Goalkeeper (GK)</option>
+                                <option value="DEF">Defender (DEF)</option>
+                                <option value="MID">Midfielder (MID)</option>
+                                <option value="FWD">Forward (FWD)</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Avatar</label>
+                                <input type="file" :name="'players['+index+'][image]'" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[10px]" accept="image/*">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Full Photo</label>
+                                <input type="file" :name="'players['+index+'][full_image]'" class="w-full bg-white border border-zinc-200 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[10px]" accept="image/*">
+                            </div>
+                        </div>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Shirt #</label>
-                        <input type="number" name="shirt_number" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="9" min="1" max="99">
-                    </div>
+                </template>
+
+                <div class="flex items-center gap-4">
+                    <button type="button" @click="addPlayerRow()" class="flex-1 border-2 border-dashed border-zinc-200 text-zinc-400 font-black py-4 rounded-2xl hover:border-primary hover:text-primary transition uppercase tracking-widest text-[10px]">
+                        + Add Another Player
+                    </button>
+                    <button type="submit" class="flex-1 bg-primary text-secondary font-black py-4 rounded-2xl hover:bg-primary-light transition uppercase tracking-widest text-[10px] shadow-lg">
+                        Register All Players
+                    </button>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Position</label>
-                    <select name="position" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" required>
-                        <option value="GK">Goalkeeper (GK)</option>
-                        <option value="DEF">Defender (DEF)</option>
-                        <option value="MID">Midfielder (MID)</option>
-                        <option value="FWD" selected>Forward (FWD)</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Avatar</label>
-                        <input type="file" name="image" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[10px]" accept="image/*">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Full Photo</label>
-                        <input type="file" name="full_image" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[10px]" accept="image/*">
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-primary text-secondary font-black py-4 rounded-2xl hover:bg-primary-light transition uppercase tracking-widest text-[10px] shadow-lg mt-4">Register Player</button>
             </form>
         </div>
     </div>

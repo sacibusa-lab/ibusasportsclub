@@ -11,7 +11,6 @@
         <a href="{{ route('results') }}" class="hover:text-primary transition">Results</a>
         <span>/</span>
         <span class="text-primary">Match Details</span>
-        <span class="ml-auto text-[8px] text-zinc-300 font-bold uppercase opacity-50">✓ Match Details Loaded</span>
     </nav>
 
     <!-- Premium Dynamic Match Header Card -->

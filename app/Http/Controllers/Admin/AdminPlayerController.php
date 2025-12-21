@@ -27,34 +27,37 @@ class AdminPlayerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
             'team_id' => 'required|exists:teams,id',
-            'position' => 'required|in:GK,DEF,MID,FWD',
-            'shirt_number' => 'nullable|integer|min:1|max:99',
-            'image' => 'nullable|image|max:2048',
-            'full_image' => 'nullable|image|max:3072',
+            'players' => 'required|array|min:1',
+            'players.*.name' => 'required|string|max:255',
+            'players.*.position' => 'required|in:GK,DEF,MID,FWD',
+            'players.*.shirt_number' => 'nullable|integer|min:1|max:99',
+            'players.*.image' => 'nullable|image|max:2048',
+            'players.*.full_image' => 'nullable|image|max:3072',
         ]);
 
-        $imageUrl = null;
-        if ($request->hasFile('image')) {
-            $imageUrl = $this->imageService->upload($request->file('image'), 'players');
+        foreach ($request->players as $index => $playerData) {
+            $imageUrl = null;
+            if ($request->hasFile("players.$index.image")) {
+                $imageUrl = $this->imageService->upload($request->file("players.$index.image"), 'players');
+            }
+
+            $fullImageUrl = null;
+            if ($request->hasFile("players.$index.full_image")) {
+                $fullImageUrl = $this->imageService->upload($request->file("players.$index.full_image"), 'players/full');
+            }
+
+            Player::create([
+                'name' => $playerData['name'],
+                'team_id' => $request->team_id,
+                'position' => $playerData['position'],
+                'shirt_number' => $playerData['shirt_number'],
+                'image_url' => $imageUrl,
+                'full_image_url' => $fullImageUrl,
+            ]);
         }
 
-        $fullImageUrl = null;
-        if ($request->hasFile('full_image')) {
-            $fullImageUrl = $this->imageService->upload($request->file('full_image'), 'players/full');
-        }
-
-        Player::create([
-            'name' => $request->name,
-            'team_id' => $request->team_id,
-            'position' => $request->position,
-            'shirt_number' => $request->shirt_number,
-            'image_url' => $imageUrl,
-            'full_image_url' => $fullImageUrl,
-        ]);
-
-        return back()->with('success', 'Player added successfully.');
+        return back()->with('success', count($request->players) . ' players added successfully.');
     }
 
     public function update(Request $request, $id)
