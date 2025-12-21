@@ -141,13 +141,39 @@
             </div>
         </div>
 
-        <div class="flex items-center justify-end gap-4 pt-4 pb-12">
+        <div class="flex items-center justify-end gap-4 pt-4 pb-1">
             <button type="submit" class="bg-primary text-secondary font-black px-12 py-5 rounded-2xl hover:bg-primary-light transition uppercase tracking-widest text-xs shadow-xl flex items-center gap-3">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 Publish Changes
             </button>
         </div>
     </form>
+
+    <!-- Diagnostics Section -->
+    <div class="bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-800">
+        <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+            Server Path Diagnostics
+        </h3>
+        <div class="grid gap-4 font-mono text-[10px] text-zinc-300">
+            <div class="flex justify-between bg-zinc-800/50 p-3 rounded-xl">
+                <span class="text-zinc-500 uppercase">Document Root:</span>
+                <span class="text-emerald-400 break-all">{{ $_SERVER['DOCUMENT_ROOT'] ?? 'N/A' }}</span>
+            </div>
+            <div class="flex justify-between bg-zinc-800/50 p-3 rounded-xl">
+                <span class="text-zinc-500 uppercase">Base Path:</span>
+                <span class="text-sky-400 break-all">{{ base_path() }}</span>
+            </div>
+            <div class="flex justify-between bg-zinc-800/50 p-3 rounded-xl">
+                <span class="text-zinc-500 uppercase">Public Path:</span>
+                <span class="text-amber-400 break-all">{{ public_path() }}</span>
+            </div>
+            <div class="flex justify-between bg-zinc-800/50 p-3 rounded-xl">
+                <span class="text-zinc-500 uppercase">Storage Path:</span>
+                <span class="text-rose-400 break-all">{{ storage_path('app/public') }}</span>
+            </div>
+        </div>
+    </div>
     
     <!-- Maintenance Section -->
     <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">

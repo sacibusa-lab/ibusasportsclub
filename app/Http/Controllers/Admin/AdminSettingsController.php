@@ -139,16 +139,30 @@ class AdminSettingsController extends Controller
     {
         try {
             $source = storage_path('app/public');
-            $dest = public_path('storage');
+            $message = "";
 
-            if (!is_dir($dest)) {
-                mkdir($dest, 0755, true);
+            $destinations = [
+                public_path('storage'),
+                base_path('../public_html/storage'),
+                ($_SERVER['DOCUMENT_ROOT'] ? $_SERVER['DOCUMENT_ROOT'] . '/storage' : null)
+            ];
+
+            foreach ($destinations as $dest) {
+                if (!$dest) continue;
+                
+                // If it's the SAME path as source, skip (safety)
+                if (realpath($dest) === realpath($source)) continue;
+
+                if (!is_dir($dest)) {
+                    mkdir($dest, 0755, true);
+                }
+
+                \Illuminate\Support\Facades\File::copyDirectory($source, $dest);
+                $this->chmod_r($dest);
+                $message .= "Synced to " . basename(dirname($dest)) . ". ";
             }
 
-            \Illuminate\Support\Facades\File::copyDirectory($source, $dest);
-            $this->chmod_r($dest);
-
-            return back()->with('success', 'Files synchronized to public folder successfully.');
+            return back()->with('success', "Files synchronized successfully: $message");
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to sync files: ' . $e->getMessage());
         }
