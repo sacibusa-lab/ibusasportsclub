@@ -149,6 +149,7 @@ class AdminController extends Controller
                 if (!isset($lineup['player_id'])) continue;
                 $syncData[$lineup['player_id']] = [
                     'team_id' => $lineup['team_id'],
+                    'position_key' => $lineup['position_key'] ?? null,
                     'position_x' => $lineup['position_x'] ?? null,
                     'position_y' => $lineup['position_y'] ?? null,
                     'shirt_number' => $lineup['shirt_number'] ?? null,
@@ -321,6 +322,7 @@ class AdminController extends Controller
                     $syncData[$playerId] = [
                         'team_id' => $player->team_id ?? ($playerId % 2 == 0 ? $request->home_team_id : $request->away_team_id),
                         'is_substitute' => $isSub,
+                        'position_key' => $posKey,
                         'position_x' => $coords['x'],
                         'position_y' => $coords['y'],
                         'shirt_number' => $player->shirt_number ?? null
@@ -337,6 +339,7 @@ class AdminController extends Controller
                 if (!isset($lineup['player_id'])) continue;
                 $syncData[$lineup['player_id']] = [
                     'team_id' => $lineup['team_id'],
+                    'position_key' => $lineup['position_key'] ?? null,
                     'position_x' => $lineup['position_x'] ?? null,
                     'position_y' => $lineup['position_y'] ?? null,
                     'shirt_number' => $lineup['shirt_number'] ?? null,

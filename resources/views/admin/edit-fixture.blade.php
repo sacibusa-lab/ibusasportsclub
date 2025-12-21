@@ -119,11 +119,7 @@
                                             $savedX = $pLineup->pivot->position_x ?? null;
                                             $savedY = $pLineup->pivot->position_y ?? null;
                                             
-                                            // Identify position from coords for selection (Using new 0.45 scaling)
-                                            $currentPos = 'GK';
-                                            foreach($positions as $key => $coords) {
-                                                if (round($coords['x'] * 0.45, 1) == round($savedX, 1) && $coords['y'] == $savedY) { $currentPos = $key; break; }
-                                            }
+                                            $currentPos = $pLineup->pivot->position_key ?? 'GK';
                                         @endphp
                                         <tr class="group hover:bg-white transition">
                                             <td class="py-3 px-4">
@@ -181,11 +177,7 @@
                                             $savedX = $pLineup->pivot->position_x ?? null;
                                             $savedY = $pLineup->pivot->position_y ?? null;
                                             
-                                            // Identify position from coords (Reverse mapping for away team using 0.45 scaling)
-                                            $currentPos = 'GK';
-                                            foreach($positions as $key => $coords) {
-                                                if (round(100 - ($coords['x'] * 0.45), 1) == round($savedX, 1) && $coords['y'] == $savedY) { $currentPos = $key; break; }
-                                            }
+                                            $currentPos = $pLineup->pivot->position_key ?? 'GK';
                                         @endphp
                                         <tr class="group hover:bg-white transition">
                                             <td class="py-3 px-4 text-right">

@@ -11,6 +11,7 @@
         <a href="{{ route('results') }}" class="hover:text-primary transition">Results</a>
         <span>/</span>
         <span class="text-primary">Match Details</span>
+        <span class="ml-auto text-[8px] text-zinc-300 font-bold uppercase opacity-50">✓ Match Details Loaded</span>
     </nav>
 
     <!-- Premium Dynamic Match Header Card -->
@@ -158,41 +159,47 @@
             <div class="flex justify-start items-center gap-2 md:gap-3 text-left">
                 @if($event->team_id == $match->away_team_id)
                     @if($event->event_type === 'goal')
-                    <div class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-base md:text-lg">⚽</div>
+                        <div class="flex flex-col items-start mr-2">
+                            <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
+                            @if($event->assistant)
+                            <span class="text-[8px] md:text-[10px] text-zinc-400 font-bold uppercase tracking-wide">{{ $event->assistant->name }} (Assist)</span>
+                            @endif
+                        </div>
+                        <div class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center text-base md:text-lg">⚽</div>
                     @elseif($event->event_type === 'yellow_card')
-                    <div class="w-3 md:w-4 h-4 md:h-5 bg-yellow-400 rounded-sm shadow-sm -rotate-6"></div>
+                        <div class="w-3 md:w-4 h-4 md:h-5 bg-yellow-400 rounded-sm shadow-sm -rotate-6"></div>
                     @elseif($event->event_type === 'red_card')
-                    <div class="w-3 md:w-4 h-4 md:h-5 bg-red-600 rounded-sm shadow-sm -rotate-6"></div>
+                        <div class="w-3 md:w-4 h-4 md:h-5 bg-red-600 rounded-sm shadow-sm -rotate-6"></div>
                     @elseif($event->event_type === 'sub_on')
-                    <div class="flex flex-col items-start">
-                        <div class="flex items-center gap-2">
-                             <div class="w-4 h-4 md:w-5 md:h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px]">⬆</div>
-                             <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
-                             <span class="text-[10px] text-emerald-500 font-bold">IN</span>
+                        <div class="flex flex-col items-start">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 md:w-5 md:h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px]">⬆</div>
+                                <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
+                                <span class="text-[10px] text-emerald-500 font-bold">IN</span>
+                            </div>
+                            @if($event->relatedPlayer)
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
+                                <span class="text-[9px] text-rose-500 font-bold">OUT</span>
+                                <span class="text-[9px] text-zinc-400 font-bold italic">{{ $event->relatedPlayer->name }}</span>
+                            </div>
+                            @endif
                         </div>
-                        @if($event->relatedPlayer)
-                        <div class="flex items-center gap-2 mt-0.5">
-                             <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
-                             <span class="text-[9px] text-rose-500 font-bold">OUT</span>
-                             <span class="text-[9px] text-zinc-400 font-bold italic">{{ $event->relatedPlayer->name }}</span>
-                        </div>
-                        @endif
-                    </div>
                     @elseif($event->event_type === 'sub_off' && !$match->matchEvents->where('event_type', 'sub_on')->where('minute', $event->minute)->where('team_id', $event->team_id)->first())
-                    <div class="flex flex-col items-start">
-                         <div class="flex items-center gap-2">
-                             <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
-                             <span class="text-[10px] text-rose-500 font-bold">OUT</span>
-                             <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
+                        <div class="flex flex-col items-start">
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
+                                <span class="text-[10px] text-rose-500 font-bold">OUT</span>
+                                <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
+                            </div>
                         </div>
-                    </div>
                     @else
-                    <div class="flex flex-col items-start">
-                        <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
-                        @if($event->assistant)
-                        <span class="text-[8px] md:text-[10px] text-zinc-400 font-bold uppercase tracking-wide">{{ $event->assistant->name }} (Assist)</span>
-                        @endif
-                    </div>
+                        <div class="flex flex-col items-start">
+                            <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
+                            @if($event->assistant)
+                            <span class="text-[8px] md:text-[10px] text-zinc-400 font-bold uppercase tracking-wide">{{ $event->assistant->name }} (Assist)</span>
+                            @endif
+                        </div>
                     @endif
                 @endif
             </div>
@@ -538,12 +545,11 @@
                             @empty
                                  <p class="text-[10px] text-zinc-300 italic">No substitutes recorded.</p>
                             @endforelse
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 </div>
 
@@ -551,7 +557,7 @@
     <div x-show="tab === 'stats'" x-cloak>
         <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-6 md:p-8 space-y-6 md:space-y-10">
             <h3 class="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest border-b border-zinc-50 pb-4">Match Statistics</h3>
-            
+
             @php
                 $stats = [
                     ['Possession', $match->home_possession, $match->away_possession, '%'],

@@ -54,7 +54,7 @@ class MatchModel extends Model
     public function lineups()
     {
         return $this->belongsToMany(Player::class, 'match_lineups', 'match_id', 'player_id')
-                    ->withPivot('team_id', 'is_captain', 'is_substitute', 'shirt_number', 'position_x', 'position_y')
+                    ->withPivot('team_id', 'is_captain', 'is_substitute', 'shirt_number', 'position_key', 'position_x', 'position_y')
                     ->withTimestamps();
     }
 }
