@@ -4,6 +4,8 @@
     itemIndex: 0,
     progress: 0,
     timer: null,
+    isPlaying: true,
+    isMuted: false,
     groups: @js($stories),
     
     openStory(gIndex) {
@@ -15,6 +17,7 @@
     
     startItem() {
         this.progress = 0;
+        this.isPlaying = true;
         if (this.timer) clearInterval(this.timer);
         this.timer = setInterval(() => {
             this.progress += 1;
@@ -22,6 +25,40 @@
                 this.nextItem();
             }
         }, 50);
+    },
+    
+    togglePlayPause() {
+        if (this.isPlaying) {
+            // Pause
+            if (this.timer) clearInterval(this.timer);
+            const videos = document.querySelectorAll('video');
+            videos.forEach(v => {
+                if (v.offsetParent !== null) {
+                    v.pause();
+                }
+            });
+            this.isPlaying = false;
+        } else {
+            // Play
+            this.startItem();
+            const videos = document.querySelectorAll('video');
+            videos.forEach(v => {
+                if (v.offsetParent !== null) {
+                    v.play();
+                }
+            });
+            this.isPlaying = true;
+        }
+    },
+    
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        const videos = document.querySelectorAll('video');
+        videos.forEach(v => {
+            if (v.offsetParent !== null) {
+                v.muted = this.isMuted;
+            }
+        });
     },
     
     nextItem() {
@@ -63,22 +100,27 @@
     
     closeViewer() {
         this.showViewer = false;
+        this.isPlaying = false;
         if (this.timer) clearInterval(this.timer);
     }
 }" class="mb-12">
     <!-- Stories Carousel -->
-    <div class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar pb-2">
+    <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
         @foreach($stories as $index => $story)
         @continue($story->items->count() == 0)
-        <button @click="openStory({{ $index }})" class="flex flex-col items-center gap-2 shrink-0 group focus:outline-none">
-            <div class="p-[3px] rounded-full bg-gradient-to-tr from-secondary via-primary to-accent group-hover:scale-110 transition duration-300">
-                <div class="p-[2px] bg-white rounded-full">
-                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                        <img src="{{ $story->thumbnail_url ?? $story->items->first()->media_url }}" class="w-full h-full object-cover">
-                    </div>
+        <button @click="openStory({{ $index }})" class="flex-none group focus:outline-none">
+            <div class="relative w-32 h-48 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <img src="{{ $story->thumbnail_url ?? $story->items->first()->media_url }}" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                
+                <!-- Story Title -->
+                <div class="absolute bottom-0 left-0 right-0 p-3">
+                    <span class="text-xs font-black text-white uppercase tracking-tight line-clamp-2 drop-shadow-lg">{{ $story->title }}</span>
                 </div>
+
+                <!-- Ring Border -->
+                <div class="absolute inset-0 ring-2 ring-secondary rounded-2xl group-hover:ring-4 transition-all"></div>
             </div>
-            <span class="text-[10px] md:text-xs font-black text-primary uppercase tracking-tight truncate max-w-[80px]">{{ $story->title }}</span>
         </button>
         @endforeach
     </div>
@@ -131,21 +173,82 @@
                             <img :src="item.media_url" class="w-full h-full object-cover" x-show="item.type === 'image'">
                             <video x-show="item.type === 'video'" 
                                    :src="item.media_url" 
-                                   autoplay muted playsinline
-                                   class="w-full h-full object-cover">
+                                   x-ref="storyVideo"
+                                   autoplay playsinline preload="auto"
+                                   class="w-full h-full object-cover"
+                                   @ended="nextItem()"
+                                   @loadedmetadata="$el.muted = false; $el.volume = 1.0;"
+                                   @play="startItem()"
+                                   @pause="if (timer) clearInterval(timer)"
+                                   style="object-fit: cover;">
                             </video>
                         </div>
                     </template>
 
-                    <!-- Navigation Zones -->
-                    <div class="absolute inset-0 z-[110] flex">
+                    <!-- Navigation Zones (Lower z-index) -->
+                    <div class="absolute inset-0 z-[100] flex">
                         <div @click="prevItem()" class="w-1/3 h-full cursor-pointer"></div>
                         <div class="w-1/3 h-full" @mousedown="if (timer) clearInterval(timer)" @mouseup="startItem()"></div>
                         <div @click="nextItem()" class="w-1/3 h-full cursor-pointer"></div>
                     </div>
 
-                    <!-- Story Caption/Link -->
+                    <!-- Custom Video Controls Overlay (Higher z-index) -->
+                    <div class="absolute top-24 right-6 z-[130] flex flex-col gap-3" @click.stop>
+                        <!-- Volume Button -->
+                        <button @click="toggleMute()" 
+                                type="button"
+                                class="w-12 h-12 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-black/80 transition shadow-xl">
+                            <svg x-show="!isMuted" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                            </svg>
+                            <svg x-show="isMuted" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+                            </svg>
+                        </button>
+
+                        <!-- Play/Pause Button -->
+                        <button @click="togglePlayPause()" 
+                                type="button"
+                                class="w-12 h-12 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-black/80 transition shadow-xl">
+                            <svg x-show="!isPlaying" class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                            <svg x-show="isPlaying" class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                            </svg>
+                        </button>
+
+                        <!-- Share Button -->
+                        <button @click="
+                            if (navigator.share) {
+                                navigator.share({
+                                    title: 'Check out this story!',
+                                    url: window.location.href
+                                });
+                            } else {
+                                navigator.clipboard.writeText(window.location.href);
+                                alert('Link copied to clipboard!');
+                            }
+                        " 
+                                type="button"
+                                class="w-12 h-12 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-black/80 transition shadow-xl">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Story Caption -->
                     <div class="absolute bottom-0 left-0 right-0 p-8 z-[115]">
+                        <template x-if="groups[groupIndex]?.items[itemIndex]?.caption">
+                            <div class="mb-4 text-center">
+                                <p class="text-base font-black leading-relaxed drop-shadow-2xl"
+                                   :style="'color: ' + (groups[groupIndex]?.items[itemIndex]?.caption_color || '#FFFFFF')"
+                                   x-text="groups[groupIndex]?.items[itemIndex]?.caption">
+                                </p>
+                            </div>
+                        </template>
+                        
                          <template x-if="groups[groupIndex]?.link_url || groups[groupIndex]?.items[itemIndex]?.link_url">
                             <div class="flex flex-col items-center gap-4">
                                 <a :href="groups[groupIndex]?.link_url || groups[groupIndex]?.items[itemIndex]?.link_url" target="_blank" class="w-full bg-[#0066FF] text-white font-black py-4 rounded-xl uppercase text-[11px] tracking-widest hover:bg-white hover:text-[#0066FF] transition duration-300 shadow-2xl flex items-center justify-center gap-2">

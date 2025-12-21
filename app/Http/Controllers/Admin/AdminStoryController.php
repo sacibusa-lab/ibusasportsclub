@@ -32,6 +32,10 @@ class AdminStoryController extends Controller
             'media.*' => 'file|mimetypes:image/jpeg,image/png,image/jpg,image/gif,video/mp4,video/quicktime|max:20480',
             'type' => 'required|in:image,video',
             'duration' => 'required|in:24h,permanent',
+            'captions' => 'nullable|array',
+            'captions.*' => 'nullable|string|max:200',
+            'caption_colors' => 'nullable|array',
+            'caption_colors.*' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
         ]);
 
         $expiresAt = $validated['duration'] === '24h' ? now()->addDay() : null;
@@ -51,6 +55,8 @@ class AdminStoryController extends Controller
                 'media_url' => $mediaUrl,
                 'type' => $validated['type'],
                 'order' => $index,
+                'caption' => $request->input("captions.{$index}"),
+                'caption_color' => $request->input("caption_colors.{$index}", '#FFFFFF'),
             ]);
 
             // Set the first item as the main story thumbnail if not set
@@ -79,6 +85,8 @@ class AdminStoryController extends Controller
             'items.*.type' => 'required|in:image,video',
             'items.*.link_url' => 'nullable|url',
             'items.*.order' => 'required|integer',
+            'items.*.caption' => 'nullable|string|max:200',
+            'items.*.caption_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'media' => 'nullable|array',
             'media.*' => 'file|mimetypes:image/jpeg,image/png,image/jpg,image/gif,video/mp4,video/quicktime|max:20480',
             'new_items_type' => 'required_with:media|in:image,video',
@@ -102,6 +110,8 @@ class AdminStoryController extends Controller
                     'type' => $itemData['type'],
                     'link_url' => $itemData['link_url'],
                     'order' => $itemData['order'],
+                    'caption' => $itemData['caption'] ?? null,
+                    'caption_color' => $itemData['caption_color'] ?? '#FFFFFF',
                 ]);
             }
         }

@@ -137,6 +137,16 @@
                                 <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Slide Link (Optional)</label>
                                 <input type="url" name="items[{{ $item->id }}][link_url]" value="{{ $item->link_url }}" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[11px]" placeholder="https://...">
                             </div>
+
+                            <div class="sm:col-span-2 space-y-2">
+                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Caption (Optional)</label>
+                                <textarea name="items[{{ $item->id }}][caption]" rows="2" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-medium text-zinc-700 focus:ring-2 focus:ring-primary outline-none transition text-[11px]" placeholder="Add a colorful caption...">{{ $item->caption }}</textarea>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Caption Color</label>
+                                <input type="color" name="items[{{ $item->id }}][caption_color]" value="{{ $item->caption_color ?? '#FFFFFF' }}" class="w-full h-10 bg-zinc-50 border border-zinc-100 rounded-xl cursor-pointer">
+                            </div>
                         </div>
                     </div>
                     @endforeach
