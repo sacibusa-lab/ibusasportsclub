@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
     <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
-        <form action="{{ route('admin.fixtures.update', $match->id) }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.fixtures.update', $match->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
             
@@ -318,6 +318,22 @@
             <div class="space-y-2 mt-8">
                 <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Match Report / Commentary</label>
                 <textarea name="report" rows="6" class="w-full bg-zinc-50 border border-zinc-100 p-6 rounded-2xl font-medium text-primary text-xs focus:ring-2 focus:ring-primary outline-none transition">{{ $match->report }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 bg-zinc-50 p-6 rounded-3xl border border-zinc-100">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Match Highlights Video URL (YouTube/Vimeo)</label>
+                    <input type="text" name="highlights_url" value="{{ $match->highlights_url }}" class="w-full bg-white border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Highlights Thumbnail</label>
+                    <div class="flex items-center gap-4">
+                        @if($match->highlights_thumbnail)
+                            <img src="{{ $match->highlights_thumbnail }}" class="w-20 h-12 object-cover rounded-xl border border-zinc-200">
+                        @endif
+                        <input type="file" name="highlights_thumbnail" class="flex-1 bg-white border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" accept="image/*">
+                    </div>
+                </div>
             </div>
 
             <div class="space-y-4 bg-secondary/5 p-8 rounded-3xl border border-secondary/10">

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Local Tournament')</title>
+    <title>@yield('title', 'Igbuzo Sports Competition')</title>
     @if(isset($siteSettings['favicon']))
     <link rel="icon" href="{{ $siteSettings['favicon'] }}" type="image/x-icon">
     @endif
@@ -51,7 +51,23 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="antialiased min-h-screen" style="background-color: #e5e7eb;" x-data="{ mobileMenuOpen: false }">
+<body class="antialiased min-h-screen" style="background-color: #e5e7eb;" x-data="{ 
+    mobileMenuOpen: false,
+    videoModalOpen: false, 
+    videoUrl: '',
+    getEmbedUrl(url) {
+        if (!url) return '';
+        let videoId = '';
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+            videoId = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
+            return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        } else if (url.includes('v=vimeo.com') || url.includes('vimeo.com')) {
+            videoId = url.split('/').pop();
+            return `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+        }
+        return url;
+    }
+}">
     <!-- Top Utility Bar -->
     <div class="bg-white border-b border-zinc-100 hidden md:block">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-10 flex items-center justify-between text-[11px] font-medium text-zinc-500">
@@ -173,12 +189,12 @@
             <h2 class="text-3xl font-black text-primary uppercase tracking-tight mb-8">Interviews</h2>
             
             <div class="relative">
-                <div class="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
+                <div class="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory no-scrollbar">
                     @foreach($globalInterviews as $interview)
-                    <div class="flex-none w-80 snap-start group">
-                        <a href="{{ route('interviews.show', $interview->id) }}" class="block relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
+                    <div class="flex-none w-56 snap-start group">
+                        <div @click="videoUrl = getEmbedUrl('{{ $interview->video_url }}'); videoModalOpen = true" class="block relative rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] cursor-pointer">
                             <!-- Thumbnail -->
-                            <div class="aspect-video bg-zinc-800 relative overflow-hidden">
+                            <div class="aspect-[3/4] bg-zinc-800 relative overflow-hidden">
                                 @if($interview->thumbnail_url)
                                 <img src="{{ $interview->thumbnail_url }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                                 @else
@@ -190,6 +206,13 @@
                                 <!-- Dark Overlay -->
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
                                 
+                                <!-- Play Icon -->
+                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                                    <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center shadow-2xl scale-75 group-hover:scale-100 transition duration-300">
+                                        <svg class="w-6 h-6 text-primary fill-current ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    </div>
+                                </div>
+
                                 <!-- NEW Badge -->
                                 @if($interview->is_featured)
                                 <div class="absolute top-4 left-4">
@@ -206,7 +229,7 @@
                                     @endif
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     </div>
                     @endforeach
                 </div>
@@ -221,5 +244,38 @@
             <p class="text-zinc-600 text-[11px] font-bold uppercase tracking-widest">{{ $siteSettings['copyright_text'] }}</p>
         </div>
     </footer>
+
+    <!-- Global Video Modal -->
+    <div x-show="videoModalOpen" 
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 overflow-hidden"
+         x-cloak>
+        <!-- Overlay -->
+        <div x-show="videoModalOpen" 
+             x-transition:enter="ease-out duration-300" 
+             x-transition:enter-start="opacity-0" 
+             x-transition:enter-end="opacity-100" 
+             x-transition:leave="ease-in duration-200" 
+             x-transition:leave-start="opacity-100" 
+             x-transition:leave-end="opacity-0"
+             @click="videoModalOpen = false; videoUrl = ''"
+             class="absolute inset-0 bg-primary/95 backdrop-blur-sm"></div>
+
+        <!-- Modal Content -->
+        <div x-show="videoModalOpen"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             class="relative w-full max-w-5xl aspect-video bg-black rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+            
+            <button @click="videoModalOpen = false; videoUrl = ''" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition backdrop-blur-md">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+
+            <iframe x-show="videoUrl" :src="videoUrl" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
 </body>
 </html>

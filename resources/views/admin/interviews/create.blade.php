@@ -41,7 +41,7 @@
             </div>
 
             <div class="space-y-2">
-                <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Thumbnail Image</label>
+                <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Thumbnail Image (Portrait/Vertical Recommended)</label>
                 <input type="file" name="thumbnail" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" accept="image/*">
             </div>
 

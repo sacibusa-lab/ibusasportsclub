@@ -34,10 +34,10 @@
                 <tr class="border-b border-zinc-50 hover:bg-zinc-50/50 transition">
                     <td class="p-6">
                         @if($interview->thumbnail_url)
-                        <img src="{{ $interview->thumbnail_url }}" class="w-20 h-12 object-cover rounded-lg">
+                        <img src="{{ $interview->thumbnail_url }}" class="w-12 h-16 object-cover rounded-lg border border-zinc-100">
                         @else
-                        <div class="w-20 h-12 bg-zinc-100 rounded-lg flex items-center justify-center">
-                            <span class="text-zinc-300 text-xs">No image</span>
+                        <div class="w-12 h-16 bg-zinc-100 rounded-lg flex items-center justify-center border border-zinc-100">
+                            <span class="text-zinc-300 text-[8px] uppercase font-black">No image</span>
                         </div>
                         @endif
                     </td>

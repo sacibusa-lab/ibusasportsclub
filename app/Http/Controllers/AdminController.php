@@ -262,43 +262,50 @@ class AdminController extends Controller
         $match = MatchModel::findOrFail($id);
         $homeTeam = Team::find($request->home_team_id);
 
-        $match->update([
+        $updateData = [
             'home_team_id' => $request->home_team_id,
             'away_team_id' => $request->away_team_id,
-            'match_date' => $request->match_date,
-            'venue' => $request->venue,
-            'matchday' => $request->matchday,
+            'match_date'   => $request->match_date,
+            'venue'        => $request->venue,
+            'matchday'     => $request->matchday,
             'broadcaster_logo' => $request->broadcaster_logo,
-            'stage' => $request->stage,
-            'group_id' => $request->stage === 'group' ? $homeTeam->group_id : null,
-            'status' => $request->status,
-            'home_score' => $request->home_score,
-            'away_score' => $request->away_score,
+            'stage'        => $request->stage,
+            'group_id'     => $request->stage === 'group' ? $homeTeam->group_id : null,
+            'status'       => $request->status,
+            'home_score'   => $request->home_score,
+            'away_score'   => $request->away_score,
             'home_possession' => $request->home_possession ?? 50,
             'away_possession' => $request->away_possession ?? 50,
-            'home_shots' => $request->home_shots ?? 0,
-            'away_shots' => $request->away_shots ?? 0,
+            'home_shots'   => $request->home_shots ?? 0,
+            'away_shots'   => $request->away_shots ?? 0,
             'home_corners' => $request->home_corners ?? 0,
             'away_corners' => $request->away_corners ?? 0,
             'home_offsides' => $request->home_offsides ?? 0,
             'away_offsides' => $request->away_offsides ?? 0,
-            'home_fouls' => $request->home_fouls ?? 0,
-            'away_fouls' => $request->away_fouls ?? 0,
+            'home_fouls'   => $request->home_fouls ?? 0,
+            'away_fouls'   => $request->away_fouls ?? 0,
             'home_free_kicks' => $request->home_free_kicks ?? 0,
             'away_free_kicks' => $request->away_free_kicks ?? 0,
             'home_throw_ins' => $request->home_throw_ins ?? 0,
             'away_throw_ins' => $request->away_throw_ins ?? 0,
-            'home_saves' => $request->home_saves ?? 0,
-            'away_saves' => $request->away_saves ?? 0,
+            'home_saves'   => $request->home_saves ?? 0,
+            'away_saves'   => $request->away_saves ?? 0,
             'home_goal_kicks' => $request->home_goal_kicks ?? 0,
             'away_goal_kicks' => $request->away_goal_kicks ?? 0,
             'home_scorers' => $request->home_scorers,
             'away_scorers' => $request->away_scorers,
-            'report' => $request->report,
+            'report'       => $request->report,
             'motm_player_id' => $request->motm_player_id,
-            'referee' => $request->referee,
-            'attendance' => $request->attendance,
-        ]);
+            'referee'      => $request->referee,
+            'attendance'   => $request->attendance,
+            'highlights_url' => $request->highlights_url,
+        ];
+
+        if ($request->hasFile('highlights_thumbnail')) {
+            $updateData['highlights_thumbnail'] = $this->imageService->upload($request->file('highlights_thumbnail'), 'matches/thumbnails');
+        }
+
+        $match->update($updateData);
 
         // Process Lineups
         if ($request->has('lineup')) {

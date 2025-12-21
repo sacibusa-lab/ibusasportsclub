@@ -64,6 +64,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('/tags', [AdminNewsController::class, 'tags'])->name('tags');
         Route::post('/tags', [AdminNewsController::class, 'storeTag'])->name('tags.store');
         Route::delete('/tags/{id}', [AdminNewsController::class, 'destroyTag'])->name('tags.destroy');
+
+        Route::post('/upload-image', [AdminNewsController::class, 'uploadImage'])->name('upload-image');
     });
 
     // Admin Sponsors Routes

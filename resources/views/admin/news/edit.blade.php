@@ -125,10 +125,43 @@
                 ['bold', 'italic', 'underline', 'strike'],
                 ['blockquote', 'code-block'],
                 [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link'],
+                ['link', 'image'],
                 ['clean']
             ]
         }
+    });
+
+    // Custom Image Handler
+    quill.getModule('toolbar').addHandler('image', function() {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = () => {
+            const file = input.files[0];
+            if (/^image\//.test(file.type)) {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                fetch('{{ route("admin.news.upload-image") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.url) {
+                        const range = quill.getSelection();
+                        quill.insertEmbed(range.index, 'image', result.url);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                    alert('Image upload failed.');
+                });
+            }
+        };
     });
 
     document.getElementById('articleForm').onsubmit = function() {

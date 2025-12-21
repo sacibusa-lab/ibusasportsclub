@@ -47,7 +47,22 @@ class TournamentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('home', compact('upcomingMatch', 'upcomingMatches', 'latestResult', 'heroPost', 'trendingPosts', 'stories'));
+        $highlights = MatchModel::whereNotNull('highlights_url')
+            ->with(['homeTeam', 'awayTeam'])
+            ->orderBy('match_date', 'desc')
+            ->limit(4)
+            ->get();
+
+        $afconPosts = Post::where('is_published', true)
+            ->whereHas('category', function($q) {
+                $q->where('name', 'Africa Cup of Nations');
+            })
+            ->with('category')
+            ->orderBy('published_at', 'desc')
+            ->limit(4)
+            ->get();
+
+        return view('home', compact('upcomingMatch', 'upcomingMatches', 'latestResult', 'heroPost', 'trendingPosts', 'stories', 'highlights', 'afconPosts'));
     }
 
     public function table()

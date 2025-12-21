@@ -152,4 +152,13 @@ class AdminNewsController extends Controller
         Tag::findOrFail($id)->delete();
         return back()->with('success', 'Tag removed.');
     }
+
+    public function uploadImage(Request $request)
+    {
+        if ($request->hasFile('image')) {
+            $url = $this->imageService->upload($request->file('image'), 'news/editor');
+            return response()->json(['url' => $url]);
+        }
+        return response()->json(['error' => 'No image uploaded.'], 400);
+    }
 }
