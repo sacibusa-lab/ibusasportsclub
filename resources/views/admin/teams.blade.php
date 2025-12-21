@@ -47,6 +47,15 @@
                 <h3 class="text-xl font-black mb-6 text-primary uppercase italic tracking-tighter">Add New Team</h3>
                 <form action="{{ route('admin.teams.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
+                    @if ($errors->any())
+                        <div class="p-4 bg-rose-50 text-rose-500 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-rose-100">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>• {{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <div>
                         <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Team Name</label>
                         <input type="text" name="name" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" placeholder="e.g. AFC Community" required>
@@ -209,6 +218,8 @@
                 </div>
             </form>
         </div>
+    </div>
+
     <!-- Add Player Modal -->
     <div x-show="playerModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">
         <div @click.away="playerModal = false" class="bg-white rounded-3xl p-8 shadow-2xl border border-zinc-100 w-full max-w-md animate-scale-in">
@@ -221,6 +232,15 @@
             </div>
             <form action="{{ route('admin.players.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
+                @if ($errors->any())
+                    <div class="p-4 bg-rose-50 text-rose-500 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-rose-100">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <input type="hidden" name="team_id" :value="newPlayer.team_id">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
@@ -269,6 +289,15 @@
             <form :action="'{{ url('admin/players') }}/' + editPlayer.id" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 @method('PUT')
+                @if ($errors->any())
+                    <div class="p-4 bg-rose-50 text-rose-500 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-rose-100">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <input type="hidden" name="team_id" :value="editPlayer.team_id">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
