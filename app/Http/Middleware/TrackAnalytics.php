@@ -27,12 +27,29 @@ class TrackAnalytics
         }
 
         try {
+            // Basic Geolocation Logic (IP API)
+            // In a real production app, use a local database (like MaxMind) or a paid service to avoid rate limits
+            $ip = $request->ip();
+            $country = null;
+            $city = null;
+
+            // Simple check to avoid calling API for local IPs
+            if ($ip !== '127.0.0.1' && $ip !== '::1') {
+                $geoData = @json_decode(file_get_contents("http://ip-api.com/json/{$ip}?fields=country,city"));
+                if ($geoData) {
+                    $country = $geoData->country ?? null;
+                    $city = $geoData->city ?? null;
+                }
+            }
+
             DB::table('analytics_visits')->insert([
-                'ip_address' => $request->ip(),
+                'ip_address' => $ip,
                 'url' => $request->path(),
                 'method' => $request->method(),
                 'user_agent' => $request->userAgent(),
                 'referer' => $request->header('referer'),
+                'country' => $country,
+                'city' => $city,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

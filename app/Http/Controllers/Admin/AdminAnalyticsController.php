@@ -43,6 +43,15 @@ class AdminAnalyticsController extends Controller
             
         $desktopVisits = $totalViews - $mobileVisits;
 
+        // 5. Top Countries
+        $topCountries = DB::table('analytics_visits')
+            ->select('country', DB::raw('count(*) as count'))
+            ->whereNotNull('country')
+            ->groupBy('country')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
+
         return view('admin.analytics.index', compact(
             'totalViews', 
             'uniqueVisitors', 
@@ -50,7 +59,8 @@ class AdminAnalyticsController extends Controller
             'data', 
             'topPages',
             'mobileVisits',
-            'desktopVisits'
+            'desktopVisits',
+            'topCountries'
         ));
     }
 }

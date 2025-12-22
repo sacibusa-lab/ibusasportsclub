@@ -82,6 +82,29 @@
                 @endforeach
             </div>
         </div>
+
+        <!-- Top Locations -->
+        <div class="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm">
+            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-6">Top Locations</h3>
+            <div class="space-y-4">
+                @foreach($topCountries as $country)
+                <div class="flex items-center justify-between group">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-50 flex items-center justify-center text-zinc-300 font-bold text-[10px]">
+                            {{ $loop->iteration }}
+                        </div>
+                        <span class="text-xs font-bold text-zinc-600 truncate group-hover:text-primary transition">
+                            {{ $country->country }}
+                        </span>
+                    </div>
+                    <span class="text-xs font-black text-primary tabular-nums">{{ number_format($country->count) }}</span>
+                </div>
+                @endforeach
+                @if($topCountries->isEmpty())
+                <p class="text-xs text-zinc-400 italic">No location data yet.</p>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
 
