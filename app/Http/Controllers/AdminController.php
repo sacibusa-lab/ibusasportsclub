@@ -8,6 +8,7 @@ use App\Models\MatchModel;
 use App\Models\MatchEvent;
 use App\Services\TournamentService;
 use App\Services\ImageService;
+use App\Models\MatchCommentary;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -467,7 +468,40 @@ class AdminController extends Controller
 
     public function destroyEvent($id)
     {
-        MatchEvent::findOrFail($id)->delete();
-        return back()->with('success', 'Event removed.');
+        $event = MatchEvent::findOrFail($id);
+        $event->delete();
+        return back()->with('success', 'Event deleted.');
+    }
+
+    // Live Reporting Methods
+    public function liveFixture($id)
+    {
+        $match = MatchModel::with(['homeTeam', 'awayTeam', 'commentaries'])->findOrFail($id);
+        return view('admin.live-fixture', compact('match'));
+    }
+
+    public function storeCommentary(Request $request, $id)
+    {
+        $request->validate([
+            'minute' => 'nullable|integer',
+            'type'   => 'required|in:goal,foul,sub,info,whistle,card,var',
+            'comment'=> 'required|string'
+        ]);
+
+        MatchCommentary::create([
+            'match_id' => $id,
+            'minute'   => $request->minute,
+            'type'     => $request->type,
+            'comment'  => $request->comment
+        ]);
+
+        return back()->with('success', 'Update posted!');
+    }
+
+    public function destroyCommentary($id)
+    {
+        $commentary = MatchCommentary::findOrFail($id);
+        $commentary->delete();
+        return back()->with('success', 'Commentary removed.');
     }
 }

@@ -47,6 +47,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/matches/{id}/events', [AdminController::class, 'storeEvent'])->name('matches.events.store');
     Route::delete('/events/{id}', [AdminController::class, 'destroyEvent'])->name('events.destroy');
 
+    // Live Reporting
+    Route::get('/fixtures/{id}/live', [AdminController::class, 'liveFixture'])->name('fixtures.live');
+    Route::post('/fixtures/{id}/live', [AdminController::class, 'storeCommentary'])->name('fixtures.live.store');
+    Route::delete('/fixtures/live/{id}', [AdminController::class, 'destroyCommentary'])->name('fixtures.live.destroy');
+
     // Admin News Routes
     Route::prefix('news')->name('news.')->group(function() {
         Route::get('/', [AdminNewsController::class, 'index'])->name('index');

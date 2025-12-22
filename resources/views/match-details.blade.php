@@ -94,8 +94,37 @@
     <div class="flex gap-1 bg-white p-1 rounded-2xl border border-zinc-100 shadow-sm overflow-x-auto sticky top-4 z-20">
         <button @click="tab = 'recap'" :class="tab === 'recap' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Recap</button>
         <button @click="tab = 'lineups'" :class="tab === 'lineups' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Lineups</button>
+        <button @click="tab = 'live'" :class="tab === 'live' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Live</button>
         <button @click="tab = 'stats'" :class="tab === 'stats' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Stats</button>
         <button @click="tab = 'info'" :class="tab === 'info' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Info</button>
+    </div>
+
+    <!-- LIVE FEED TAB -->
+    <div x-show="tab === 'live'" x-cloak class="space-y-6">
+        @if($match->commentaries->count() > 0)
+        <div class="space-y-4">
+            @foreach($match->commentaries as $log)
+            <div class="bg-white p-4 md:p-6 rounded-3xl border border-zinc-100 shadow-sm flex gap-4">
+                <div class="flex-shrink-0 w-12 text-center">
+                    <span class="block text-sm font-black text-secondary">{{ $log->minute }}'</span>
+                </div>
+                <div class="flex-grow pb-2 border-l-2 border-zinc-100 pl-4 relative">
+                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-4 border-zinc-100"></div>
+                    <span class="inline-block px-2 py-0.5 rounded bg-zinc-50 border border-zinc-100 text-[9px] font-bold text-zinc-400 uppercase mb-2">{{ $log->type }}</span>
+                    <p class="text-xs md:text-sm font-bold text-zinc-700 leading-relaxed">{{ $log->comment }}</p>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-12 text-center">
+            <div class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-300">
+                <div class="w-2 h-2 bg-zinc-400 rounded-full animate-ping"></div>
+            </div>
+            <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-1">Live Feed</h3>
+            <p class="text-[10px] text-zinc-300">Waiting for match updates...</p>
+        </div>
+        @endif
     </div>
 
     <!-- RECAP TAB -->

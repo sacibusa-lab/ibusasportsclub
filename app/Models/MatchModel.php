@@ -57,4 +57,9 @@ class MatchModel extends Model
                     ->withPivot('team_id', 'is_captain', 'is_substitute', 'shirt_number', 'position_key', 'position_x', 'position_y')
                     ->withTimestamps();
     }
+
+    public function commentaries()
+    {
+        return $this->hasMany(MatchCommentary::class, 'match_id')->orderBy('created_at', 'desc');
+    }
 }
