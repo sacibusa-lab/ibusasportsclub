@@ -19,7 +19,7 @@ class MatchModel extends Model
         'home_fouls', 'away_fouls', 'home_free_kicks', 'away_free_kicks', 'home_throw_ins', 'away_throw_ins',
         'home_saves', 'away_saves', 'home_goal_kicks', 'away_goal_kicks',
         'home_scorers', 'away_scorers', 'report', 'motm_player_id',
-        'referee', 'attendance', 'highlights_url', 'highlights_thumbnail'
+        'referee', 'referee_ar1', 'referee_ar2', 'attendance', 'highlights_url', 'highlights_thumbnail'
     ];
 
     protected $casts = [

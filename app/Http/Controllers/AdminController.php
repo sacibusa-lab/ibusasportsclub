@@ -113,19 +113,39 @@ class AdminController extends Controller
             'lineups_json' => 'nullable|json',
         ]);
 
-        $homeTeam = Team::find($request->home_team_id);
+    $homeTeam = Team::find($request->home_team_id);
 
-        $match = MatchModel::create([
-            'home_team_id' => $request->home_team_id,
-            'away_team_id' => $request->away_team_id,
-            'match_date' => $request->match_date,
-            'venue' => $request->venue,
-            'referee' => $request->referee,
-            'attendance' => $request->attendance,
-            'stage' => $request->stage,
-            'group_id' => $request->stage === 'group' ? $homeTeam->group_id : null,
-            'status' => 'upcoming'
-        ]);
+    // Auto-calculate matchday based on date proximity or sequential increment
+    $inputDate = \Carbon\Carbon::parse($request->match_date);
+    $existingMatchInWindow = MatchModel::where('stage', $request->stage)
+        ->whereBetween('match_date', [$inputDate->copy()->subDays(2), $inputDate->copy()->addDays(2)])
+        ->whereNotNull('matchday')
+        ->first();
+
+    if ($existingMatchInWindow) {
+        $matchday = $existingMatchInWindow->matchday;
+    } else {
+        $maxMatchday = MatchModel::where('stage', $request->stage)->max('matchday');
+        $matchday = $maxMatchday ? $maxMatchday + 1 : 1;
+    }
+
+    $match = MatchModel::create([
+        'home_team_id' => $request->home_team_id,
+        'away_team_id' => $request->away_team_id,
+        'match_date' => $request->match_date,
+        'venue' => $request->venue,
+        'match_date' => $request->match_date,
+        'venue' => $request->venue,
+        'referee' => $request->referee,
+        'referee_ar1' => $request->referee_ar1,
+        'referee_ar2' => $request->referee_ar2,
+        'attendance' => $request->attendance,
+        'attendance' => $request->attendance,
+        'stage' => $request->stage,
+        'group_id' => $request->stage === 'group' ? $homeTeam->group_id : null,
+        'status' => 'upcoming',
+        'matchday' => $matchday
+    ]);
 
         // Process Lineups if provided
         $syncData = [];
@@ -255,6 +275,8 @@ class AdminController extends Controller
             'report' => 'nullable|string',
             'motm_player_id' => 'nullable|exists:players,id',
             'referee' => 'nullable|string|max:255',
+            'referee_ar1' => 'nullable|string|max:255',
+            'referee_ar2' => 'nullable|string|max:255',
             'attendance' => 'nullable|integer|min:0',
             'lineups_json' => 'nullable|json',
         ]);
@@ -297,6 +319,8 @@ class AdminController extends Controller
             'report'       => $request->report,
             'motm_player_id' => $request->motm_player_id,
             'referee'      => $request->referee,
+            'referee_ar1'  => $request->referee_ar1,
+            'referee_ar2'  => $request->referee_ar2,
             'attendance'   => $request->attendance,
             'highlights_url' => $request->highlights_url,
         ];

@@ -77,11 +77,22 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-8">
+            <div class="grid grid-cols-3 gap-8">
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Referee</label>
                     <input type="text" name="referee" value="{{ $match->referee }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="Who is the Ref?">
                 </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Assistant Ref 1</label>
+                    <input type="text" name="referee_ar1" value="{{ $match->referee_ar1 }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="AR 1">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Assistant Ref 2</label>
+                    <input type="text" name="referee_ar2" value="{{ $match->referee_ar2 }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="AR 2">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-8">
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Attendance</label>
                     <input type="number" name="attendance" value="{{ $match->attendance }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" placeholder="e.g. 50000">

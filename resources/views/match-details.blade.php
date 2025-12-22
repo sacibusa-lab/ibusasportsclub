@@ -390,6 +390,32 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Officials Section (Just below pitch) -->
+                    @if($match->referee || $match->referee_ar1 || $match->referee_ar2)
+                    <div class="bg-white rounded-3xl p-6 border border-zinc-100 shadow-sm flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
+                        @if($match->referee)
+                        <div class="flex flex-col items-center">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Referee</span>
+                            <span class="text-xs font-black text-primary uppercase">{{ $match->referee }}</span>
+                        </div>
+                        @endif
+                        
+                        @if($match->referee_ar1)
+                        <div class="flex flex-col items-center">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Assistant Ref 1</span>
+                            <span class="text-xs font-black text-primary uppercase">{{ $match->referee_ar1 }}</span>
+                        </div>
+                        @endif
+
+                        @if($match->referee_ar2)
+                        <div class="flex flex-col items-center">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Assistant Ref 2</span>
+                            <span class="text-xs font-black text-primary uppercase">{{ $match->referee_ar2 }}</span>
+                        </div>
+                        @endif
+                    </div>
+                    @endif
                 </div>
 
                 <!-- Starting XI Lists -->
