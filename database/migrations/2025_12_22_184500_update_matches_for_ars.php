@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::table('matches', function (Blueprint $table) {
             if (!Schema::hasColumn('matches', 'referee_ar1_id')) {
-                $table->foreignId('referee_ar1_id')->nullable()->constrained('referees')->onDelete('set null');
+                $table->unsignedBigInteger('referee_ar1_id')->nullable();
+                $table->foreign('referee_ar1_id')->references('id')->on('referees')->onDelete('set null');
             }
             if (!Schema::hasColumn('matches', 'referee_ar2_id')) {
-                $table->foreignId('referee_ar2_id')->nullable()->constrained('referees')->onDelete('set null');
+                $table->unsignedBigInteger('referee_ar2_id')->nullable();
+                $table->foreign('referee_ar2_id')->references('id')->on('referees')->onDelete('set null');
             }
         });
     }
