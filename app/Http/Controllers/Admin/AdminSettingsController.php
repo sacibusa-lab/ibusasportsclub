@@ -31,6 +31,7 @@ class AdminSettingsController extends Controller
             'current_season' => date('Y'),
             'footer_text' => 'Local Community Football Championship. Built with Laravel. Not affiliated with the Premier League.',
             'copyright_text' => '© ' . date('Y') . ' Local Community Football Championship.',
+            'analytics_whitelist_ips' => '127.0.0.1, ::1',
         ];
 
         foreach ($defaults as $key => $value) {

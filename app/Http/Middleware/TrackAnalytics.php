@@ -21,6 +21,16 @@ class TrackAnalytics
             return $next($request);
         }
 
+        // Check for IP Whitelist from DB Settings
+        $ip = $request->ip();
+        $whitelist = \App\Models\Setting::where('key', 'analytics_whitelist_ips')->value('value');
+        if ($whitelist) {
+            $ips = array_map('trim', explode(',', $whitelist));
+            if (in_array($ip, $ips)) {
+                return $next($request);
+            }
+        }
+
         // Only track GET requests for page views
         if (!$request->isMethod('GET')) {
             return $next($request);

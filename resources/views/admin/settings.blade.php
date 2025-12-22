@@ -138,6 +138,24 @@
                     <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">Copyright Text</label>
                     <input type="text" name="copyright_text" value="{{ $settings['copyright_text'] }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs">
                 </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Settings -->
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
+            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-8 border-b border-zinc-50 pb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Analytics & Privacy
+            </h3>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">Whitelisted IPs (Comma Separated)</label>
+                    <textarea name="analytics_whitelist_ips" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs h-24">{{ $settings['analytics_whitelist_ips'] ?? '127.0.0.1, ::1' }}</textarea>
+                    <p class="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">
+                        Your Current IP: <span class="text-primary bg-zinc-100 px-1 rounded">{{ request()->ip() }}</span> (Add this to exclude your visits)
+                    </p>
+                </div>
             </div>
         </div>
 
