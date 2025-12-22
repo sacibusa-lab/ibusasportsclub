@@ -210,7 +210,40 @@ class TournamentController extends Controller
 
     public function matchDetails($id)
     {
-        $match = MatchModel::with(['homeTeam', 'awayTeam', 'matchEvents.player', 'matchEvents.assistant', 'matchEvents.relatedPlayer', 'lineups'])->findOrFail($id);
+        $match = MatchModel::with(['homeTeam', 'awayTeam', 'matchEvents.player', 'matchEvents.assistant', 'matchEvents.relatedPlayer', 'lineups', 'commentaries'])->findOrFail($id);
         return view('match-details', compact('match'));
+    }
+
+    public function matchFeed($id)
+    {
+        $match = MatchModel::with(['commentaries'])->findOrFail($id);
+        
+        $html = '';
+        if($match->commentaries->count() > 0) {
+            $html .= '<div class="space-y-4">';
+            foreach($match->commentaries as $log) {
+                $html .= '<div class="bg-white p-4 md:p-6 rounded-3xl border border-zinc-100 shadow-sm flex gap-4 animate-fade-in-up">';
+                $html .= '<div class="flex-shrink-0 w-12 text-center">';
+                $html .= '<span class="block text-sm font-black text-secondary">' . $log->minute . '\'</span>';
+                $html .= '</div>';
+                $html .= '<div class="flex-grow pb-2 border-l-2 border-zinc-100 pl-4 relative">';
+                $html .= '<div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-4 border-zinc-100"></div>';
+                $html .= '<span class="inline-block px-2 py-0.5 rounded bg-zinc-50 border border-zinc-100 text-[9px] font-bold text-zinc-400 uppercase mb-2">' . $log->type . '</span>';
+                $html .= '<p class="text-xs md:text-sm font-bold text-zinc-700 leading-relaxed">' . e($log->comment) . '</p>';
+                $html .= '</div>';
+                $html .= '</div>';
+            }
+            $html .= '</div>';
+        } else {
+             $html .= '<div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-12 text-center">';
+             $html .= '<div class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-300">';
+             $html .= '<div class="w-2 h-2 bg-zinc-400 rounded-full animate-ping"></div>';
+             $html .= '</div>';
+             $html .= '<h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-1">Live Feed</h3>';
+             $html .= '<p class="text-[10px] text-zinc-300">Waiting for match updates...</p>';
+             $html .= '</div>';
+        }
+        
+        return response($html);
     }
 }

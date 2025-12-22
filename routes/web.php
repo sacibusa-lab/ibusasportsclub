@@ -17,6 +17,7 @@ Route::get('/players/{id}', [TournamentController::class, 'player'])->name('play
 Route::get('/knockout', [TournamentController::class, 'knockout'])->name('knockout');
 Route::get('/stats', [TournamentController::class, 'stats'])->name('stats');
 Route::get('/match/{id}', [TournamentController::class, 'matchDetails'])->name('match.details');
+Route::get('/match/{id}/feed', [TournamentController::class, 'matchFeed'])->name('match.feed');
 
 // News Routes
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
@@ -107,6 +108,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::put('/{id}', [\App\Http\Controllers\Admin\AdminStoryController::class, 'update'])->name('update');
         Route::delete('/{id}', [\App\Http\Controllers\Admin\AdminStoryController::class, 'destroy'])->name('destroy');
         Route::delete('/items/{id}', [\App\Http\Controllers\Admin\AdminStoryController::class, 'destroyItem'])->name('items.destroy');
+    });
+
+    // Admin Referees Routes
+    Route::prefix('referees')->name('referees.')->group(function() {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminRefereeController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\AdminRefereeController::class, 'store'])->name('store');
+        Route::put('/{id}', [\App\Http\Controllers\Admin\AdminRefereeController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\AdminRefereeController::class, 'destroy'])->name('destroy');
     });
 
     // Admin Settings Routes

@@ -100,31 +100,26 @@
     </div>
 
     <!-- LIVE FEED TAB -->
-    <div x-show="tab === 'live'" x-cloak class="space-y-6">
-        @if($match->commentaries->count() > 0)
-        <div class="space-y-4">
-            @foreach($match->commentaries as $log)
-            <div class="bg-white p-4 md:p-6 rounded-3xl border border-zinc-100 shadow-sm flex gap-4">
-                <div class="flex-shrink-0 w-12 text-center">
-                    <span class="block text-sm font-black text-secondary">{{ $log->minute }}'</span>
+    <div x-show="tab === 'live'" x-cloak class="space-y-6"
+         x-data="{ 
+             feed: '',
+             fetchFeed() {
+                 fetch('{{ route('match.feed', $match->id) }}')
+                    .then(response => response.text())
+                    .then(html => { this.feed = html; });
+             } 
+         }"
+         x-init="fetchFeed(); setInterval(() => fetchFeed(), 15000)">
+        
+        <div x-html="feed" class="transition-opacity duration-300">
+            <!-- Loading State initially (before first fetch) -->
+             <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-12 text-center animate-pulse">
+                <div class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-300">
+                    <div class="w-2 h-2 bg-zinc-400 rounded-full animate-ping"></div>
                 </div>
-                <div class="flex-grow pb-2 border-l-2 border-zinc-100 pl-4 relative">
-                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-4 border-zinc-100"></div>
-                    <span class="inline-block px-2 py-0.5 rounded bg-zinc-50 border border-zinc-100 text-[9px] font-bold text-zinc-400 uppercase mb-2">{{ $log->type }}</span>
-                    <p class="text-xs md:text-sm font-bold text-zinc-700 leading-relaxed">{{ $log->comment }}</p>
-                </div>
+                <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-1">Connecting...</h3>
             </div>
-            @endforeach
         </div>
-        @else
-        <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-12 text-center">
-            <div class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-300">
-                <div class="w-2 h-2 bg-zinc-400 rounded-full animate-ping"></div>
-            </div>
-            <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-1">Live Feed</h3>
-            <p class="text-[10px] text-zinc-300">Waiting for match updates...</p>
-        </div>
-        @endif
     </div>
 
     <!-- RECAP TAB -->
@@ -418,26 +413,90 @@
                                 <span class="text-[9px] md:text-[10px] font-black text-white uppercase">{{ $match->awayTeam->manager ?? 'N/A' }}</span>
                             </div>
                         </div>
+
                     </div>
 
                     <!-- Officials Section (Just below pitch) -->
-                    @if($match->referee || $match->referee_ar1 || $match->referee_ar2)
+                    @if($match->assignedReferee || $match->referee_ar1 || $match->referee_ar2)
                     <div class="bg-white rounded-3xl p-6 border border-zinc-100 shadow-sm flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
-                        @if($match->referee)
-                        <div class="flex flex-col items-center">
+                        @if($match->assignedReferee)
+                        <div class="flex flex-col items-center gap-2">
                             <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Referee</span>
-                            <span class="text-xs font-black text-primary uppercase">{{ $match->referee }}</span>
+                            <div class="flex items-center gap-3">
+                                @if($match->assignedReferee->image_url)
+                                <img src="{{ $match->assignedReferee->image_url }}" class="w-10 h-10 rounded-full object-cover border border-zinc-100 shadow-sm">
+                                @else
+                                <div class="w-10 h-10 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center text-[10px] font-black text-zinc-300">REF</div>
+                                @endif
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-xs font-black text-primary uppercase">{{ $match->assignedReferee->name }}</span>
+                                        @if($match->assignedReferee->has_fifa_badge)
+                                        <span class="bg-primary text-white text-[7px] px-1.5 py-0.5 rounded font-black tracking-widest border border-white shadow-sm" title="FIFA Referee">FIFA</span>
+                                        @endif
+                                    </div>
+                                    @if($match->assignedReferee->nationality)
+                                    <span class="text-[9px] font-bold text-zinc-400 uppercase">{{ $match->assignedReferee->nationality }}</span>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                         @endif
                         
-                        @if($match->referee_ar1)
+                        {{-- Assistant Ref 1 --}}
+                        @if($match->assignedAssistant1)
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Assistant Ref 1</span>
+                            <div class="flex items-center gap-3">
+                                @if($match->assignedAssistant1->image_url)
+                                <img src="{{ $match->assignedAssistant1->image_url }}" class="w-10 h-10 rounded-full object-cover border border-zinc-100 shadow-sm">
+                                @else
+                                <div class="w-10 h-10 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center text-[10px] font-black text-zinc-300">AR1</div>
+                                @endif
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-xs font-black text-primary uppercase">{{ $match->assignedAssistant1->name }}</span>
+                                        @if($match->assignedAssistant1->has_fifa_badge)
+                                        <span class="bg-primary text-white text-[7px] px-1.5 py-0.5 rounded font-black tracking-widest border border-white shadow-sm" title="FIFA Referee">FIFA</span>
+                                        @endif
+                                    </div>
+                                    @if($match->assignedAssistant1->nationality)
+                                    <span class="text-[9px] font-bold text-zinc-400 uppercase">{{ $match->assignedAssistant1->nationality }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @elseif($match->referee_ar1)
                         <div class="flex flex-col items-center">
                             <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Assistant Ref 1</span>
                             <span class="text-xs font-black text-primary uppercase">{{ $match->referee_ar1 }}</span>
                         </div>
                         @endif
 
-                        @if($match->referee_ar2)
+                        {{-- Assistant Ref 2 --}}
+                        @if($match->assignedAssistant2)
+                         <div class="flex flex-col items-center gap-2">
+                            <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Assistant Ref 2</span>
+                            <div class="flex items-center gap-3">
+                                @if($match->assignedAssistant2->image_url)
+                                <img src="{{ $match->assignedAssistant2->image_url }}" class="w-10 h-10 rounded-full object-cover border border-zinc-100 shadow-sm">
+                                @else
+                                <div class="w-10 h-10 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center text-[10px] font-black text-zinc-300">AR2</div>
+                                @endif
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-xs font-black text-primary uppercase">{{ $match->assignedAssistant2->name }}</span>
+                                        @if($match->assignedAssistant2->has_fifa_badge)
+                                        <span class="bg-primary text-white text-[7px] px-1.5 py-0.5 rounded font-black tracking-widest border border-white shadow-sm" title="FIFA Referee">FIFA</span>
+                                        @endif
+                                    </div>
+                                    @if($match->assignedAssistant2->nationality)
+                                    <span class="text-[9px] font-bold text-zinc-400 uppercase">{{ $match->assignedAssistant2->nationality }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @elseif($match->referee_ar2)
                         <div class="flex flex-col items-center">
                             <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest mb-1">Assistant Ref 2</span>
                             <span class="text-xs font-black text-primary uppercase">{{ $match->referee_ar2 }}</span>
@@ -741,7 +800,7 @@
             </div>
             <div class="space-y-1.5 md:space-y-2">
                 <label class="block text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest">Referee</label>
-                <p class="text-xs md:text-sm font-bold text-primary">{{ $match->referee ?? 'TBA' }}</p>
+                <p class="text-xs md:text-sm font-bold text-primary">{{ $match->assignedReferee->name ?? 'TBA' }}</p>
             </div>
             <div class="space-y-1.5 md:space-y-2">
                 <label class="block text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest">Attendance</label>

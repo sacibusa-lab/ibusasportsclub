@@ -19,7 +19,7 @@ class MatchModel extends Model
         'home_fouls', 'away_fouls', 'home_free_kicks', 'away_free_kicks', 'home_throw_ins', 'away_throw_ins',
         'home_saves', 'away_saves', 'home_goal_kicks', 'away_goal_kicks',
         'home_scorers', 'away_scorers', 'report', 'motm_player_id',
-        'referee', 'referee_ar1', 'referee_ar2', 'attendance', 'highlights_url', 'highlights_thumbnail'
+        'referee', 'referee_ar1', 'referee_ar2', 'referee_id', 'referee_ar1_id', 'referee_ar2_id', 'attendance', 'highlights_url', 'highlights_thumbnail'
     ];
 
     protected $casts = [
@@ -61,5 +61,20 @@ class MatchModel extends Model
     public function commentaries()
     {
         return $this->hasMany(MatchCommentary::class, 'match_id')->orderBy('created_at', 'desc');
+    }
+
+    public function assignedReferee()
+    {
+        return $this->belongsTo(Referee::class, 'referee_id');
+    }
+
+    public function assignedAssistant1()
+    {
+        return $this->belongsTo(Referee::class, 'referee_ar1_id');
+    }
+
+    public function assignedAssistant2()
+    {
+        return $this->belongsTo(Referee::class, 'referee_ar2_id');
     }
 }

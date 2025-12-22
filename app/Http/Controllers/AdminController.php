@@ -97,8 +97,9 @@ class AdminController extends Controller
     {
         $teams = Team::with('players')->get();
         $groups = Group::all();
+        $referees = \App\Models\Referee::all();
         $allMatches = MatchModel::orderBy('match_date', 'asc')->get();
-        return view('admin.fixtures', compact('teams', 'groups', 'allMatches'));
+        return view('admin.fixtures', compact('teams', 'groups', 'allMatches', 'referees'));
     }
 
     public function storeFixture(Request $request)
@@ -108,7 +109,9 @@ class AdminController extends Controller
             'away_team_id' => 'required|exists:teams,id',
             'match_date' => 'required|date',
             'venue' => 'nullable|string',
-            'referee' => 'nullable|string',
+            'referee_id' => 'nullable|exists:referees,id',
+            'referee_ar1_id' => 'nullable|exists:referees,id',
+            'referee_ar2_id' => 'nullable|exists:referees,id',
             'attendance' => 'nullable|integer|min:0',
             'stage' => 'required|in:group,semifinal,final,novelty',
             'lineups_json' => 'nullable|json',
@@ -135,11 +138,10 @@ class AdminController extends Controller
         'away_team_id' => $request->away_team_id,
         'match_date' => $request->match_date,
         'venue' => $request->venue,
-        'match_date' => $request->match_date,
-        'venue' => $request->venue,
-        'referee' => $request->referee,
-        'referee_ar1' => $request->referee_ar1,
-        'referee_ar2' => $request->referee_ar2,
+        'referee_id' => $request->referee_id,
+        'referee' => null, // Legacy column null
+        'referee_ar1_id' => $request->referee_ar1_id,
+        'referee_ar2_id' => $request->referee_ar2_id,
         'attendance' => $request->attendance,
         'attendance' => $request->attendance,
         'stage' => $request->stage,
@@ -233,11 +235,12 @@ class AdminController extends Controller
 
     public function editFixture($id)
     {
-        $match = MatchModel::with(['homeTeam.players', 'awayTeam.players', 'lineups', 'matchEvents.team'])->findOrFail($id);
+        $match = MatchModel::with(['homeTeam.players', 'awayTeam.players', 'lineups', 'matchEvents.team', 'assignedReferee', 'assignedAssistant1', 'assignedAssistant2'])->findOrFail($id);
         $teams = Team::with('players')->get();
+        $referees = \App\Models\Referee::all();
         $groups = Group::all();
         $positions = self::$pitchPositions;
-        return view('admin.edit-fixture', compact('match', 'teams', 'groups', 'positions'));
+        return view('admin.edit-fixture', compact('match', 'teams', 'groups', 'positions', 'referees'));
     }
 
     public function updateFixture(Request $request, $id)
@@ -275,9 +278,9 @@ class AdminController extends Controller
             'away_scorers' => 'nullable|string',
             'report' => 'nullable|string',
             'motm_player_id' => 'nullable|exists:players,id',
-            'referee' => 'nullable|string|max:255',
-            'referee_ar1' => 'nullable|string|max:255',
-            'referee_ar2' => 'nullable|string|max:255',
+            'referee_id' => 'nullable|exists:referees,id',
+            'referee_ar1_id' => 'nullable|exists:referees,id',
+            'referee_ar2_id' => 'nullable|exists:referees,id',
             'attendance' => 'nullable|integer|min:0',
             'lineups_json' => 'nullable|json',
         ]);
@@ -319,9 +322,9 @@ class AdminController extends Controller
             'away_scorers' => $request->away_scorers,
             'report'       => $request->report,
             'motm_player_id' => $request->motm_player_id,
-            'referee'      => $request->referee,
-            'referee_ar1'  => $request->referee_ar1,
-            'referee_ar2'  => $request->referee_ar2,
+            'referee_id'   => $request->referee_id,
+            'referee_ar1_id' => $request->referee_ar1_id,
+            'referee_ar2_id' => $request->referee_ar2_id,
             'attendance'   => $request->attendance,
             'highlights_url' => $request->highlights_url,
         ];

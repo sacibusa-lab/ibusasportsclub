@@ -45,11 +45,31 @@
 
                 <div class="space-y-4">
                     <label class="block text-xs font-black text-primary uppercase tracking-widest border-b border-zinc-50 pb-2">Match Info</label>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input type="datetime-local" name="match_date" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" required>
                         <input type="text" name="venue" placeholder="Venue Name" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs">
-                        <input type="text" name="referee" placeholder="Referee" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs">
+                        
+                        <select name="referee_id" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs">
+                            <option value="">Select Referee</option>
+                            @foreach($referees as $referee)
+                                <option value="{{ $referee->id }}">{{ $referee->name }} {{ $referee->has_fifa_badge ? '(FIFA)' : '' }}</option>
+                            @endforeach
+                        </select>
                         <input type="number" name="attendance" placeholder="Expected Attendance" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs">
+                        
+                        <select name="referee_ar1_id" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs">
+                            <option value="">Select Assistant 1</option>
+                            @foreach($referees as $referee)
+                                <option value="{{ $referee->id }}">{{ $referee->name }} {{ $referee->has_fifa_badge ? '(FIFA)' : '' }}</option>
+                            @endforeach
+                        </select>
+
+                        <select name="referee_ar2_id" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs">
+                            <option value="">Select Assistant 2</option>
+                            @foreach($referees as $referee)
+                                <option value="{{ $referee->id }}">{{ $referee->name }} {{ $referee->has_fifa_badge ? '(FIFA)' : '' }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
             </div>
