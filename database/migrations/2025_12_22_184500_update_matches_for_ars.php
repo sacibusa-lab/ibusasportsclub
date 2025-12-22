@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('matches', function (Blueprint $table) {
-            $table->foreignId('referee_ar1_id')->nullable()->constrained('referees')->onDelete('set null');
-            $table->foreignId('referee_ar2_id')->nullable()->constrained('referees')->onDelete('set null');
+            if (!Schema::hasColumn('matches', 'referee_ar1_id')) {
+                $table->foreignId('referee_ar1_id')->nullable()->constrained('referees')->onDelete('set null');
+            }
+            if (!Schema::hasColumn('matches', 'referee_ar2_id')) {
+                $table->foreignId('referee_ar2_id')->nullable()->constrained('referees')->onDelete('set null');
+            }
         });
     }
 

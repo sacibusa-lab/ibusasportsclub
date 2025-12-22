@@ -11,14 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('referees', function (Blueprint $table) {
-            $table->boolean('has_fifa_badge')->default(false)->after('name');
-        });
+        if (!Schema::hasColumn('referees', 'has_fifa_badge')) {
+            Schema::table('referees', function (Blueprint $table) {
+                $table->boolean('has_fifa_badge')->default(false)->after('name');
+            });
+        }
 
-        Schema::table('matches', function (Blueprint $table) {
-            $table->unsignedBigInteger('referee_id')->nullable()->after('venue');
-            $table->foreign('referee_id')->references('id')->on('referees')->onDelete('set null');
-        });
+        if (!Schema::hasColumn('matches', 'referee_id')) {
+            Schema::table('matches', function (Blueprint $table) {
+                $table->unsignedBigInteger('referee_id')->nullable()->after('venue');
+                $table->foreign('referee_id')->references('id')->on('referees')->onDelete('set null');
+            });
+        }
     }
 
     /**
