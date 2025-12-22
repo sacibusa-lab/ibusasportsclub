@@ -109,4 +109,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('/settings', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'update'])->name('settings.update');
     Route::post('/fix-storage', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'fixStorage'])->name('fix-storage');
     Route::post('/sync-storage', [\App\Http\Controllers\Admin\AdminSettingsController::class, 'syncStorage'])->name('sync-storage');
+
+    // Admin Analytics Routes
+    Route::get('/analytics', [\App\Http\Controllers\Admin\AdminAnalyticsController::class, 'index'])->name('analytics.index');
 });
