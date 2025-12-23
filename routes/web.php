@@ -126,4 +126,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Admin Analytics Routes
     Route::get('/analytics', [\App\Http\Controllers\Admin\AdminAnalyticsController::class, 'index'])->name('analytics.index');
+
+    // Admin Stats Routes
+    Route::get('/stats', [\App\Http\Controllers\Admin\AdminStatsController::class, 'index'])->name('stats.index');
 });
