@@ -220,6 +220,28 @@
 
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         
+        <!-- Goals Scored -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-green-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">Goals Scored</h3>
+                <span class="text-xl">⚽</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topGoalsScored as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100 hover:border-green-500 transition-all">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-green-600 italic">{{ $team->goals_for }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
         <!-- Most Shots -->
         <div class="space-y-6">
             <div class="flex items-center justify-between border-b-4 border-indigo-600 pb-4">

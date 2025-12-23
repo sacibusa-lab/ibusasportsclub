@@ -142,6 +142,7 @@ class TournamentController extends Controller
         $topMOTM = $this->statisticsService->getTopMOTM(10);
 
         // Team Stats
+        $topGoalsScored = Team::orderBy('goals_for', 'desc')->take(10)->get();
         $topShots = $this->statisticsService->getTopTeamsByStat('shots', 5);
         $topCorners = $this->statisticsService->getTopTeamsByStat('corners', 5);
         $topOffsides = $this->statisticsService->getTopTeamsByStat('offsides', 5);
@@ -152,7 +153,7 @@ class TournamentController extends Controller
 
         return view('stats', compact(
             'topScorers', 'topAssists', 'topCleanSheets', 'topCards', 'topMOTM',
-            'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks'
+            'topGoalsScored', 'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks'
         ));
     }
 
