@@ -55,7 +55,7 @@ class TournamentController extends Controller
 
         $afconPosts = Post::where('is_published', true)
             ->whereHas('category', function($q) {
-                $q->where('name', 'Africa Cup of Nations');
+                $q->where('name', 'like', '%Africa% Cup of Nations%');
             })
             ->with('category')
             ->orderBy('published_at', 'desc')
