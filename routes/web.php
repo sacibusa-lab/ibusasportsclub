@@ -16,6 +16,7 @@ Route::get('/teams/{id}', [TournamentController::class, 'team'])->name('team.det
 Route::get('/players/{id}', [TournamentController::class, 'player'])->name('player.details');
 Route::get('/knockout', [TournamentController::class, 'knockout'])->name('knockout');
 Route::get('/stats', [TournamentController::class, 'stats'])->name('stats');
+Route::get('/gallery', [TournamentController::class, 'gallery'])->name('gallery');
 Route::get('/match/{id}', [TournamentController::class, 'matchDetails'])->name('match.details');
 Route::get('/match/{id}/feed', [TournamentController::class, 'matchFeed'])->name('match.feed');
 
@@ -45,8 +46,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/fixtures/{id}/results', [AdminController::class, 'updateResult'])->name('results.update');
 
     // Match Events
-    Route::post('/matches/{id}/events', [AdminController::class, 'storeEvent'])->name('matches.events.store');
-    Route::delete('/events/{id}', [AdminController::class, 'destroyEvent'])->name('events.destroy');
+    Route::post('/matches/{match}/events', [AdminController::class, 'storeEvent'])->name('matches.events.store');
+    Route::delete('/events/{id}', [AdminController::class, 'destroyEvent'])->name('matches.events.destroy');
+
+    // Gallery Management
+    Route::post('/matches/{match}/gallery', [AdminController::class, 'storeMatchImage'])->name('matches.gallery.store');
+    Route::delete('/gallery/{id}', [AdminController::class, 'destroyMatchImage'])->name('matches.gallery.destroy');
 
     // Live Reporting
     Route::get('/fixtures/{id}/live', [AdminController::class, 'liveFixture'])->name('fixtures.live');

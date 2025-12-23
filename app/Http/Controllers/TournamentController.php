@@ -267,8 +267,18 @@ class TournamentController extends Controller
 
     public function matchDetails($id)
     {
-        $match = MatchModel::with(['homeTeam', 'awayTeam', 'matchEvents.player', 'matchEvents.assistant', 'matchEvents.relatedPlayer', 'lineups', 'commentaries'])->findOrFail($id);
+        $match = MatchModel::with(['homeTeam', 'awayTeam', 'matchEvents.player', 'matchEvents.assistant', 'matchEvents.relatedPlayer', 'lineups', 'commentaries', 'images'])->findOrFail($id);
         return view('match-details', compact('match'));
+    }
+
+    public function gallery()
+    {
+        $matchesWithImages = MatchModel::whereHas('images')
+            ->with(['homeTeam', 'awayTeam', 'images'])
+            ->orderBy('match_date', 'desc')
+            ->get();
+            
+        return view('gallery', compact('matchesWithImages'));
     }
 
     public function matchFeed($id)

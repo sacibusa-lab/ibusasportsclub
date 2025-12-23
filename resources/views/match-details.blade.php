@@ -96,6 +96,7 @@
         <button @click="tab = 'lineups'" :class="tab === 'lineups' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Lineups</button>
         <button @click="tab = 'live'" :class="tab === 'live' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Live</button>
         <button @click="tab = 'stats'" :class="tab === 'stats' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Stats</button>
+        <button @click="tab = 'gallery'" :class="tab === 'gallery' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Gallery</button>
         <button @click="tab = 'info'" :class="tab === 'info' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Info</button>
     </div>
 
@@ -784,6 +785,51 @@
                     </div>
                 @endforeach
             </div>
+        </div>
+    </div>
+
+    <!-- GALLERY TAB -->
+    <div x-show="tab === 'gallery'" x-cloak class="space-y-8">
+        <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-6 md:p-8">
+            <h3 class="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest border-b border-zinc-50 pb-4 mb-6">Match Gallery</h3>
+            
+            @if($match->images->count() > 0)
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                    @foreach($match->images as $image)
+                    <div x-data="{ open: false }">
+                        <div @click="open = true" class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer bg-zinc-50 border border-zinc-100 transition hover:shadow-xl">
+                            <img src="{{ $image->image_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $image->caption }}">
+                            @if($image->caption)
+                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <p class="text-[10px] text-white font-bold truncate">{{ $image->caption }}</p>
+                            </div>
+                            @endif
+                        </div>
+
+                        <!-- Lightbox -->
+                        <div x-show="open" 
+                             class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-md" 
+                             @click.away="open = false" 
+                             x-cloak>
+                            <button @click="open = false" class="absolute top-8 right-8 text-white text-4xl">&times;</button>
+                            <div class="max-w-5xl w-full">
+                                <img src="{{ $image->image_url }}" class="w-full h-auto max-h-[85vh] object-contain rounded-xl shadow-2xl">
+                                @if($image->caption)
+                                <p class="text-center text-white font-black uppercase tracking-widest mt-6 italic">{{ $image->caption }}</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="py-20 text-center space-y-4">
+                    <div class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-2 text-zinc-200">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-[10px] font-black text-zinc-300 uppercase tracking-widest italic">No snapshots available for this match yet.</p>
+                </div>
+            @endif
         </div>
     </div>
 

@@ -461,7 +461,7 @@ class AdminController extends Controller
                                 : ($event->event_type == 'sub_on' && $event->relatedPlayer 
                                     ? 'replacing: ' . $event->relatedPlayer->name 
                                     : null),
-                    'delete_url' => route('admin.events.destroy', $event->id)
+                    'delete_url' => route('admin.matches.events.destroy', $event->id)
                 ]
             ]);
         }
@@ -506,5 +506,49 @@ class AdminController extends Controller
         $commentary = MatchCommentary::findOrFail($id);
         $commentary->delete();
         return back()->with('success', 'Commentary removed.');
+    }
+
+    public function storeMatchImage(Request $request, $matchId)
+    {
+        $request->validate([
+            'image' => 'nullable|image|max:5120',
+            'image_url' => 'nullable|url',
+            'caption' => 'nullable|string|max:255'
+        ]);
+
+        $match = MatchModel::findOrFail($matchId);
+        $finalUrl = null;
+
+        if ($request->hasFile('image')) {
+            $finalUrl = $this->imageService->upload($request->file('image'), 'matches/gallery');
+        } elseif ($request->image_url) {
+            $finalUrl = $request->image_url;
+        }
+
+        if (!$finalUrl) {
+            return back()->with('error', 'Please provide an image file or a valid URL.');
+        }
+
+        \App\Models\MatchImage::create([
+            'match_id' => $matchId,
+            'image_url' => $finalUrl,
+            'caption' => $request->caption,
+            'order' => $match->images()->max('order') + 1
+        ]);
+
+        return back()->with('success', 'Image added to gallery.');
+    }
+
+    public function destroyMatchImage($id)
+    {
+        $image = \App\Models\MatchImage::findOrFail($id);
+        
+        // If it's a local storage image, delete the file
+        if (str_contains($image->image_url, asset('storage/'))) {
+            $this->imageService->delete($image->image_url);
+        }
+
+        $image->delete();
+        return back()->with('success', 'Image removed from gallery.');
     }
 }

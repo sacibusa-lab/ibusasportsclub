@@ -630,7 +630,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-3 text-right">
-                                <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST" onsubmit="return confirm('Remove this event?')">
+                                <form action="{{ route('admin.matches.events.destroy', $event->id) }}" method="POST" onsubmit="return confirm('Remove this event?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-accent hover:text-red-700 transition">✕</button>
@@ -644,6 +644,86 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <!-- Match Gallery Section -->
+        <div class="mt-16 pt-16 border-t border-zinc-100 space-y-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xs font-black text-primary uppercase tracking-widest">Match Gallery</h3>
+                    <p class="text-[10px] text-zinc-400 mt-1 uppercase font-bold">Add photos or external links for this match</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Upload Form -->
+                <div class="lg:col-span-1">
+                    <form action="{{ route('admin.matches.gallery.store', $match->id) }}" method="POST" enctype="multipart/form-data" class="bg-zinc-50 p-6 rounded-3xl border border-zinc-100 space-y-4 shadow-sm">
+                        @csrf
+                        <div class="space-y-2">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Upload Image</label>
+                            <input type="file" name="image" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-[10px]" accept="image/*">
+                        </div>
+
+                        <div class="relative py-2 flex items-center">
+                            <div class="flex-grow border-t border-zinc-200"></div>
+                            <span class="flex-shrink mx-4 text-[8px] font-black text-zinc-300 uppercase">OR</span>
+                            <div class="flex-grow border-t border-zinc-200"></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Image URL</label>
+                            <input type="text" name="image_url" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-[10px]" placeholder="https://example.com/photo.jpg">
+                        </div>
+
+                        <div class="space-y-2 pt-2">
+                            <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Caption (Optional)</label>
+                            <input type="text" name="caption" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-[10px]" placeholder="Match action shot">
+                        </div>
+
+                        <button type="submit" class="w-full bg-primary text-secondary font-black py-4 rounded-xl hover:bg-primary-light transition uppercase tracking-widest text-[10px] shadow-md mt-2">Add to Gallery</button>
+                    </form>
+                </div>
+
+                <!-- Gallery Display -->
+                <div class="lg:col-span-2">
+                    <div class="bg-zinc-50 p-6 rounded-3xl border border-zinc-100 min-h-[300px]">
+                        @if($match->images->count() > 0)
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                @foreach($match->images as $image)
+                                    <div class="group relative aspect-video bg-white rounded-2xl overflow-hidden border border-zinc-200 shadow-sm transition hover:shadow-md">
+                                        <img src="{{ $image->image_url }}" class="w-full h-full object-cover" alt="{{ $image->caption }}">
+                                        
+                                        <!-- Overlay with Actions -->
+                                        <div class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                                            <form action="{{ route('admin.matches.gallery.destroy', $image->id) }}" method="POST" onsubmit="return confirm('Remove this image from gallery?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center hover:bg-red-700 transition">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        @if($image->caption)
+                                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                                                <p class="text-[8px] font-bold text-white truncate">{{ $image->caption }}</p>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="h-full flex flex-col items-center justify-center text-center p-12">
+                                <div class="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mb-4">
+                                    <svg class="w-8 h-8 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                </div>
+                                <h4 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">No images yet</h4>
+                                <p class="text-[9px] text-zinc-300 mt-1">Upload match photos to showcase them to fans.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </div>

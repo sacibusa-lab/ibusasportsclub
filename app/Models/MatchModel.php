@@ -77,4 +77,9 @@ class MatchModel extends Model
     {
         return $this->belongsTo(Referee::class, 'referee_ar2_id');
     }
+
+    public function images()
+    {
+        return $this->hasMany(MatchImage::class, 'match_id')->orderBy('order', 'asc');
+    }
 }

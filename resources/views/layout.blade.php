@@ -105,6 +105,7 @@
                     <a href="{{ route('table') }}" class="hover:text-secondary transition {{ request()->routeIs('table') ? 'text-secondary' : '' }}">Table</a>
                     <a href="{{ route('knockout') }}" class="hover:text-secondary transition {{ request()->routeIs('knockout') ? 'text-secondary' : '' }}">Knockout</a>
                     <a href="{{ route('stats') }}" class="hover:text-secondary transition {{ request()->routeIs('stats') ? 'text-secondary' : '' }}">Stats</a>
+                    <a href="{{ route('gallery') }}" class="hover:text-secondary transition {{ request()->routeIs('gallery') ? 'text-secondary' : '' }}">Gallery</a>
                     <a href="{{ route('news.index') }}" class="hover:text-secondary transition {{ request()->routeIs('news.index') ? 'text-secondary' : '' }}">News</a>
                     <a href="{{ route('teams') }}" class="hover:text-secondary transition {{ request()->routeIs('teams') ? 'text-secondary' : '' }}">Teams</a>
                 </nav>
@@ -138,6 +139,7 @@
                 <a href="{{ route('table') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('table') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Table</a>
                 <a href="{{ route('knockout') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('knockout') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Knockout</a>
                 <a href="{{ route('stats') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('stats') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Stats</a>
+                <a href="{{ route('gallery') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('gallery') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Gallery</a>
                 <a href="{{ route('news.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('news.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">News</a>
                 <a href="{{ route('teams') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('teams') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Teams</a>
                 <hr class="my-2 border-zinc-100">
