@@ -20,6 +20,14 @@
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom Scrollbar for Admin Nav */
+        .admin-nav-scrollbar::-webkit-scrollbar { width: 4px; }
+        .admin-nav-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .admin-nav-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .admin-nav-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
+        .admin-nav-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.2) transparent; }
+
         body { font-family: 'Inter', sans-serif; }
     </style>
     <script>
@@ -44,9 +52,9 @@
 <body class="antialiased bg-zinc-100 flex min-h-screen">
     
     <!-- Sidebar -->
-    <aside class="w-64 bg-primary text-white flex flex-col fixed h-full z-50">
-        <div class="p-8">
-            <div class="px-8 py-8 border-b border-primary-light flex items-center gap-3">
+    <aside class="w-64 bg-primary text-white flex flex-col fixed h-full z-50 overflow-hidden">
+        <!-- Logo Section -->
+        <div class="shrink-0 p-6 border-b border-primary-light flex items-center gap-3 bg-primary">
             @if(isset($siteSettings['site_logo']))
             <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center p-1">
                 <img src="{{ $siteSettings['site_logo'] }}" class="max-w-full max-h-full object-contain">
@@ -62,7 +70,8 @@
             </div>
         </div>
 
-        <nav class="flex-1 px-4 space-y-1">
+        <!-- Navigation Section -->
+        <nav class="flex-1 min-h-0 px-4 py-6 space-y-1 overflow-y-auto admin-nav-scrollbar">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.dashboard') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                 Dashboard
@@ -140,7 +149,8 @@
             </a>
         </nav>
 
-        <div class="p-6 border-t border-primary-light">
+        <!-- Exit Section -->
+        <div class="shrink-0 p-6 border-t border-primary-light bg-primary">
             <a href="{{ route('home') }}" class="text-xs font-bold text-zinc-400 hover:text-white transition flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 Exit to Website
