@@ -321,32 +321,67 @@
 
             <!-- Recent Results -->
             <div class="space-y-4">
-                <h3 class="text-lg md:text-xl font-black text-primary uppercase tracking-tighter italic">Recent Form</h3>
-                <div class="space-y-2">
+                <h3 class="text-lg md:text-xl font-black text-primary uppercase tracking-tighter italic flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    Recent Form
+                </h3>
+                <div class="space-y-3">
                     @foreach($recentMatches as $match)
                     @php
                         $isHome = $match->home_team_id == $team->id;
                         $teamScore = $isHome ? $match->home_score : $match->away_score;
                         $opponentScore = $isHome ? $match->away_score : $match->home_score;
+                        $opponent = $isHome ? $match->awayTeam : $match->homeTeam;
                         $resultColor = $teamScore > $opponentScore ? 'bg-green-500' : ($teamScore == $opponentScore ? 'bg-zinc-400' : 'bg-red-500');
                         $resultChar = $teamScore > $opponentScore ? 'W' : ($teamScore == $opponentScore ? 'D' : 'L');
+                        $borderColor = $teamScore > $opponentScore ? 'border-green-100' : ($teamScore == $opponentScore ? 'border-zinc-100' : 'border-red-100');
                     @endphp
-                    <a href="{{ route('match.details', $match->id) }}" class="group bg-white rounded-xl p-3 md:p-4 border border-zinc-100 flex items-center justify-between hover:border-secondary transition">
-                        <div class="flex items-center gap-3">
-                            <div class="w-5 h-5 md:w-6 md:h-6 rounded-full {{ $resultColor }} flex items-center justify-center text-white text-[9px] md:text-[10px] font-black">
-                                {{ $resultChar }}
+                    <a href="{{ route('match.details', $match->id) }}" class="group bg-white rounded-2xl p-4 border {{ $borderColor }} hover:border-secondary hover:shadow-lg transition-all duration-300 block">
+                        <!-- Result Badge & Date -->
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg {{ $resultColor }} flex items-center justify-center text-white text-xs font-black shadow-sm">
+                                    {{ $resultChar }}
+                                </div>
+                                <span class="text-[9px] md:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                                    {{ \Carbon\Carbon::parse($match->match_date)->format('M d, Y') }}
+                                </span>
                             </div>
-                            <div class="text-[10px] md:text-xs font-bold text-zinc-500">
-                                vs <span class="text-primary">{{ $isHome ? $match->awayTeam->name : $match->homeTeam->name }}</span>
+                            <div class="text-xs font-black text-primary bg-zinc-50 px-3 py-1.5 rounded-lg group-hover:bg-secondary group-hover:text-white transition">
+                                {{ $match->home_score }} - {{ $match->away_score }}
                             </div>
                         </div>
-                        <div class="font-black text-primary text-xs md:text-sm bg-zinc-50 px-2 md:px-3 py-1 rounded-lg group-hover:bg-secondary group-hover:text-white transition">
-                            {{ $match->home_score }} - {{ $match->away_score }}
+
+                        <!-- Teams -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 flex-1">
+                                @if($opponent->logo_url)
+                                <img src="{{ $opponent->logo_url }}" class="w-8 h-8 object-contain" alt="{{ $opponent->name }}">
+                                @else
+                                <div class="w-8 h-8 bg-zinc-100 rounded-lg flex items-center justify-center text-xs font-black text-zinc-300">
+                                    {{ substr($opponent->name, 0, 1) }}
+                                </div>
+                                @endif
+                                <div class="flex-1">
+                                    <div class="text-xs font-bold text-zinc-500 mb-0.5">vs</div>
+                                    <div class="text-sm font-black text-primary leading-tight">{{ $opponent->name }}</div>
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 text-zinc-300 group-hover:text-secondary group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+
+                        <!-- Match Details -->
+                        <div class="mt-3 pt-3 border-t border-zinc-50 flex items-center justify-between text-[9px] text-zinc-400 font-bold uppercase tracking-wider">
+                            <span>{{ $match->venue ?? 'Venue TBD' }}</span>
+                            <span>{{ $match->stage }}</span>
                         </div>
                     </a>
                     @endforeach
                     @if($recentMatches->isEmpty())
-                    <div class="text-center text-zinc-400 text-[10px] md:text-xs font-bold py-4 italic">No recent matches played.</div>
+                    <div class="bg-zinc-50 rounded-2xl p-8 text-center border border-zinc-100 border-dashed">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <span class="text-zinc-400 font-bold text-xs uppercase tracking-widest">No recent matches played</span>
+                    </div>
                     @endif
                 </div>
             </div>

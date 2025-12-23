@@ -183,14 +183,14 @@ class TournamentController extends Controller
 
         $recentMatches = MatchModel::where(function($q) use ($id) {
             $q->where('home_team_id', $id)->orWhere('away_team_id', $id);
-        })->where('match_date', '<=', now())->where('status', 'FT')->orderBy('match_date', 'desc')->take(5)->get();
+        })->where('match_date', '<=', now())->where('status', 'finished')->orderBy('match_date', 'desc')->take(5)->get();
 
         $squad = $team->players->groupBy('position');
 
         // Calculate additional statistics
         $allMatches = MatchModel::where(function($q) use ($id) {
             $q->where('home_team_id', $id)->orWhere('away_team_id', $id);
-        })->where('status', 'FT')->get();
+        })->where('status', 'finished')->get();
 
         $cleanSheets = $allMatches->filter(function($match) use ($id) {
             if ($match->home_team_id == $id) {
