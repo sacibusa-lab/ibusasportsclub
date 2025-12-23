@@ -187,7 +187,63 @@ class TournamentController extends Controller
 
         $squad = $team->players->groupBy('position');
 
-        return view('team-details', compact('team', 'nextMatch', 'recentMatches', 'rank', 'squad'));
+        // Calculate additional statistics
+        $allMatches = MatchModel::where(function($q) use ($id) {
+            $q->where('home_team_id', $id)->orWhere('away_team_id', $id);
+        })->where('status', 'FT')->get();
+
+        $cleanSheets = $allMatches->filter(function($match) use ($id) {
+            if ($match->home_team_id == $id) {
+                return $match->away_score == 0;
+            } else {
+                return $match->home_score == 0;
+            }
+        })->count();
+
+        $goalsPerGame = $team->played > 0 ? round($team->goals_for / $team->played, 2) : 0;
+        $goalsConcededPerGame = $team->played > 0 ? round($team->goals_against / $team->played, 2) : 0;
+        $winRate = $team->played > 0 ? round(($team->wins / $team->played) * 100, 1) : 0;
+
+        // Calculate biggest win and biggest loss
+        $biggestWin = null;
+        $biggestLoss = null;
+        $biggestWinMargin = 0;
+        $biggestLossMargin = 0;
+
+        foreach ($allMatches as $match) {
+            $isHome = $match->home_team_id == $id;
+            $teamScore = $isHome ? $match->home_score : $match->away_score;
+            $opponentScore = $isHome ? $match->away_score : $match->home_score;
+            $margin = $teamScore - $opponentScore;
+
+            if ($margin > $biggestWinMargin) {
+                $biggestWinMargin = $margin;
+                $biggestWin = $match;
+            }
+
+            if ($margin < $biggestLossMargin) {
+                $biggestLossMargin = $margin;
+                $biggestLoss = $match;
+            }
+        }
+
+        // Calculate form string (last 5 matches)
+        $formString = '';
+        foreach ($recentMatches as $match) {
+            $isHome = $match->home_team_id == $id;
+            $teamScore = $isHome ? $match->home_score : $match->away_score;
+            $opponentScore = $isHome ? $match->away_score : $match->home_score;
+            
+            if ($teamScore > $opponentScore) {
+                $formString .= 'W';
+            } elseif ($teamScore == $opponentScore) {
+                $formString .= 'D';
+            } else {
+                $formString .= 'L';
+            }
+        }
+
+        return view('team-details', compact('team', 'nextMatch', 'recentMatches', 'rank', 'squad', 'cleanSheets', 'goalsPerGame', 'goalsConcededPerGame', 'winRate', 'biggestWin', 'biggestLoss', 'formString'));
     }
 
     public function player($id)

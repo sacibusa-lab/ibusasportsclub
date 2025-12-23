@@ -69,6 +69,140 @@
         </div>
     </div>
 
+    <!-- Team Statistics Section -->
+    <div class="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-zinc-100">
+        <h2 class="text-2xl md:text-3xl font-black text-primary uppercase tracking-tighter italic mb-6 md:mb-8 flex items-center gap-3">
+            <svg class="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Team Statistics
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+            <!-- Goals Scored -->
+            <div class="bg-gradient-to-br from-green-50 to-white rounded-2xl p-4 md:p-5 border border-green-100 hover:shadow-lg transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-green-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    </div>
+                </div>
+                <span class="block text-3xl md:text-4xl font-black text-green-600">{{ $team->goals_for }}</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Goals Scored</span>
+            </div>
+
+            <!-- Goals Conceded -->
+            <div class="bg-gradient-to-br from-red-50 to-white rounded-2xl p-4 md:p-5 border border-red-100 hover:shadow-lg transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-red-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+                    </div>
+                </div>
+                <span class="block text-3xl md:text-4xl font-black text-red-600">{{ $team->goals_against }}</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Goals Conceded</span>
+            </div>
+
+            <!-- Goal Difference -->
+            <div class="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-4 md:p-5 border border-blue-100 hover:shadow-lg transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-blue-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                    </div>
+                </div>
+                <span class="block text-3xl md:text-4xl font-black {{ ($team->goals_for - $team->goals_against) >= 0 ? 'text-blue-600' : 'text-red-600' }}">
+                    {{ $team->goals_for - $team->goals_against > 0 ? '+' : '' }}{{ $team->goals_for - $team->goals_against }}
+                </span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Goal Difference</span>
+            </div>
+
+            <!-- Clean Sheets -->
+            <div class="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-4 md:p-5 border border-purple-100 hover:shadow-lg transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-purple-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                </div>
+                <span class="block text-3xl md:text-4xl font-black text-purple-600">{{ $cleanSheets }}</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Clean Sheets</span>
+            </div>
+
+            <!-- Win Rate -->
+            <div class="bg-gradient-to-br from-amber-50 to-white rounded-2xl p-4 md:p-5 border border-amber-100 hover:shadow-lg transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-amber-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                    </div>
+                </div>
+                <span class="block text-3xl md:text-4xl font-black text-amber-600">{{ $winRate }}%</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Win Rate</span>
+            </div>
+
+            <!-- Goals Per Game -->
+            <div class="bg-gradient-to-br from-emerald-50 to-white rounded-2xl p-4 md:p-5 border border-emerald-100 hover:shadow-lg transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                </div>
+                <span class="block text-3xl md:text-4xl font-black text-emerald-600">{{ $goalsPerGame }}</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Goals Per Game</span>
+            </div>
+
+            <!-- Goals Conceded Per Game -->
+            <div class="bg-gradient-to-br from-rose-50 to-white rounded-2xl p-4 md:p-5 border border-rose-100 hover:shadow-lg transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-rose-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                </div>
+                <span class="block text-3xl md:text-4xl font-black text-rose-600">{{ $goalsConcededPerGame }}</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Conceded Per Game</span>
+            </div>
+
+            <!-- Current Form -->
+            <div class="bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-4 md:p-5 border border-indigo-100 hover:shadow-lg transition col-span-2 md:col-span-1">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-indigo-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    </div>
+                </div>
+                <div class="flex gap-1 mb-1">
+                    @foreach(str_split($formString) as $result)
+                        <span class="w-6 h-6 md:w-7 md:h-7 rounded-md flex items-center justify-center text-[10px] md:text-xs font-black {{ $result == 'W' ? 'bg-green-500 text-white' : ($result == 'D' ? 'bg-zinc-400 text-white' : 'bg-red-500 text-white') }}">
+                            {{ $result }}
+                        </span>
+                    @endforeach
+                </div>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Current Form</span>
+            </div>
+
+            <!-- Biggest Win -->
+            @if($biggestWin)
+            <div class="bg-gradient-to-br from-teal-50 to-white rounded-2xl p-4 md:p-5 border border-teal-100 hover:shadow-lg transition col-span-2 md:col-span-1">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-teal-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    </div>
+                </div>
+                <span class="block text-2xl md:text-3xl font-black text-teal-600">{{ $biggestWin->home_score }} - {{ $biggestWin->away_score }}</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Biggest Win</span>
+                <span class="text-[8px] text-zinc-400 block mt-1">vs {{ $biggestWin->home_team_id == $team->id ? $biggestWin->awayTeam->name : $biggestWin->homeTeam->name }}</span>
+            </div>
+            @endif
+
+            <!-- Biggest Loss -->
+            @if($biggestLoss)
+            <div class="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-4 md:p-5 border border-orange-100 hover:shadow-lg transition col-span-2 md:col-span-1">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-orange-500 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </div>
+                </div>
+                <span class="block text-2xl md:text-3xl font-black text-orange-600">{{ $biggestLoss->home_score }} - {{ $biggestLoss->away_score }}</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Biggest Loss</span>
+                <span class="text-[8px] text-zinc-400 block mt-1">vs {{ $biggestLoss->home_team_id == $team->id ? $biggestLoss->awayTeam->name : $biggestLoss->homeTeam->name }}</span>
+            </div>
+            @endif
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <!-- Main Content: Squad -->
         <div class="lg:col-span-2 space-y-8 md:space-y-12">
