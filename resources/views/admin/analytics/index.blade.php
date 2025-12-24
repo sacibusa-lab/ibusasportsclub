@@ -105,6 +105,29 @@
                 @endif
             </div>
         </div>
+
+        <!-- Top Referrers -->
+        <div class="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm">
+            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-6">Top Referrers</h3>
+            <div class="space-y-4">
+                @foreach($topReferrers as $referrer)
+                <div class="flex items-center justify-between group">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-50 flex items-center justify-center text-zinc-300 font-bold text-[10px]">
+                            {{ $loop->iteration }}
+                        </div>
+                        <span class="text-xs font-bold text-zinc-600 truncate group-hover:text-primary transition" title="{{ $referrer->referer }}">
+                            {{ parse_url($referrer->referer, PHP_URL_HOST) ?: $referrer->referer }}
+                        </span>
+                    </div>
+                    <span class="text-xs font-black text-primary tabular-nums">{{ number_format($referrer->count) }}</span>
+                </div>
+                @endforeach
+                @if($topReferrers->isEmpty())
+                <p class="text-xs text-zinc-400 italic">No referral data yet.</p>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
 

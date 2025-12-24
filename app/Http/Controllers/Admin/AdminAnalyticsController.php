@@ -49,7 +49,16 @@ class AdminAnalyticsController extends Controller
             ->whereNotNull('country')
             ->groupBy('country')
             ->orderByDesc('count')
-            ->limit(5)
+            ->limit(10)
+            ->get();
+
+        // 6. Top Referrers
+        $topReferrers = DB::table('analytics_visits')
+            ->select('referer', DB::raw('count(*) as count'))
+            ->whereNotNull('referer')
+            ->groupBy('referer')
+            ->orderByDesc('count')
+            ->limit(10)
             ->get();
 
         return view('admin.analytics.index', compact(
@@ -60,7 +69,8 @@ class AdminAnalyticsController extends Controller
             'topPages',
             'mobileVisits',
             'desktopVisits',
-            'topCountries'
+            'topCountries',
+            'topReferrers'
         ));
     }
 }
