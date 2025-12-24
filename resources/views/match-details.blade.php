@@ -125,35 +125,11 @@
     <div class="flex gap-1 bg-white p-1 rounded-2xl border border-zinc-100 shadow-sm overflow-x-auto sticky top-4 z-20">
         <button @click="tab = 'recap'" :class="tab === 'recap' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Recap</button>
         <button @click="tab = 'lineups'" :class="tab === 'lineups' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Lineups</button>
-        <button @click="tab = 'live'" :class="tab === 'live' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Live</button>
+
         <button @click="tab = 'stats'" :class="tab === 'stats' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Stats</button>
         <button @click="tab = 'gallery'" :class="tab === 'gallery' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Gallery</button>
         <button @click="tab = 'info'" :class="tab === 'info' ? 'bg-primary text-secondary shadow-md' : 'text-zinc-400 hover:bg-zinc-50'" class="flex-1 py-3 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition">Info</button>
     </div>
-
-    <!-- LIVE FEED TAB -->
-    <div x-show="tab === 'live'" x-cloak class="space-y-6"
-         x-data="{ 
-             feed: '',
-             fetchFeed() {
-                 fetch('{{ route('match.feed', $match->id) }}')
-                    .then(response => response.text())
-                    .then(html => { this.feed = html; });
-             } 
-         }"
-         x-init="fetchFeed(); setInterval(() => fetchFeed(), 15000)">
-        
-        <div x-html="feed" class="transition-opacity duration-300">
-            <!-- Loading State initially (before first fetch) -->
-             <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-12 text-center animate-pulse">
-                <div class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-300">
-                    <div class="w-2 h-2 bg-zinc-400 rounded-full animate-ping"></div>
-                </div>
-                <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-1">Connecting...</h3>
-            </div>
-        </div>
-    </div>
-
     <!-- RECAP TAB -->
     <div x-show="tab === 'recap'" class="space-y-6 md:space-y-8">
 
