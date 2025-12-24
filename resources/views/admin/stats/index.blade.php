@@ -185,6 +185,7 @@
                                     ['label' => 'Throw-ins', 'emoji' => '👐', 'data' => $topThrows],
                                     ['label' => 'GK Saves', 'emoji' => '🧱', 'data' => $topSaves],
                                     ['label' => 'Goal Kicks', 'emoji' => '🦵', 'data' => $topGoalKicks],
+                                    ['label' => 'Missed Chances', 'emoji' => '💨', 'data' => $topMissedChances],
                                 ];
                             @endphp
                             @foreach($stats as $stat)

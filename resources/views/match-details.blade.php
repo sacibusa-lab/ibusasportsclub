@@ -786,6 +786,7 @@
                     ['Throw-ins', $match->home_throw_ins, $match->away_throw_ins, ''],
                     ['Fouls', $match->home_fouls, $match->away_fouls, ''],
                     ['Goal-Kicks', $match->home_goal_kicks, $match->away_goal_kicks, ''],
+                    ['Missed Chances', $match->home_missed_chances, $match->away_missed_chances, ''],
                     ['Saves', $match->home_saves, $match->away_saves, ''],
                     ['Yellow Cards', $match->matchEvents->where('event_type', 'yellow_card')->where('team_id', $match->home_team_id)->count(), $match->matchEvents->where('event_type', 'yellow_card')->where('team_id', $match->away_team_id)->count(), ''],
                     ['Red Cards', $match->matchEvents->where('event_type', 'red_card')->where('team_id', $match->home_team_id)->count(), $match->matchEvents->where('event_type', 'red_card')->where('team_id', $match->away_team_id)->count(), ''],

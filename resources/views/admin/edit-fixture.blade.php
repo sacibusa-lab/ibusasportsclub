@@ -320,6 +320,10 @@
                             <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Goal Kicks</label>
                             <input type="number" name="home_goal_kicks" value="{{ $match->home_goal_kicks }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
                         </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-rose-500 uppercase tracking-widest">Missed Chances</label>
+                            <input type="number" name="home_missed_chances" value="{{ $match->home_missed_chances }}" class="w-full bg-white border border-rose-100 p-3 rounded-xl font-bold text-rose-600 text-xs" min="0">
+                        </div>
                     </div>
                 </div>
 
@@ -366,6 +370,10 @@
                         <div class="space-y-1">
                             <label class="block text-[9px] font-black text-zinc-400 uppercase tracking-widest">Goal Kicks</label>
                             <input type="number" name="away_goal_kicks" value="{{ $match->away_goal_kicks }}" class="w-full bg-white border border-zinc-200 p-3 rounded-xl font-bold text-primary text-xs" min="0">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="block text-[9px] font-black text-rose-500 uppercase tracking-widest">Missed Chances</label>
+                            <input type="number" name="away_missed_chances" value="{{ $match->away_missed_chances }}" class="w-full bg-white border border-rose-100 p-3 rounded-xl font-bold text-rose-600 text-xs" min="0">
                         </div>
                     </div>
                 </div>

@@ -156,6 +156,17 @@
                 <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Conceded Per Game</span>
             </div>
 
+            <!-- Missed Chances -->
+            <div class="bg-gradient-to-br from-zinc-50 to-white rounded-2xl p-4 md:p-5 border border-zinc-100 hover:shadow-lg transition">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-zinc-800 flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                </div>
+                <span class="block text-3xl md:text-4xl font-black text-zinc-800">{{ $totalMissedChances }}</span>
+                <span class="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Missed Chances</span>
+            </div>
+
             <!-- Current Form -->
             <div class="bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-4 md:p-5 border border-indigo-100 hover:shadow-lg transition col-span-2 md:col-span-1">
                 <div class="flex items-center gap-2 mb-2">

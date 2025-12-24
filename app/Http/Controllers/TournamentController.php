@@ -150,10 +150,11 @@ class TournamentController extends Controller
         $topThrows = $this->statisticsService->getTopTeamsByStat('throw_ins', 5);
         $topSaves = $this->statisticsService->getTopTeamsByStat('saves', 5);
         $topGoalKicks = $this->statisticsService->getTopTeamsByStat('goal_kicks', 5);
+        $topMissedChances = $this->statisticsService->getTopTeamsByStat('missed_chances', 5);
 
         return view('stats', compact(
             'topScorers', 'topAssists', 'topCleanSheets', 'topCards', 'topMOTM',
-            'topGoalsScored', 'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks'
+            'topGoalsScored', 'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks', 'topMissedChances'
         ));
     }
 
@@ -205,6 +206,10 @@ class TournamentController extends Controller
         $goalsConcededPerGame = $team->played > 0 ? round($team->goals_against / $team->played, 2) : 0;
         $winRate = $team->played > 0 ? round(($team->wins / $team->played) * 100, 1) : 0;
 
+        $totalMissedChances = $allMatches->sum(function($match) use ($id) {
+            return $match->home_team_id == $id ? $match->home_missed_chances : $match->away_missed_chances;
+        });
+
         // Calculate biggest win and biggest loss
         $biggestWin = null;
         $biggestLoss = null;
@@ -244,7 +249,7 @@ class TournamentController extends Controller
             }
         }
 
-        return view('team-details', compact('team', 'nextMatch', 'recentMatches', 'rank', 'squad', 'cleanSheets', 'goalsPerGame', 'goalsConcededPerGame', 'winRate', 'biggestWin', 'biggestLoss', 'formString'));
+        return view('team-details', compact('team', 'totalMissedChances', 'nextMatch', 'recentMatches', 'rank', 'squad', 'cleanSheets', 'goalsPerGame', 'goalsConcededPerGame', 'winRate', 'biggestWin', 'biggestLoss', 'formString'));
     }
 
     public function player($id)

@@ -396,6 +396,28 @@
             </div>
         </div>
 
+        <!-- Missed Chances -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between border-b-4 border-rose-600 pb-4">
+                <h3 class="text-xl font-black text-primary uppercase italic tracking-tight">Missed Chances</h3>
+                <span class="text-xl">💨</span>
+            </div>
+            <div class="space-y-4">
+                @foreach($topMissedChances as $index => $team)
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-zinc-100">
+                    <div class="flex items-center gap-4">
+                        <span class="text-lg font-black text-zinc-300 italic w-6">{{ $index + 1 }}</span>
+                        @if($team->logo_url)
+                        <img src="{{ $team->logo_url }}" class="w-8 h-8 object-contain">
+                        @endif
+                        <p class="font-black text-primary text-xs uppercase">{{ $team->name }}</p>
+                    </div>
+                    <span class="text-xl font-black text-rose-600 italic">{{ $team->total_stat }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
     </div>
 </div>
 @endsection

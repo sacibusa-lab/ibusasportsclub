@@ -34,10 +34,11 @@ class AdminStatsController extends Controller
         $topThrows = $this->statisticsService->getTopTeamsByStat('throw_ins', 10);
         $topSaves = $this->statisticsService->getTopTeamsByStat('saves', 10);
         $topGoalKicks = $this->statisticsService->getTopTeamsByStat('goal_kicks', 10);
+        $topMissedChances = $this->statisticsService->getTopTeamsByStat('missed_chances', 10);
 
         return view('admin.stats.index', compact(
             'topScorers', 'topAssists', 'topCleanSheets', 'topCards', 'topMOTM',
-            'topGoalsScored', 'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks'
+            'topGoalsScored', 'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks', 'topMissedChances'
         ));
     }
 }
