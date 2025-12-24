@@ -26,7 +26,7 @@ class NewsController extends Controller
 
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)->where('is_published', true)->with(['category', 'tags', 'match.homeTeam', 'match.awayTeam'])->firstOrFail();
+        $post = Post::where('slug', $slug)->where('is_published', true)->with(['category', 'tags', 'match.homeTeam', 'match.awayTeam', 'comments.replies'])->firstOrFail();
         $relatedPosts = Post::where('category_id', $post->category_id)
             ->where('id', '!=', $post->id)
             ->where('is_published', true)

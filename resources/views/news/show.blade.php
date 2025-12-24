@@ -122,6 +122,141 @@
         </footer>
     </article>
 
+
+    <!-- Comments Section -->
+    <section class="pt-20 border-t border-zinc-100" id="comments" x-data="{ replyingTo: null, replyName: '' }">
+        <div class="flex items-center justify-between mb-12">
+            <h3 class="text-3xl font-black text-primary uppercase tracking-tighter italic">Comments ({{ $post->comments->count() + $post->comments->sum(fn($c) => $c->replies->count()) }})</h3>
+            <a href="#comment-form" class="text-[10px] font-black text-secondary px-4 py-2 bg-primary rounded-lg uppercase tracking-widest hover:scale-105 transition shadow-lg">Leave a comment</a>
+        </div>
+
+        <!-- Comment Form -->
+        <div class="bg-zinc-50 rounded-[2rem] p-8 md:p-12 mb-16 border border-zinc-100 shadow-sm relative overflow-hidden" id="comment-form">
+            <div class="absolute -top-12 -left-12 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
+            
+            <div class="relative z-10 space-y-8">
+                <div class="space-y-2">
+                    <h4 class="text-xl font-black text-primary uppercase tracking-tight italic" x-text="replyingTo ? 'Reply to ' + replyName : 'Join the conversation'">Join the conversation</h4>
+                    <p class="text-xs font-medium text-zinc-400">Your email address will not be published.</p>
+                </div>
+
+                <form action="{{ route('news.comments.store', $post->id) }}" method="POST" class="space-y-6">
+                    @csrf
+                    <input type="hidden" name="parent_id" x-model="replyingTo">
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Name</label>
+                            <input type="text" name="name" required class="w-full bg-white border border-zinc-200 px-6 py-4 rounded-2xl text-sm font-bold text-primary focus:ring-2 focus:ring-secondary outline-none transition placeholder:text-zinc-300" placeholder="e.g. John Doe">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest ml-1">Email <span class="text-zinc-300 italic">(Optional)</span></label>
+                            <input type="email" name="email" class="w-full bg-white border border-zinc-200 px-6 py-4 rounded-2xl text-sm font-bold text-primary focus:ring-2 focus:ring-secondary outline-none transition placeholder:text-zinc-300" placeholder="john@example.com">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2" x-data="{ 
+                        comment: '',
+                        showEmojis: false,
+                        insertEmoji(emoji) {
+                            const textarea = this.$refs.commentArea;
+                            const start = textarea.selectionStart;
+                            const end = textarea.selectionEnd;
+                            this.comment = this.comment.substring(0, start) + emoji + this.comment.substring(end);
+                            this.showEmojis = false;
+                            this.$nextTick(() => {
+                                textarea.focus();
+                                const newPos = start + emoji.length;
+                                textarea.setSelectionRange(newPos, newPos);
+                            });
+                        }
+                    }">
+                        <div class="flex items-center justify-between ml-1">
+                            <label class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Your Comment</label>
+                            <div class="relative">
+                                <button type="button" @click="showEmojis = !showEmojis" class="w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-lg hover:bg-zinc-50 transition shadow-sm">😊</button>
+                                
+                                <div x-show="showEmojis" @click.away="showEmojis = false" class="absolute bottom-10 right-0 z-50 bg-white border border-zinc-100 rounded-2xl shadow-2xl p-4 w-72 h-80 overflow-y-auto no-scrollbar grid grid-cols-6 gap-2" x-cloak>
+                                    @php
+                                        $emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😓', '😩', '😫', '🥱', '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾', '👋', '🤚', '🖐', '✋', '🖖', '👌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✍️', '💅', '🤳', '💪', '🦾', '🦵', '🦿', '🦶', '👂', '🦻', '👃', '🧠', '🦷', '🦴', '👀', '👁', '👅', '👄', '💋', '🩸', '⚽', '🏆', '🔥', '💎', '⭐'];
+                                    @endphp
+                                    @foreach($emojis as $emoji)
+                                        <button type="button" @click="insertEmoji('{{ $emoji }}')" class="hover:bg-zinc-50 p-1.5 rounded-lg transition text-xl flex items-center justify-center">{{ $emoji }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                        <textarea x-ref="commentArea" x-model="comment" name="comment" required rows="5" class="w-full bg-white border border-zinc-200 px-6 py-4 rounded-2xl text-sm font-bold text-primary focus:ring-2 focus:ring-secondary outline-none transition placeholder:text-zinc-300 resize-none" placeholder="What's your thought?"></textarea>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <button type="submit" class="flex-1 py-4 bg-primary text-secondary text-xs font-black uppercase tracking-widest rounded-2xl hover:scale-[1.02] active:scale-95 transition shadow-lg">Post Comment</button>
+                        <button type="button" x-show="replyingTo" @click="replyingTo = null" class="px-6 py-4 bg-zinc-200 text-zinc-600 text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-zinc-300 transition">Cancel Reply</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        @if(session('success'))
+        <div class="mb-12 p-6 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-3xl flex items-center gap-4 animate-fade-in-up">
+            <span class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg">✓</span>
+            <p class="text-sm font-bold uppercase tracking-tight">{{ session('success') }}</p>
+        </div>
+        @endif
+
+        <!-- Comments List -->
+        <div class="space-y-8">
+            @forelse($post->comments as $comment)
+                <div class="bg-white rounded-3xl p-6 md:p-8 border border-zinc-100 shadow-sm space-y-4 group">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-zinc-100 rounded-2xl flex items-center justify-center font-black text-zinc-400 text-sm">
+                                {{ substr($comment->name, 0, 1) }}
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-black text-primary uppercase tracking-tight">{{ $comment->name }}</h5>
+                                <span class="text-[10px] font-bold text-zinc-300 uppercase tracking-widest italic">{{ $comment->created_at->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                        <button @click="replyingTo = {{ $comment->id }}; replyName = '{{ $comment->name }}'; window.scrollTo({top: document.getElementById('comment-form').offsetTop - 100, behavior: 'smooth'})" class="text-[9px] font-black text-zinc-400 uppercase tracking-widest border border-zinc-100 px-4 py-2 rounded-lg hover:bg-primary hover:text-secondary transition shadow-sm">Reply</button>
+                    </div>
+                    <div class="text-sm font-medium text-zinc-600 leading-relaxed pl-16">
+                        {{ $comment->comment }}
+                    </div>
+
+                    <!-- Threaded Replies -->
+                    @if($comment->replies->count() > 0)
+                    <div class="pl-16 space-y-6 pt-4">
+                        @foreach($comment->replies as $reply)
+                        <div class="bg-zinc-50 rounded-2xl p-4 md:p-6 border border-zinc-100/50 space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-zinc-200 rounded-xl flex items-center justify-center font-black text-zinc-400 text-[10px]">
+                                    {{ substr($reply->name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <h6 class="text-xs font-black text-primary uppercase tracking-tight">{{ $reply->name }}</h6>
+                                    <span class="text-[9px] font-bold text-zinc-300 uppercase tracking-widest italic">{{ $reply->created_at->diffForHumans() }}</span>
+                                </div>
+                            </div>
+                            <div class="text-xs font-medium text-zinc-500 leading-relaxed">
+                                {{ $reply->comment }}
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+            @empty
+                <div class="bg-zinc-50 rounded-[2rem] p-16 text-center border border-zinc-100 border-dashed">
+                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-zinc-300 text-2xl animate-bounce shadow-sm">💬</div>
+                    <h4 class="text-sm font-black text-zinc-400 uppercase tracking-widest mb-1">No comments yet</h4>
+                    <p class="text-[10px] text-zinc-300 italic">Be the first to share your thoughts!</p>
+                </div>
+            @endforelse
+        </div>
+    </section>
+
     <!-- Related News -->
     @if($relatedPosts->count() > 0)
     <section class="pt-20 space-y-8">

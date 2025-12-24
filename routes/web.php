@@ -23,6 +23,7 @@ Route::get('/match/{id}/feed', [TournamentController::class, 'matchFeed'])->name
 // News Routes
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
+Route::post('/news/{post}/comments', [\App\Http\Controllers\CommentController::class, 'store'])->name('news.comments.store');
 
 // Interview Routes
 Route::get('/interviews/{id}', [\App\Http\Controllers\InterviewController::class, 'show'])->name('interviews.show');
@@ -134,4 +135,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Admin Stats Routes
     Route::get('/stats', [\App\Http\Controllers\Admin\AdminStatsController::class, 'index'])->name('stats.index');
+
+    // Admin Comment Routes
+    Route::get('/comments', [\App\Http\Controllers\Admin\AdminCommentController::class, 'index'])->name('comments.index');
+    Route::post('/comments/{id}/toggle', [\App\Http\Controllers\Admin\AdminCommentController::class, 'toggleApproval'])->name('comments.toggle');
+    Route::delete('/comments/{id}', [\App\Http\Controllers\Admin\AdminCommentController::class, 'destroy'])->name('comments.destroy');
 });
