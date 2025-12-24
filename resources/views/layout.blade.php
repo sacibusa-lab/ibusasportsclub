@@ -57,14 +57,21 @@
     videoUrl: '',
     getEmbedUrl(url) {
         if (!url) return '';
-        let videoId = '';
-        if (url.includes('youtube.com') || url.includes('youtu.be')) {
-            videoId = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
-            return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-        } else if (url.includes('v=vimeo.com') || url.includes('vimeo.com')) {
-            videoId = url.split('/').pop();
-            return `https://player.vimeo.com/video/${videoId}?autoplay=1`;
+        
+        // YouTube Regex
+        const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+        const youtubeMatch = url.match(youtubeRegex);
+        if (youtubeMatch && youtubeMatch[1]) {
+            return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1&mute=1&rel=0`;
         }
+        
+        // Vimeo Regex
+        const vimeoRegex = /vimeo\.com\/(\d+)/;
+        const vimeoMatch = url.match(vimeoRegex);
+        if (vimeoMatch && vimeoMatch[1]) {
+            return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1&muted=1`;
+        }
+        
         return url;
     }
 }">
@@ -272,11 +279,22 @@
              x-transition:leave-end="opacity-0 scale-95"
              class="relative w-full max-w-5xl aspect-video bg-black rounded-3xl shadow-2xl overflow-hidden border border-white/10">
             
-            <button @click="videoModalOpen = false; videoUrl = ''" class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition backdrop-blur-md">
+            <button @click="videoModalOpen = false; videoUrl = ''" class="absolute top-4 right-4 z-[110] w-10 h-10 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition backdrop-blur-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
 
-            <iframe x-show="videoUrl" :src="videoUrl" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <!-- Conditional Player -->
+            <div class="w-full h-full">
+                <!-- Iframes (YouTube/Vimeo) -->
+                <template x-if="videoUrl && (videoUrl.includes('youtube.com') || videoUrl.includes('vimeo.com') || videoUrl.includes('player.vimeo.com'))">
+                    <iframe :src="videoUrl" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </template>
+
+                <!-- Native Video (MP4, etc) -->
+                <template x-if="videoUrl && !(videoUrl.includes('youtube.com') || videoUrl.includes('vimeo.com') || videoUrl.includes('player.vimeo.com'))">
+                    <video :src="videoUrl" class="w-full h-full" controls autoplay playsinline></video>
+                </template>
+            </div>
         </div>
     </div>
 </body>

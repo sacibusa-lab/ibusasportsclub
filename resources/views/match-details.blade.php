@@ -2,6 +2,37 @@
 
 @section('title', $match->homeTeam->name . ' vs ' . $match->awayTeam->name)
 
+@push('styles')
+<style>
+    .match-report-content h1, .match-report-content h2, .match-report-content h3 {
+        color: var(--primary);
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: -0.05em;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-style: italic;
+    }
+    .match-report-content h1 { font-size: 1.5rem; }
+    .match-report-content h2 { font-size: 1.25rem; }
+    .match-report-content h3 { font-size: 1.125rem; }
+    .match-report-content p { margin-bottom: 1rem; }
+    .match-report-content .ql-video {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 1.5rem;
+        margin: 2rem 0;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+    .match-report-content img {
+        border-radius: 1rem;
+        margin: 1.5rem 0;
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+@endpush
+
 @section('content')
 <div x-data="{ tab: 'recap' }" class="max-w-6xl mx-auto space-y-6 md:space-y-8 pb-24">
     <!-- Breadcrumbs -->
@@ -854,8 +885,10 @@
             </div>
             
             <div class="col-span-1 md:col-span-2 mt-2 md:mt-4 pt-4 md:pt-4 border-t border-zinc-50">
-                 <label class="block text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Match Report</label>
-                 <p class="text-[11px] md:text-xs leading-relaxed text-zinc-500 font-medium">{{ $match->report ?? 'No report available.' }}</p>
+                 <label class="block text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4">Match Report</label>
+                 <div class="prose prose-zinc max-w-none text-zinc-600 font-medium leading-loose match-report-content">
+                      {!! $match->report ?? '<p class="italic text-zinc-300">No report available yet.</p>' !!}
+                 </div>
             </div>
         </div>
     </div>

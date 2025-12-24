@@ -2,10 +2,34 @@
 
 @section('title', 'Edit Fixture')
 
+@push('styles')
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-toolbar.ql-snow {
+        border: 1px solid #f4f4f5;
+        background: white;
+        border-top-left-radius: 1rem;
+        border-top-right-radius: 1rem;
+        padding: 1rem;
+    }
+    .ql-container.ql-snow {
+        border: 1px solid #f4f4f5;
+        border-bottom-left-radius: 1rem;
+        border-bottom-right-radius: 1rem;
+        background: #fafafa;
+    }
+    .ql-editor {
+        font-family: inherit;
+        font-size: 14px;
+        min-height: 250px;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="max-w-7xl mx-auto">
     <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
-        <form action="{{ route('admin.fixtures.update', $match->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form id="fixtureForm" action="{{ route('admin.fixtures.update', $match->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
             
@@ -349,7 +373,10 @@
 
             <div class="space-y-2 mt-8">
                 <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Match Report / Commentary</label>
-                <textarea name="report" rows="6" class="w-full bg-zinc-50 border border-zinc-100 p-6 rounded-2xl font-medium text-primary text-xs focus:ring-2 focus:ring-primary outline-none transition">{{ $match->report }}</textarea>
+                <div id="editor-container" class="bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 shadow-sm mt-2">
+                    <div id="report-editor">{!! $match->report !!}</div>
+                </div>
+                <input type="hidden" name="report" id="report-input">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 bg-zinc-50 p-6 rounded-3xl border border-zinc-100">
@@ -729,3 +756,63 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+    var quill = new Quill('#report-editor', {
+        theme: 'snow',
+        placeholder: 'Enter detailed match report or live commentary...',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'image', 'video'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Handle Image Upload using the news upload route
+    quill.getModule('toolbar').addHandler('image', function() {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+
+        input.onchange = () => {
+            const file = input.files[0];
+            if (/^image\//.test(file.type)) {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                fetch('{{ route("admin.news.upload-image") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.url) {
+                        const range = quill.getSelection();
+                        quill.insertEmbed(range.index, 'image', result.url);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error uploading image:', error);
+                    alert('Image upload failed.');
+                });
+            }
+        };
+    });
+
+    document.getElementById('fixtureForm').onsubmit = function() {
+        var report = document.querySelector('#report-input');
+        report.value = quill.root.innerHTML;
+        
+        // Optional: validation could go here
+    };
+</script>
+@endpush

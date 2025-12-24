@@ -174,10 +174,9 @@
                             <video x-show="item.type === 'video'" 
                                    :src="item.media_url" 
                                    x-ref="storyVideo"
-                                   autoplay playsinline preload="auto"
+                                   autoplay muted playsinline preload="auto"
                                    class="w-full h-full object-cover"
                                    @ended="nextItem()"
-                                   @loadedmetadata="$el.muted = false; $el.volume = 1.0;"
                                    @play="startItem()"
                                    @pause="if (timer) clearInterval(timer)"
                                    style="object-fit: cover;">

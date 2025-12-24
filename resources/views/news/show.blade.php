@@ -57,6 +57,17 @@
                 color: var(--primary);
                 margin: 2rem 0;
             }
+            .news-content .ql-video {
+                width: 100%;
+                aspect-ratio: 16 / 9;
+                border-radius: 1.5rem;
+                margin: 2rem 0;
+                box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            }
+            .news-content img {
+                border-radius: 1.5rem;
+                margin: 2rem 0;
+            }
         </style>
 
         @if($post->match)

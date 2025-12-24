@@ -120,7 +120,7 @@
                 ['bold', 'italic', 'underline', 'strike'],
                 ['blockquote', 'code-block'],
                 [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                ['link', 'image'],
+                ['link', 'image', 'video'],
                 ['clean']
             ]
         }
