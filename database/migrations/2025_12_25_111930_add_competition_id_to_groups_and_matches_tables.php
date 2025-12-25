@@ -11,13 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::table('groups', function (Blueprint $table) {
-            $table->foreignId('competition_id')->nullable()->constrained()->onDelete('cascade');
+            if (!Schema::hasColumn('groups', 'competition_id')) {
+                $table->unsignedBigInteger('competition_id')->nullable()->after('id');
+            }
+        });
+
+        Schema::table('groups', function (Blueprint $table) {
+            $table->foreign('competition_id')->references('id')->on('competitions')->onDelete('cascade');
         });
 
         Schema::table('matches', function (Blueprint $table) {
-            $table->foreignId('competition_id')->nullable()->constrained()->onDelete('cascade');
+            if (!Schema::hasColumn('matches', 'competition_id')) {
+                $table->unsignedBigInteger('competition_id')->nullable()->after('id');
+            }
         });
+
+        Schema::table('matches', function (Blueprint $table) {
+            $table->foreign('competition_id')->references('id')->on('competitions')->onDelete('cascade');
+        });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -26,11 +42,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('groups', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('competition_id');
+            $table->dropForeign(['competition_id']);
+            $table->dropColumn('competition_id');
         });
 
         Schema::table('matches', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('competition_id');
+            $table->dropForeign(['competition_id']);
+            $table->dropColumn('competition_id');
         });
     }
 };

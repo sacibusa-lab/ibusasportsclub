@@ -11,9 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::table('sponsors', function (Blueprint $table) {
-            $table->foreignId('competition_id')->nullable()->constrained()->onDelete('cascade');
+            if (!Schema::hasColumn('sponsors', 'competition_id')) {
+                $table->unsignedBigInteger('competition_id')->nullable()->after('id');
+            }
         });
+
+        Schema::table('sponsors', function (Blueprint $table) {
+            $table->foreign('competition_id')->references('id')->on('competitions')->onDelete('cascade');
+        });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
