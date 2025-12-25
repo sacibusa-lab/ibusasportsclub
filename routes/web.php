@@ -45,6 +45,11 @@ Route::get('/predictor', [\App\Http\Controllers\PredictorController::class, 'ind
 Route::post('/predictor/predict', [\App\Http\Controllers\PredictorController::class, 'predict'])->name('predictor.predict')->middleware('auth');
 Route::get('/dashboard', [\App\Http\Controllers\FanDashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
+Route::middleware('auth')->group(function () {
+    Route::post('/push-subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'subscribe']);
+    Route::post('/push-unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'unsubscribe']);
+});
+
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/teams', [AdminController::class, 'teams'])->name('teams');

@@ -33,6 +33,11 @@ class User extends Authenticatable
         return $this->hasMany(Prediction::class);
     }
 
+    public function pushSubscriptions()
+    {
+        return $this->hasMany(PushSubscription::class);
+    }
+
     /**
      * Get the user's current rank tier based on points.
      */

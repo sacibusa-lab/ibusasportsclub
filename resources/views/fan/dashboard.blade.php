@@ -26,8 +26,69 @@
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
             <h1 class="text-4xl font-black text-primary uppercase tracking-tighter italic">Career Hub</h1>
-            <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1">Welcome back, {{ explode(' ', $user->name)[0] }}</p>
+            <div class="flex items-center gap-3 mt-1">
+                <p class="text-zinc-500 text-xs font-bold uppercase tracking-widest">Welcome back, {{ explode(' ', $user->name)[0] }}</p>
+                <div x-data="pushNotifications()" class="flex items-center gap-2">
+                    <span class="w-1 h-1 bg-zinc-300 rounded-full"></span>
+                    <button @click="togglePush()" :class="enabled ? 'text-secondary' : 'text-zinc-300'" class="text-[9px] font-black uppercase tracking-widest hover:text-secondary transition flex items-center gap-1.5">
+                        <template x-if="enabled">
+                            <span class="flex items-center gap-1.5">
+                                <span class="relative flex h-2 w-2">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
+                                </span>
+                                Notifications On
+                            </span>
+                        </template>
+                        <template x-if="!enabled">
+                            <span>Enable Notifications</span>
+                        </template>
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <script>
+        function pushNotifications() {
+            return {
+                enabled: false,
+                async init() {
+                    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+                    const registration = await navigator.serviceWorker.ready;
+                    const subscription = await registration.pushManager.getSubscription();
+                    this.enabled = !!subscription;
+                },
+                async togglePush() {
+                    const registration = await navigator.serviceWorker.ready;
+                    if (this.enabled) {
+                        const subscription = await registration.pushManager.getSubscription();
+                        await subscription.unsubscribe();
+                        await fetch('/push-unsubscribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ endpoint: subscription.endpoint })
+                        });
+                        this.enabled = false;
+                    } else {
+                        const permission = await Notification.requestPermission();
+                        if (permission !== 'granted') return;
+                        
+                        const subscription = await registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: '{{ config('services.push.public_key') ?? 'BMV_91_...placeholder...' }}'
+                        });
+                        
+                        await fetch('/push-subscribe', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify(subscription)
+                        });
+                        this.enabled = true;
+                    }
+                }
+            }
+        }
+        </script>
         <div class="flex items-center gap-4 bg-white p-2 pr-6 rounded-2xl shadow-sm border border-zinc-100">
             <div class="w-12 h-12 bg-{{ strtolower($rankTier) == 'bronze' ? 'amber-700' : (strtolower($rankTier) == 'silver' ? 'zinc-400' : (strtolower($rankTier) == 'gold' ? 'yellow-400' : 'slate-300')) }} rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
                 {{ substr($rankTier, 0, 1) }}

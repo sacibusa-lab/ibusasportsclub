@@ -7,6 +7,15 @@
     @if(isset($siteSettings['favicon']))
     <link rel="icon" href="{{ $siteSettings['favicon'] }}" type="image/x-icon">
     @endif
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Predictor Hub">
+    <link rel="apple-touch-icon" href="/pwa-icon-192.png">
+
     <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +24,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('SW registered');
+                }).catch(err => {
+                    console.log('SW failed', err);
+                });
+            });
+        }
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -52,7 +73,6 @@
     </style>
 </head>
 <body class="antialiased min-h-screen" style="background-color: #e5e7eb;" x-data="{ 
-    mobileMenuOpen: false,
     videoModalOpen: false, 
     videoUrl: '',
     getEmbedUrl(url) {
@@ -98,7 +118,8 @@
     </div>
 
     <!-- Main Header -->
-    <header class="bg-white sticky top-0 z-50 border-b border-zinc-100">
+    <div x-data="{ mobileMenuOpen: false }">
+        <header class="bg-white sticky top-0 z-50 border-b border-zinc-100">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-16 md:h-20 flex items-center justify-between">
             <div class="flex items-center gap-6 lg:gap-12">
                 <a href="{{ route('home') }}" class="flex items-center gap-2 shrink-0">
@@ -145,53 +166,56 @@
                 @endauth
                 
                 <!-- Mobile Menu Button -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-primary hover:bg-zinc-50 rounded-lg transition">
+                <button type="button" @click.stop="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-primary hover:bg-zinc-50 rounded-lg transition relative z-[60]">
                     <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                    <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-cloak><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
         </div>
 
+    </header>
+
         <!-- Mobile Navigation -->
         <div x-show="mobileMenuOpen" 
+             @click.outside="mobileMenuOpen = false"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-4"
              x-transition:enter-end="opacity-100 translate-y-0"
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 -translate-y-4"
-             class="md:hidden bg-white border-b border-zinc-100 absolute w-full z-40"
-             style="display: none;">
-            <nav class="flex flex-col p-4 gap-2 text-sm font-bold text-primary">
-                <a href="{{ route('home') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('home') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Home</a>
-                <a href="{{ route('fixtures') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('fixtures') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Matches</a>
-                <a href="{{ route('results') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('results') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Results</a>
-                <a href="{{ route('table') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('table') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Table</a>
-                <a href="{{ route('knockout') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('knockout') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Knockout</a>
-                <a href="{{ route('stats') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('stats') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Stats</a>
-                <a href="{{ route('gallery') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('gallery') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Gallery</a>
-                <a href="{{ route('predictor.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('predictor.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Predictor League</a>
-                <a href="{{ route('news.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('news.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">News</a>
-                <a href="{{ route('teams') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('teams') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Teams</a>
-                <hr class="my-2 border-zinc-100">
-                @auth
-                <div class="p-3 flex items-center justify-between">
-                    <div class="flex flex-col">
-                        <a href="{{ route('dashboard') }}" class="font-black text-xs text-primary hover:text-secondary mb-1">DASHBOARD ({{ Auth::user()->predictor_points }} PTS)</a>
-                    </div>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="text-rose-500 text-[10px] uppercase font-black tracking-widest">Logout</button>
-                    </form>
+             class="md:hidden bg-white border-b border-zinc-100 fixed top-16 left-0 w-full z-[55] shadow-2xl"
+             x-cloak>
+        <nav class="flex flex-col p-4 gap-2 text-sm font-bold text-primary">
+            <a href="{{ route('home') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('home') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Home</a>
+            <a href="{{ route('fixtures') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('fixtures') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Matches</a>
+            <a href="{{ route('results') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('results') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Results</a>
+            <a href="{{ route('table') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('table') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Table</a>
+            <a href="{{ route('knockout') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('knockout') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Knockout</a>
+            <a href="{{ route('stats') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('stats') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Stats</a>
+            <a href="{{ route('gallery') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('gallery') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Gallery</a>
+            <a href="{{ route('predictor.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('predictor.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Predictor League</a>
+            <a href="{{ route('news.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('news.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">News</a>
+            <a href="{{ route('teams') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('teams') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Teams</a>
+            <hr class="my-2 border-zinc-100">
+            @auth
+            <div class="p-3 flex items-center justify-between">
+                <div class="flex flex-col">
+                    <a href="{{ route('dashboard') }}" class="font-black text-xs text-primary hover:text-secondary mb-1">DASHBOARD ({{ Auth::user()->predictor_points }} PTS)</a>
                 </div>
-                @else
-                <a href="{{ route('login') }}" class="p-3 bg-primary text-white text-center rounded-xl font-black uppercase tracking-widest text-[10px]">Sign In</a>
-                @endauth
-            </nav>
-        </div>
-    </header>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="text-rose-500 text-[10px] uppercase font-black tracking-widest">Logout</button>
+                </form>
+            </div>
+            @else
+            <a href="{{ route('login') }}" class="p-3 bg-primary text-white text-center rounded-xl font-black uppercase tracking-widest text-[10px]">Sign In</a>
+            @endauth
+        </nav>
+    </div>
+</div>
 
-    <!-- News Ticker Placeholder -->
+<!-- News Ticker Placeholder -->
     <div class="bg-white border-b border-zinc-100">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex items-center gap-4 text-[10px] md:text-xs font-bold text-zinc-600 overflow-x-auto no-scrollbar whitespace-nowrap">
             <span class="text-secondary shrink-0">LATEST:</span>
