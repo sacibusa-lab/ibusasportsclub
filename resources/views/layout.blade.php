@@ -79,13 +79,20 @@
     <div class="bg-white border-b border-zinc-100 hidden md:block">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-10 flex items-center justify-between text-[11px] font-medium text-zinc-500">
             <div class="flex gap-6">
-                <a href="#" class="hover:text-primary transition">Community Championship</a>
-                <a href="#" class="hover:text-primary transition">About Us</a>
+                @foreach($competitions as $comp)
+                <a href="?competition={{ $comp->slug }}" class="transition flex items-center gap-1.5 {{ (isset($activeCompetition) && $activeCompetition->id == $comp->id) ? 'text-primary font-bold border-b-2 border-primary' : 'hover:text-primary' }}">
+                    {{ $comp->name }}
+                </a>
+                @endforeach
+                <span class="text-zinc-200">|</span>
                 <a href="{{ route('news.index') }}" class="text-[11px] font-bold text-zinc-600 hover:text-primary transition uppercase tracking-widest {{ request()->routeIs('news.*') ? 'text-primary' : '' }}">News</a>
-                <a href="#" class="hover:text-primary transition">Youth</a>
             </div>
             <div class="flex gap-4 items-center">
+                @if(isset($activeCompetition))
+                <span class="text-primary font-bold">ACTIVE: {{ $activeCompetition->name }}</span>
+                @else
                 <span>Official Competition Site</span>
+                @endif
             </div>
         </div>
     </div>

@@ -76,6 +76,13 @@
 
             <div class="flex items-center justify-between pt-8 border-t border-zinc-50">
                 <div class="flex gap-4">
+                    <select name="competition_id" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs w-64" required>
+                        <option value="">Select Competition</option>
+                        @foreach($competitions as $competition)
+                            <option value="{{ $competition->id }}">{{ $competition->name }}</option>
+                        @endforeach
+                    </select>
+
                     <select name="stage" class="bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs w-48" required>
                         <option value="group">Group Stage</option>
                         <option value="semifinal">Semi-Final</option>
@@ -123,17 +130,14 @@
                             <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">{{ $match->status }}</span>
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end gap-2">
-                                <a href="{{ route('admin.fixtures.live', $match->id) }}" class="p-2 text-zinc-300 hover:text-emerald-500 transition" title="Live Console">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                                </a>
-                                <a href="{{ route('admin.fixtures.edit', $match->id) }}" class="p-2 text-zinc-300 hover:text-primary transition" title="Edit">
+                            <div class="flex justify-end gap-2 text-zinc-300">
+                                <a href="{{ route('admin.fixtures.edit', $match->id) }}" class="p-2 hover:text-primary transition" title="Edit">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
                                 <form action="{{ route('admin.fixtures.destroy', $match->id) }}" method="POST" onsubmit="return confirm('Remove this fixture?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-2 text-zinc-300 hover:text-accent transition" title="Delete">
+                                    <button type="submit" class="p-2 hover:text-accent transition" title="Delete">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                 </form>

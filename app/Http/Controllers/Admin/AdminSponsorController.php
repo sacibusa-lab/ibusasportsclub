@@ -17,7 +17,8 @@ class AdminSponsorController extends Controller
     }
     public function index()
     {
-        $sponsors = Sponsor::orderBy('level')->orderBy('order')->get();
+        $sponsors = Sponsor::with('competition')->orderBy('level')->orderBy('order')->get();
+        $competitions = \App\Models\Competition::all();
         $levels = [
             'Lead Partner',
             'Official Creativity Partner',
@@ -29,7 +30,7 @@ class AdminSponsorController extends Controller
             'Official Licensee',
             'Official Broadcaster'
         ];
-        return view('admin.sponsors.index', compact('sponsors', 'levels'));
+        return view('admin.sponsors.index', compact('sponsors', 'levels', 'competitions'));
     }
 
     public function store(Request $request)
@@ -38,7 +39,8 @@ class AdminSponsorController extends Controller
             'name' => 'required|string|max:255',
             'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'level' => 'required|string',
-            'order' => 'integer'
+            'order' => 'integer',
+            'competition_id' => 'nullable|exists:competitions,id'
         ]);
 
         if ($request->hasFile('logo')) {
@@ -56,7 +58,8 @@ class AdminSponsorController extends Controller
             'name' => 'required|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'level' => 'required|string',
-            'order' => 'integer'
+            'order' => 'integer',
+            'competition_id' => 'nullable|exists:competitions,id'
         ]);
 
         $sponsor = Sponsor::findOrFail($id);

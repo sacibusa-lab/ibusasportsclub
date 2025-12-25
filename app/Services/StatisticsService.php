@@ -8,27 +8,35 @@ use App\Models\MatchModel;
 
 class StatisticsService
 {
-    public function getTopScorers($limit = 10)
+    public function getTopScorers($limit = 10, $competitionId = null)
     {
-        return Player::withCount(['goals' => function($query) {
+        return Player::withCount(['goals' => function($query) use ($competitionId) {
                 $query->where('event_type', 'goal')
-                      ->whereHas('match', function($q) {
+                      ->whereHas('match', function($q) use ($competitionId) {
                           $q->where('stage', '!=', 'novelty');
+                          if ($competitionId) {
+                              $q->where('competition_id', $competitionId);
+                          }
                       });
             }])
-            ->with('team')
+            ->with(['team', 'team.competitionTeams' => function($q) use ($competitionId) {
+                if ($competitionId) $q->where('competition_id', $competitionId);
+            }])
             ->having('goals_count', '>', 0)
             ->orderBy('goals_count', 'desc')
             ->take($limit)
             ->get();
     }
 
-    public function getTopAssists($limit = 10)
+    public function getTopAssists($limit = 10, $competitionId = null)
     {
-        return Player::withCount(['assists' => function($query) {
+        return Player::withCount(['assists' => function($query) use ($competitionId) {
                 $query->where('event_type', 'goal')
-                      ->whereHas('match', function($q) {
+                      ->whereHas('match', function($q) use ($competitionId) {
                           $q->where('stage', '!=', 'novelty');
+                          if ($competitionId) {
+                              $q->where('competition_id', $competitionId);
+                          }
                       });
             }])
             ->with('team')
@@ -38,11 +46,14 @@ class StatisticsService
             ->get();
     }
 
-    public function getTopCards($limit = 10)
+    public function getTopCards($limit = 10, $competitionId = null)
     {
-        return Player::withCount(['cards' => function($query) {
-                $query->whereHas('match', function($q) {
+        return Player::withCount(['cards' => function($query) use ($competitionId) {
+                $query->whereHas('match', function($q) use ($competitionId) {
                     $q->where('stage', '!=', 'novelty');
+                    if ($competitionId) {
+                        $q->where('competition_id', $competitionId);
+                    }
                 });
             }])
             ->with('team')
@@ -57,7 +68,7 @@ class StatisticsService
      * and attributing it to their registered Goalkeeper(s) who were in the squad.
      * Since we don't have full squad tracking yet, we attribute it to any GK in the team.
      */
-    public function getTopCleanSheets($limit = 10)
+    public function getTopCleanSheets($limit = 10, $competitionId = null)
     {
         $gks = Player::where('position', 'GK')->with('team')->get();
         
@@ -75,6 +86,10 @@ class StatisticsService
                     });
                 });
 
+            if ($competitionId) {
+                $baseQuery->where('competition_id', $competitionId);
+            }
+
             $homeCleanSheets = (clone $baseQuery)->where('home_team_id', $gk->team_id)
                 ->where('away_score', 0)
                 ->count();
@@ -91,10 +106,13 @@ class StatisticsService
         })->sortByDesc('clean_sheets_count')->take($limit);
     }
 
-    public function getTopMOTM($limit = 10)
+    public function getTopMOTM($limit = 10, $competitionId = null)
     {
-        return Player::withCount(['motmAwards' => function($query) {
+        return Player::withCount(['motmAwards' => function($query) use ($competitionId) {
                 $query->where('stage', '!=', 'novelty');
+                if ($competitionId) {
+                    $query->where('competition_id', $competitionId);
+                }
             }])
             ->with('team')
             ->having('motm_awards_count', '>', 0)
@@ -103,19 +121,22 @@ class StatisticsService
             ->get();
     }
 
-    public function getTopTeamsByStat($stat, $limit = 10)
+    public function getTopTeamsByStat($stat, $limit = 10, $competitionId = null)
     {
         $teams = \App\Models\Team::all();
         
         foreach ($teams as $team) {
-            $homeStat = MatchModel::where('home_team_id', $team->id)
-                ->where('status', 'finished')
-                ->where('stage', '!=', 'novelty')
+            $baseQuery = MatchModel::where('status', 'finished')
+                ->where('stage', '!=', 'novelty');
+            
+            if ($competitionId) {
+                $baseQuery->where('competition_id', $competitionId);
+            }
+
+            $homeStat = (clone $baseQuery)->where('home_team_id', $team->id)
                 ->sum('home_' . $stat);
                 
-            $awayStat = MatchModel::where('away_team_id', $team->id)
-                ->where('status', 'finished')
-                ->where('stage', '!=', 'novelty')
+            $awayStat = (clone $baseQuery)->where('away_team_id', $team->id)
                 ->sum('away_' . $stat);
                 
             $team->total_stat = $homeStat + $awayStat;

@@ -30,9 +30,10 @@ class AdminController extends Controller
 
     public function teams()
     {
-        $groups = Group::all();
+        $groups = Group::with('competition')->get();
+        $competitions = \App\Models\Competition::all();
         $teams = Team::with('players')->get();
-        return view('admin.teams', compact('groups', 'teams'));
+        return view('admin.teams', compact('groups', 'teams', 'competitions'));
     }
 
     public function storeTeam(Request $request)
@@ -97,9 +98,10 @@ class AdminController extends Controller
     {
         $teams = Team::with('players')->get();
         $groups = Group::all();
+        $competitions = \App\Models\Competition::all();
         $referees = \App\Models\Referee::all();
         $allMatches = MatchModel::orderBy('match_date', 'asc')->get();
-        return view('admin.fixtures', compact('teams', 'groups', 'allMatches', 'referees'));
+        return view('admin.fixtures', compact('teams', 'groups', 'allMatches', 'referees', 'competitions'));
     }
 
     public function storeFixture(Request $request)
@@ -107,6 +109,7 @@ class AdminController extends Controller
         $request->validate([
             'home_team_id' => 'required|exists:teams,id',
             'away_team_id' => 'required|exists:teams,id',
+            'competition_id' => 'required|exists:competitions,id',
             'match_date' => 'required|date',
             'venue' => 'nullable|string',
             'referee_id' => 'nullable|exists:referees,id',
@@ -143,8 +146,8 @@ class AdminController extends Controller
         'referee_ar1_id' => $request->referee_ar1_id,
         'referee_ar2_id' => $request->referee_ar2_id,
         'attendance' => $request->attendance,
-        'attendance' => $request->attendance,
         'stage' => $request->stage,
+        'competition_id' => $request->competition_id,
         'group_id' => $request->stage === 'group' ? $homeTeam->group_id : null,
         'status' => 'upcoming',
         'matchday' => $matchday
@@ -240,7 +243,8 @@ class AdminController extends Controller
         $referees = \App\Models\Referee::all();
         $groups = Group::all();
         $positions = self::$pitchPositions;
-        return view('admin.edit-fixture', compact('match', 'teams', 'groups', 'positions', 'referees'));
+        $competitions = \App\Models\Competition::all();
+        return view('admin.edit-fixture', compact('match', 'teams', 'groups', 'positions', 'referees', 'competitions'));
     }
 
     public function updateFixture(Request $request, $id)
@@ -248,6 +252,7 @@ class AdminController extends Controller
         $request->validate([
             'home_team_id' => 'required|exists:teams,id',
             'away_team_id' => 'required|exists:teams,id',
+            'competition_id' => 'required|exists:competitions,id',
             'match_date' => 'required|date',
             'venue' => 'nullable|string',
             'matchday' => 'nullable|integer|min:0',
@@ -293,6 +298,7 @@ class AdminController extends Controller
         $updateData = [
             'home_team_id' => $request->home_team_id,
             'away_team_id' => $request->away_team_id,
+            'competition_id' => $request->competition_id,
             'match_date'   => $request->match_date,
             'venue'        => $request->venue,
             'matchday'     => $request->matchday,
@@ -480,37 +486,7 @@ class AdminController extends Controller
         return back()->with('success', 'Event deleted.');
     }
 
-    // Live Reporting Methods
-    public function liveFixture($id)
-    {
-        $match = MatchModel::with(['homeTeam', 'awayTeam', 'commentaries'])->findOrFail($id);
-        return view('admin.live-fixture', compact('match'));
-    }
-
-    public function storeCommentary(Request $request, $id)
-    {
-        $request->validate([
-            'minute' => 'nullable|integer',
-            'type'   => 'required|in:goal,foul,sub,info,whistle,card,var',
-            'comment'=> 'required|string'
-        ]);
-
-        MatchCommentary::create([
-            'match_id' => $id,
-            'minute'   => $request->minute,
-            'type'     => $request->type,
-            'comment'  => $request->comment
-        ]);
-
-        return back()->with('success', 'Update posted!');
-    }
-
-    public function destroyCommentary($id)
-    {
-        $commentary = MatchCommentary::findOrFail($id);
-        $commentary->delete();
-        return back()->with('success', 'Commentary removed.');
-    }
+    // Removed Live Reporting Methods
 
     public function storeMatchImage(Request $request, $matchId)
     {

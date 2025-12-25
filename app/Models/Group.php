@@ -9,7 +9,12 @@ class Group extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'competition_id'];
+
+    public function competition()
+    {
+        return $this->belongsTo(Competition::class);
+    }
 
     public function teams()
     {

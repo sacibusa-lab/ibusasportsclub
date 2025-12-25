@@ -11,14 +11,21 @@ class TournamentService
     public function updateStandings(Group $group)
     {
         $teams = $group->teams;
+        $competitionId = $group->competition_id;
+
+        if (!$competitionId) {
+            $competitionId = \App\Models\Competition::where('slug', 'main-competition')->value('id');
+        }
         
         foreach ($teams as $team) {
             $homeMatches = MatchModel::where('home_team_id', $team->id)
+                ->where('competition_id', $competitionId)
                 ->where('status', 'finished')
                 ->where('stage', 'group')
                 ->get();
                 
             $awayMatches = MatchModel::where('away_team_id', $team->id)
+                ->where('competition_id', $competitionId)
                 ->where('status', 'finished')
                 ->where('stage', 'group')
                 ->get();
@@ -46,43 +53,68 @@ class TournamentService
                 else $draws++;
             }
 
-            $team->update([
-                'played' => $played,
-                'wins' => $wins,
-                'draws' => $draws,
-                'losses' => $losses,
-                'goals_for' => $gf,
-                'goals_against' => $ga,
-                'points' => ($wins * 3) + $draws
-            ]);
+            \App\Models\CompetitionTeam::updateOrCreate(
+                ['competition_id' => $competitionId, 'team_id' => $team->id],
+                [
+                    'played' => $played,
+                    'wins' => $wins,
+                    'draws' => $draws,
+                    'losses' => $losses,
+                    'goals_for' => $gf,
+                    'goals_against' => $ga,
+                    'points' => ($wins * 3) + $draws
+                ]
+            );
         }
     }
 
     public function getSortedStandings(Group $group)
     {
-        $teams = $group->teams()
+        $competitionId = $group->competition_id;
+        
+        if (!$competitionId) {
+            $competitionId = \App\Models\Competition::where('slug', 'main-competition')->value('id');
+        }
+
+        $compTeams = \App\Models\CompetitionTeam::with('team')
+            ->where('competition_id', $competitionId)
+            ->whereIn('team_id', $group->teams()->pluck('id'))
             ->orderBy('points', 'desc')
             ->orderByRaw('(goals_for - goals_against) desc')
             ->orderBy('goals_for', 'desc')
             ->get();
 
-        foreach ($teams as $team) {
-            $team->form = $this->getTeamForm($team);
-            $team->next_match = $this->getNextMatch($team);
-            $team->goal_difference = $team->goals_for - $team->goals_against;
-        }
+        $teams = $compTeams->map(function ($compTeam) {
+            $team = $compTeam->team;
+            $team->played = $compTeam->played;
+            $team->wins = $compTeam->wins;
+            $team->draws = $compTeam->draws;
+            $team->losses = $compTeam->losses;
+            $team->goals_for = $compTeam->goals_for;
+            $team->goals_against = $compTeam->goals_against;
+            $team->points = $compTeam->points;
+            $team->goal_difference = $compTeam->goals_for - $compTeam->goals_against;
+            $team->form = $this->getTeamForm($team, $compTeam->competition_id);
+            $team->next_match = $this->getNextMatch($team, $compTeam->competition_id);
+            return $team;
+        });
 
         return $teams;
     }
 
-    public function getTeamForm(Team $team)
+    public function getTeamForm(Team $team, $competitionId = null)
     {
-        $matches = MatchModel::where(function($query) use ($team) {
+        $query = MatchModel::where(function($query) use ($team) {
                 $query->where('home_team_id', $team->id)
                       ->orWhere('away_team_id', $team->id);
             })
-            ->where('status', 'finished')
-            ->orderBy('match_date', 'desc')
+            ->where('status', 'finished');
+            
+        if ($competitionId) {
+            $query->where('competition_id', $competitionId);
+        }
+
+        $matches = $query->orderBy('match_date', 'desc')
             ->take(5)
             ->get();
 
@@ -102,14 +134,19 @@ class TournamentService
         return array_reverse($form); // Most recent last in visualization
     }
 
-    public function getNextMatch(Team $team)
+    public function getNextMatch(Team $team, $competitionId = null)
     {
-        return MatchModel::where(function($query) use ($team) {
+        $query = MatchModel::where(function($query) use ($team) {
                 $query->where('home_team_id', $team->id)
                       ->orWhere('away_team_id', $team->id);
             })
-            ->where('status', 'upcoming')
-            ->orderBy('match_date', 'asc')
+            ->where('status', 'upcoming');
+            
+        if ($competitionId) {
+            $query->where('competition_id', $competitionId);
+        }
+
+        return $query->orderBy('match_date', 'asc')
             ->first();
     }
 

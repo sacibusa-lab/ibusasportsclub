@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sponsor extends Model
 {
-    protected $fillable = ['name', 'logo_url', 'level', 'order', 'link_url', 'active'];
+    protected $fillable = ['name', 'logo_url', 'level', 'order', 'link_url', 'active', 'competition_id'];
+
+    public function competition()
+    {
+        return $this->belongsTo(Competition::class);
+    }
 }

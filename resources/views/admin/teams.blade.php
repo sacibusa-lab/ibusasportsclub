@@ -91,7 +91,7 @@
                         <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Assign Group</label>
                         <select name="group_id" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none appearance-none uppercase" required>
                             @foreach($groups as $group)
-                            <option value="{{ $group->id }}">{{ $group->name }}</option>
+                            <option value="{{ $group->id }}">{{ $group->competition->name }} - {{ $group->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -105,10 +105,18 @@
         </div>
 
         <!-- Teams List -->
-        <div class="lg:col-span-2 space-y-8">
-            @foreach($groups as $group)
-            <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-8">
-                <h4 class="text-zinc-400 font-black uppercase tracking-widest text-xs mb-6">{{ $group->name }} Participants</h4>
+        <div class="lg:col-span-2 space-y-12">
+            @php $groupedGroups = $groups->groupBy('competition.name'); @endphp
+            @foreach($groupedGroups as $competitionName => $compGroups)
+            <div class="space-y-6">
+                <h3 class="text-sm font-black text-secondary bg-primary inline-block px-4 py-2 rounded-xl uppercase tracking-tighter italic shadow-lg">
+                    {{ $competitionName }}
+                </h3>
+                
+                <div class="space-y-8">
+                    @foreach($compGroups as $group)
+                    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-8">
+                        <h4 class="text-zinc-400 font-black uppercase tracking-widest text-xs mb-6">{{ $group->name }} Participants</h4>
                 <div class="grid grid-cols-2 gap-4">
                     @forelse($group->teams as $team)
                     <div class="bg-zinc-50 rounded-2xl border border-transparent hover:border-zinc-200 transition overflow-hidden">
@@ -178,6 +186,8 @@
             @endforeach
         </div>
     </div>
+    @endforeach
+</div>
 
     <!-- Edit Modal -->
     <div x-show="editModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">

@@ -54,10 +54,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/matches/{match}/gallery', [AdminController::class, 'storeMatchImage'])->name('matches.gallery.store');
     Route::delete('/gallery/{id}', [AdminController::class, 'destroyMatchImage'])->name('matches.gallery.destroy');
 
-    // Live Reporting
-    Route::get('/fixtures/{id}/live', [AdminController::class, 'liveFixture'])->name('fixtures.live');
-    Route::post('/fixtures/{id}/live', [AdminController::class, 'storeCommentary'])->name('fixtures.live.store');
-    Route::delete('/fixtures/live/{id}', [AdminController::class, 'destroyCommentary'])->name('fixtures.live.destroy');
+    // Competitions Management
+    Route::resource('competitions', \App\Http\Controllers\Admin\AdminCompetitionController::class);
+    Route::resource('groups', \App\Http\Controllers\Admin\AdminGroupController::class);
 
     // Admin News Routes
     Route::prefix('news')->name('news.')->group(function() {

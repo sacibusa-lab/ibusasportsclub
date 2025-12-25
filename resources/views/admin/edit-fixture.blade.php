@@ -41,6 +41,15 @@
                 </div>
             @endif
 
+            <div class="space-y-2">
+                <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Competition</label>
+                <select name="competition_id" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" required>
+                    @foreach($competitions as $competition)
+                        <option value="{{ $competition->id }}" {{ $match->competition_id == $competition->id ? 'selected' : '' }}>{{ $competition->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="grid grid-cols-2 gap-8">
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Home Team</label>

@@ -4,6 +4,22 @@
 
 @section('content')
 <div class="space-y-12 pb-24">
+    <!-- Competition Filter -->
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-zinc-100 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h2 class="text-sm font-black text-primary uppercase tracking-widest italic">Statistical Analysis</h2>
+            <p class="text-[10px] text-zinc-400 font-bold uppercase tracking-tight">Viewing statistics for the selected competition</p>
+        </div>
+        <form action="{{ route('admin.stats.index') }}" method="GET" class="flex items-center gap-3">
+            <select name="competition_id" onchange="this.form.submit()" class="bg-zinc-50 border border-zinc-100 px-6 py-3 rounded-2xl font-bold text-xs text-primary focus:ring-2 focus:ring-secondary outline-none transition uppercase">
+                @foreach($competitions as $comp)
+                <option value="{{ $comp->id }}" {{ $competitionId == $comp->id ? 'selected' : '' }}>
+                    {{ $comp->name }}
+                </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
 
     <!-- Player Statistics -->
     <div class="space-y-6">
@@ -150,11 +166,11 @@
                 </div>
                 <table class="w-full text-left border-collapse text-xs">
                     <tbody class="divide-y divide-zinc-50">
-                        @foreach($topGoalsScored as $index => $team)
+                        @foreach($topGoalsScored as $index => $compTeam)
                         <tr class="hover:bg-zinc-50/50 transition">
                             <td class="px-6 py-3 font-black text-zinc-300 italic">#{{ $index + 1 }}</td>
-                            <td class="px-6 py-3 font-bold text-primary">{{ $team->name }}</td>
-                            <td class="px-6 py-3 text-right font-black text-green-600">{{ $team->goals_for }}</td>
+                            <td class="px-6 py-3 font-bold text-primary">{{ $compTeam->team->name }}</td>
+                            <td class="px-6 py-3 text-right font-black text-green-600">{{ $compTeam->goals_for }}</td>
                         </tr>
                         @endforeach
                     </tbody>

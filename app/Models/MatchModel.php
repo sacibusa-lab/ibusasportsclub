@@ -12,7 +12,7 @@ class MatchModel extends Model
     protected $table = 'matches';
 
     protected $fillable = [
-        'home_team_id', 'away_team_id', 'group_id', 'stage', 'matchday',
+        'home_team_id', 'away_team_id', 'group_id', 'competition_id', 'stage', 'matchday',
         'home_score', 'away_score', 'match_date', 'venue', 'broadcaster_logo', 'status',
         'home_possession', 'away_possession', 'home_shots', 'away_shots',
         'home_corners', 'away_corners', 'home_offsides', 'away_offsides',
@@ -26,6 +26,11 @@ class MatchModel extends Model
     protected $casts = [
         'match_date' => 'datetime',
     ];
+
+    public function competition()
+    {
+        return $this->belongsTo(Competition::class);
+    }
 
     public function homeTeam()
     {

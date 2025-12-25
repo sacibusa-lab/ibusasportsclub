@@ -24,13 +24,29 @@ class TournamentController extends Controller
         $this->statisticsService = $statisticsService;
     }
 
+    private function getActiveCompetition()
+    {
+        $competitionSlug = request()->get('competition', session('active_competition', 'main-competition'));
+        $competition = \App\Models\Competition::where('slug', $competitionSlug)->first() 
+            ?? \App\Models\Competition::first();
+
+        if ($competition) {
+            session(['active_competition' => $competition->slug]);
+        }
+
+        return $competition;
+    }
+
     public function index()
     {
-        $upcomingMatch = MatchModel::where('status', 'upcoming')->orderBy('match_date', 'asc')->first();
-        $upcomingMatches = MatchModel::where('status', 'upcoming')->orderBy('match_date', 'asc')->limit(4)->get();
-        $latestResult = MatchModel::where('status', 'finished')->orderBy('match_date', 'desc')->first();
+        $activeCompetition = $this->getActiveCompetition();
+        $compId = $activeCompetition->id;
+
+        $upcomingMatch = MatchModel::where('competition_id', $compId)->where('status', 'upcoming')->orderBy('match_date', 'asc')->first();
+        $upcomingMatches = MatchModel::where('competition_id', $compId)->where('status', 'upcoming')->orderBy('match_date', 'asc')->limit(4)->get();
+        $latestResult = MatchModel::where('competition_id', $compId)->where('status', 'finished')->orderBy('match_date', 'desc')->first();
         
-        // News items
+        // News items (News are global, but we could link them to competitions if needed)
         $heroPost = Post::where('is_published', true)->with('category')->orderBy('published_at', 'desc')->first();
         $trendingPosts = Post::where('is_published', true)
             ->where('id', '!=', $heroPost->id ?? 0)
@@ -47,7 +63,8 @@ class TournamentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $highlights = MatchModel::whereNotNull('highlights_url')
+        $highlights = MatchModel::where('competition_id', $compId)
+            ->whereNotNull('highlights_url')
             ->with(['homeTeam', 'awayTeam'])
             ->orderBy('match_date', 'desc')
             ->limit(4)
@@ -62,24 +79,30 @@ class TournamentController extends Controller
             ->limit(4)
             ->get();
 
-        return view('home', compact('upcomingMatch', 'upcomingMatches', 'latestResult', 'heroPost', 'trendingPosts', 'stories', 'highlights', 'afconPosts'));
+        $competitions = \App\Models\Competition::where('is_active', true)->get();
+
+        return view('home', compact('upcomingMatch', 'upcomingMatches', 'latestResult', 'heroPost', 'trendingPosts', 'stories', 'highlights', 'afconPosts', 'activeCompetition', 'competitions'));
     }
 
     public function table()
     {
-        $groups = Group::all();
+        $activeCompetition = $this->getActiveCompetition();
+        $groups = Group::where('competition_id', $activeCompetition->id)->get();
         $standings = [];
         
         foreach ($groups as $group) {
             $standings[$group->name] = $this->tournamentService->getSortedStandings($group);
         }
         
-        return view('table', compact('standings'));
+        $competitions = \App\Models\Competition::where('is_active', true)->get();
+        return view('table', compact('standings', 'activeCompetition', 'competitions'));
     }
 
     public function fixtures()
     {
-        $allFixtures = MatchModel::where('status', 'upcoming')
+        $activeCompetition = $this->getActiveCompetition();
+        $allFixtures = MatchModel::where('competition_id', $activeCompetition->id)
+            ->where('status', 'upcoming')
             ->orderBy('match_date', 'asc')
             ->get();
 
@@ -89,15 +112,17 @@ class TournamentController extends Controller
 
         $noveltyFixtures = $allFixtures->where('stage', 'novelty');
             
-        return view('fixtures', compact('fixtures', 'noveltyFixtures'));
+        $competitions = \App\Models\Competition::where('is_active', true)->get();
+        return view('fixtures', compact('fixtures', 'noveltyFixtures', 'activeCompetition', 'competitions'));
     }
 
     public function results(Request $request)
     {
+        $activeCompetition = $this->getActiveCompetition();
         $matchdayId = $request->query('matchday');
         $teamId = $request->query('team');
         
-        $query = MatchModel::where('status', 'finished');
+        $query = MatchModel::where('competition_id', $activeCompetition->id)->where('status', 'finished');
         
         if ($matchdayId) {
             $query->where('matchday', $matchdayId);
@@ -119,51 +144,77 @@ class TournamentController extends Controller
         
         $noveltyResults = $allResults->where('stage', 'novelty');
         
-        $matchdays = MatchModel::whereNotNull('matchday')->distinct()->pluck('matchday')->sortDesc();
-        $teams = Team::orderBy('name')->get();
+        $matchdays = MatchModel::where('competition_id', $activeCompetition->id)->whereNotNull('matchday')->distinct()->pluck('matchday')->sortDesc();
+        $teams = Team::whereHas('homeMatches', function($q) use ($activeCompetition) {
+                $q->where('competition_id', $activeCompetition->id);
+            })->orWhereHas('awayMatches', function($q) use ($activeCompetition) {
+                $q->where('competition_id', $activeCompetition->id);
+            })->orderBy('name')->get();
             
-        return view('results', compact('resultsGrouped', 'noveltyResults', 'matchdays', 'teams', 'matchdayId', 'teamId'));
+        $competitions = \App\Models\Competition::where('is_active', true)->get();
+        return view('results', compact('resultsGrouped', 'noveltyResults', 'matchdays', 'teams', 'matchdayId', 'teamId', 'activeCompetition', 'competitions'));
     }
 
     public function knockout()
     {
-        $semifinals = MatchModel::where('stage', 'semifinal')->get();
-        $final = MatchModel::where('stage', 'final')->first();
+        $activeCompetition = $this->getActiveCompetition();
+        $semifinals = MatchModel::where('competition_id', $activeCompetition->id)->where('stage', 'semifinal')->get();
+        $final = MatchModel::where('competition_id', $activeCompetition->id)->where('stage', 'final')->first();
         
-        return view('knockout', compact('semifinals', 'final'));
+        $competitions = \App\Models\Competition::where('is_active', true)->get();
+        return view('knockout', compact('semifinals', 'final', 'activeCompetition', 'competitions'));
     }
 
     public function stats()
     {
-        $topScorers = $this->statisticsService->getTopScorers(10);
-        $topAssists = $this->statisticsService->getTopAssists(10);
-        $topCleanSheets = $this->statisticsService->getTopCleanSheets(10);
-        $topCards = $this->statisticsService->getTopCards(10);
-        $topMOTM = $this->statisticsService->getTopMOTM(10);
+        $activeCompetition = $this->getActiveCompetition();
+        $compId = $activeCompetition->id;
 
-        // Team Stats
-        $topGoalsScored = Team::orderBy('goals_for', 'desc')->take(10)->get();
-        $topShots = $this->statisticsService->getTopTeamsByStat('shots', 5);
-        $topCorners = $this->statisticsService->getTopTeamsByStat('corners', 5);
-        $topOffsides = $this->statisticsService->getTopTeamsByStat('offsides', 5);
-        $topFouls = $this->statisticsService->getTopTeamsByStat('fouls', 5);
-        $topThrows = $this->statisticsService->getTopTeamsByStat('throw_ins', 5);
-        $topSaves = $this->statisticsService->getTopTeamsByStat('saves', 5);
-        $topGoalKicks = $this->statisticsService->getTopTeamsByStat('goal_kicks', 5);
-        $topMissedChances = $this->statisticsService->getTopTeamsByStat('missed_chances', 5);
+        $topScorers = $this->statisticsService->getTopScorers(10, $compId);
+        $topAssists = $this->statisticsService->getTopAssists(10, $compId);
+        $topCleanSheets = $this->statisticsService->getTopCleanSheets(10, $compId);
+        $topCards = $this->statisticsService->getTopCards(10, $compId);
+        $topMOTM = $this->statisticsService->getTopMOTM(10, $compId);
+
+        // Team Stats - This needs specific CompetitionTeam logic
+        $topGoalsScored = Team::whereHas('competitionTeams', function($q) use ($compId) {
+                $q->where('competition_id', $compId);
+            })
+            ->join('competition_teams', 'teams.id', '=', 'competition_teams.team_id')
+            ->where('competition_teams.competition_id', $compId)
+            ->orderBy('competition_teams.goals_for', 'desc')
+            ->take(10)
+            ->select('teams.*', 'competition_teams.goals_for')
+            ->get();
+
+        $topShots = $this->statisticsService->getTopTeamsByStat('shots', 5, $compId);
+        $topCorners = $this->statisticsService->getTopTeamsByStat('corners', 5, $compId);
+        $topOffsides = $this->statisticsService->getTopTeamsByStat('offsides', 5, $compId);
+        $topFouls = $this->statisticsService->getTopTeamsByStat('fouls', 5, $compId);
+        $topThrows = $this->statisticsService->getTopTeamsByStat('throw_ins', 5, $compId);
+        $topSaves = $this->statisticsService->getTopTeamsByStat('saves', 5, $compId);
+        $topGoalKicks = $this->statisticsService->getTopTeamsByStat('goal_kicks', 5, $compId);
+        $topMissedChances = $this->statisticsService->getTopTeamsByStat('missed_chances', 5, $compId);
+
+        $competitions = \App\Models\Competition::where('is_active', true)->get();
 
         return view('stats', compact(
             'topScorers', 'topAssists', 'topCleanSheets', 'topCards', 'topMOTM',
-            'topGoalsScored', 'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks', 'topMissedChances'
+            'topGoalsScored', 'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks', 'topMissedChances',
+            'activeCompetition', 'competitions'
         ));
     }
 
     public function teams()
     {
-        $teams = Team::whereHas('group', function($query) {
-            $query->where('name', 'NOT LIKE', '%Friendly%');
+        $activeCompetition = $this->getActiveCompetition();
+        $teams = Team::whereHas('group', function($query) use ($activeCompetition) {
+            $query->where('competition_id', $activeCompetition->id)
+                  ->where('name', 'NOT LIKE', '%Friendly%');
         })->orderBy('name')->get();
-        return view('teams', compact('teams'));
+
+        $competitions = \App\Models\Competition::where('is_active', true)->get();
+        return view('teams', compact('teams', 'activeCompetition', 'competitions'));
     }
 
     public function team($id)
