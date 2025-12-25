@@ -88,4 +88,9 @@ class MatchModel extends Model
     {
         return $this->hasMany(MatchImage::class, 'match_id')->orderBy('order', 'asc');
     }
+
+    public function predictions()
+    {
+        return $this->hasMany(Prediction::class, 'match_id');
+    }
 }

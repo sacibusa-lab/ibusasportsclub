@@ -43,6 +43,7 @@ Route::post('/admin/logout', [\App\Http\Controllers\Auth\AdminLoginController::c
 // Predictor League Routes
 Route::get('/predictor', [\App\Http\Controllers\PredictorController::class, 'index'])->name('predictor.index');
 Route::post('/predictor/predict', [\App\Http\Controllers\PredictorController::class, 'predict'])->name('predictor.predict')->middleware('auth');
+Route::get('/dashboard', [\App\Http\Controllers\FanDashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');

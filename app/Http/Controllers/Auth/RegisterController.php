@@ -14,7 +14,7 @@ class RegisterController extends Controller
     public function showRegistrationForm()
     {
         if (Auth::check()) {
-            return redirect()->route('home');
+            return redirect()->route('dashboard');
         }
         return view('auth.register');
     }
@@ -55,6 +55,6 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('home')->with('success', 'Welcome to the Predictor League!');
+        return redirect()->route('dashboard')->with('success', 'Welcome to the Predictor League!');
     }
 }
