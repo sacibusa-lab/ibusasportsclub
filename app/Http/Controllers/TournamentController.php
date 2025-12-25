@@ -40,6 +40,22 @@ class TournamentController extends Controller
     public function index()
     {
         $activeCompetition = $this->getActiveCompetition();
+        
+        if (!$activeCompetition) {
+            return view('home', [
+                'activeCompetition' => null,
+                'competitions' => collect(),
+                'upcomingMatch' => null,
+                'upcomingMatches' => collect(),
+                'latestResult' => null,
+                'heroPost' => Post::where('is_published', true)->with('category')->orderBy('published_at', 'desc')->first(),
+                'trendingPosts' => Post::where('is_published', true)->orderBy('published_at', 'desc')->limit(4)->get(),
+                'stories' => collect(),
+                'highlights' => collect(),
+                'afconPosts' => collect()
+            ]);
+        }
+
         $compId = $activeCompetition->id;
 
         $upcomingMatch = MatchModel::where('competition_id', $compId)->where('status', 'upcoming')->orderBy('match_date', 'asc')->first();
@@ -87,6 +103,9 @@ class TournamentController extends Controller
     public function table()
     {
         $activeCompetition = $this->getActiveCompetition();
+        if (!$activeCompetition) {
+            return view('table', ['standings' => [], 'activeCompetition' => null, 'competitions' => collect()]);
+        }
         $groups = Group::where('competition_id', $activeCompetition->id)->get();
         $standings = [];
         
@@ -101,6 +120,9 @@ class TournamentController extends Controller
     public function fixtures()
     {
         $activeCompetition = $this->getActiveCompetition();
+        if (!$activeCompetition) {
+            return view('fixtures', ['fixtures' => collect(), 'noveltyFixtures' => collect(), 'activeCompetition' => null, 'competitions' => collect()]);
+        }
         $allFixtures = MatchModel::where('competition_id', $activeCompetition->id)
             ->where('status', 'upcoming')
             ->orderBy('match_date', 'asc')
@@ -119,6 +141,18 @@ class TournamentController extends Controller
     public function results(Request $request)
     {
         $activeCompetition = $this->getActiveCompetition();
+        if (!$activeCompetition) {
+            return view('results', [
+                'resultsGrouped' => collect(), 
+                'noveltyResults' => collect(), 
+                'matchdays' => collect(), 
+                'teams' => collect(), 
+                'matchdayId' => null, 
+                'teamId' => null, 
+                'activeCompetition' => null, 
+                'competitions' => collect()
+            ]);
+        }
         $matchdayId = $request->query('matchday');
         $teamId = $request->query('team');
         
@@ -158,6 +192,9 @@ class TournamentController extends Controller
     public function knockout()
     {
         $activeCompetition = $this->getActiveCompetition();
+        if (!$activeCompetition) {
+            return view('knockout', ['semifinals' => collect(), 'final' => null, 'activeCompetition' => null, 'competitions' => collect()]);
+        }
         $semifinals = MatchModel::where('competition_id', $activeCompetition->id)->where('stage', 'semifinal')->get();
         $final = MatchModel::where('competition_id', $activeCompetition->id)->where('stage', 'final')->first();
         
@@ -168,6 +205,28 @@ class TournamentController extends Controller
     public function stats()
     {
         $activeCompetition = $this->getActiveCompetition();
+        
+        if (!$activeCompetition) {
+            return view('stats', [
+                'activeCompetition' => null,
+                'competitions' => collect(),
+                'topScorers' => collect(),
+                'topAssists' => collect(),
+                'topCleanSheets' => collect(),
+                'topCards' => collect(),
+                'topMOTM' => collect(),
+                'topGoalsScored' => collect(),
+                'topShots' => collect(),
+                'topCorners' => collect(),
+                'topOffsides' => collect(),
+                'topFouls' => collect(),
+                'topThrows' => collect(),
+                'topSaves' => collect(),
+                'topGoalKicks' => collect(),
+                'topMissedChances' => collect()
+            ]);
+        }
+
         $compId = $activeCompetition->id;
 
         $topScorers = $this->statisticsService->getTopScorers(10, $compId);
@@ -208,6 +267,9 @@ class TournamentController extends Controller
     public function teams()
     {
         $activeCompetition = $this->getActiveCompetition();
+        if (!$activeCompetition) {
+            return view('teams', ['teams' => collect(), 'activeCompetition' => null, 'competitions' => collect()]);
+        }
         $teams = Team::whereHas('group', function($query) use ($activeCompetition) {
             $query->where('competition_id', $activeCompetition->id)
                   ->where('name', 'NOT LIKE', '%Friendly%');
