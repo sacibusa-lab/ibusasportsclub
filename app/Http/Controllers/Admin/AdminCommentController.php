@@ -8,10 +8,19 @@ use Illuminate\Http\Request;
 
 class AdminCommentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $comments = Comment::with('post')->orderBy('created_at', 'desc')->paginate(20);
-        return view('admin.comments.index', compact('comments'));
+        $status = $request->get('status', 'all');
+        $query = Comment::with('post');
+
+        if ($status === 'pending') {
+            $query->where('is_approved', false);
+        } elseif ($status === 'approved') {
+            $query->where('is_approved', true);
+        }
+
+        $comments = $query->orderBy('created_at', 'desc')->paginate(20);
+        return view('admin.comments.index', compact('comments', 'status'));
     }
 
     public function destroy($id)

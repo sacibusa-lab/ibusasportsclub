@@ -48,5 +48,9 @@ class AppServiceProvider extends ServiceProvider
             $view->with('globalSponsors', \App\Models\Sponsor::where('active', true)->orderBy('order', 'desc')->get());
             $view->with('globalInterviews', \App\Models\Interview::orderBy('display_order', 'asc')->orderBy('created_at', 'desc')->limit(8)->get());
         });
+
+        view()->composer('admin.layout', function ($view) {
+            $view->with('pendingCommentsCount', \App\Models\Comment::where('is_approved', false)->count());
+        });
     }
 }

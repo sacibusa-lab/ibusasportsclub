@@ -4,6 +4,25 @@
 
 @section('content')
 <div class="space-y-8">
+    <!-- Filter Tabs -->
+    <div class="flex gap-2">
+        <a href="{{ route('admin.comments.index', ['status' => 'all']) }}" 
+           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'all' ? 'bg-primary text-secondary border-primary' : 'bg-white text-zinc-400 border-zinc-100 hover:bg-zinc-50' }}">
+            All Comments
+        </a>
+        <a href="{{ route('admin.comments.index', ['status' => 'pending']) }}" 
+           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'pending' ? 'bg-primary text-secondary border-primary' : 'bg-white text-zinc-400 border-zinc-100 hover:bg-zinc-50' }}">
+            Pending
+            @if(isset($pendingCommentsCount) && $pendingCommentsCount > 0)
+            <span class="ml-2 bg-rose-500 text-white px-1.5 py-0.5 rounded-md text-[8px]">{{ $pendingCommentsCount }}</span>
+            @endif
+        </a>
+        <a href="{{ route('admin.comments.index', ['status' => 'approved']) }}" 
+           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'approved' ? 'bg-primary text-secondary border-primary' : 'bg-white text-zinc-400 border-zinc-100 hover:bg-zinc-50' }}">
+            Approved
+        </a>
+    </div>
+
     <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
         <table class="w-full text-left">
             <thead>
