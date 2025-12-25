@@ -28,6 +28,9 @@ class AdminCompetitionController extends Controller
             'type' => 'required|string|in:league,knockout,novelty',
             'is_active' => 'nullable',
             'description' => 'nullable|string',
+            'predictor_prize_1' => 'nullable|string|max:255',
+            'predictor_prize_2' => 'nullable|string|max:255',
+            'predictor_prize_3' => 'nullable|string|max:255',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -50,6 +53,9 @@ class AdminCompetitionController extends Controller
             'type' => 'required|string|in:league,knockout,novelty',
             'is_active' => 'nullable',
             'description' => 'nullable|string',
+            'predictor_prize_1' => 'nullable|string|max:255',
+            'predictor_prize_2' => 'nullable|string|max:255',
+            'predictor_prize_3' => 'nullable|string|max:255',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);

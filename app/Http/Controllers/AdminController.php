@@ -207,6 +207,9 @@ class AdminController extends Controller
             $this->tournamentService->updateStandings($match->group);
         }
 
+        // Trigger Predictor League points calculation
+        \App\Models\Prediction::calculatePointsForMatch($match->id);
+
         return back()->with('success', 'Result updated successfully.');
     }
 
@@ -398,6 +401,10 @@ class AdminController extends Controller
 
         if ($match->stage === 'group' && $match->group) {
             $this->tournamentService->updateStandings($match->group);
+        }
+
+        if ($match->status === 'finished') {
+            \App\Models\Prediction::calculatePointsForMatch($match->id);
         }
 
         return back()->with('success', 'Fixture updated successfully.');

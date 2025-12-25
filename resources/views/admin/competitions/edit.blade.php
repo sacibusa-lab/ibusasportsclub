@@ -60,8 +60,31 @@
 
             <div class="space-y-2">
                 <label class="text-[10px] font-black text-primary uppercase tracking-widest px-1">Description (Optional)</label>
-                <textarea name="description" rows="4"
+                <textarea name="description" rows="3"
                     class="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold text-primary placeholder:text-zinc-300 focus:ring-2 focus:ring-secondary transition">{{ $competition->description }}</textarea>
+            </div>
+
+            <div class="bg-zinc-50 rounded-3xl p-6 space-y-4">
+                <h3 class="text-[10px] font-black text-primary uppercase tracking-widest px-1">Predictor League Prizes</h3>
+                <div class="space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">1st Place Prize</label>
+                        <input type="text" name="predictor_prize_1" value="{{ $competition->predictor_prize_1 }}" placeholder="e.g. N100,000 + Trophy"
+                            class="w-full bg-white border border-zinc-100 rounded-xl px-4 py-3 font-bold text-primary focus:ring-2 focus:ring-secondary transition">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">2nd Place Prize</label>
+                            <input type="text" name="predictor_prize_2" value="{{ $competition->predictor_prize_2 }}" placeholder="e.g. N50,000"
+                                class="w-full bg-white border border-zinc-100 rounded-xl px-4 py-3 font-bold text-primary focus:ring-2 focus:ring-secondary transition">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">3rd Place Prize</label>
+                            <input type="text" name="predictor_prize_3" value="{{ $competition->predictor_prize_3 }}" placeholder="e.g. N20,000"
+                                class="w-full bg-white border border-zinc-100 rounded-xl px-4 py-3 font-bold text-primary focus:ring-2 focus:ring-secondary transition">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="pt-4">

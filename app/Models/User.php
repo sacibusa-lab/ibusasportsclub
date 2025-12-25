@@ -20,8 +20,18 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+        'predictor_points',
+        'registration_ip',
+        'device_token',
+        'is_admin',
     ];
+
+    public function predictions()
+    {
+        return $this->hasMany(Prediction::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

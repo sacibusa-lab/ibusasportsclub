@@ -114,6 +114,11 @@
                 Tournament Stats
             </a>
 
+            <a href="{{ route('admin.predictor.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.predictor.*') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                Predictor League
+            </a>
+
             <div class="pt-6 pb-2 px-4">
                 <span class="text-[10px] font-black text-white/30 uppercase tracking-widest">News Management</span>
             </div>
@@ -187,7 +192,7 @@
                     <span class="block text-xs font-black text-primary uppercase">{{ auth()->user()->name }}</span>
                     <span class="block text-[10px] text-zinc-400 font-bold uppercase tracking-widest">{{ auth()->user()->email }}</span>
                 </div>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
+                <form action="{{ route('admin.logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="w-10 h-10 bg-rose-500 text-white rounded-xl flex items-center justify-center hover:bg-rose-600 transition shadow-lg" title="Logout">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>

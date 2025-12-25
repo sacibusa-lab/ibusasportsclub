@@ -30,10 +30,21 @@ Route::get('/interviews/{id}', [\App\Http\Controllers\InterviewController::class
 
 // Auth Routes
 Route::get('/login', [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'login'])->name('login.post');
+Route::get('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'register']);
 Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+// Admin Auth Routes
+Route::get('/admin/login', [\App\Http\Controllers\Auth\AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [\App\Http\Controllers\Auth\AdminLoginController::class, 'login'])->name('admin.login.post');
+Route::post('/admin/logout', [\App\Http\Controllers\Auth\AdminLoginController::class, 'logout'])->name('admin.logout');
+
+// Predictor League Routes
+Route::get('/predictor', [\App\Http\Controllers\PredictorController::class, 'index'])->name('predictor.index');
+Route::post('/predictor/predict', [\App\Http\Controllers\PredictorController::class, 'predict'])->name('predictor.predict')->middleware('auth');
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/teams', [AdminController::class, 'teams'])->name('teams');
     Route::post('/teams', [AdminController::class, 'storeTeam'])->name('teams.store');
@@ -134,6 +145,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Admin Stats Routes
     Route::get('/stats', [\App\Http\Controllers\Admin\AdminStatsController::class, 'index'])->name('stats.index');
+
+    // Admin Predictor Routes
+    Route::get('/predictor', [\App\Http\Controllers\Admin\AdminPredictorController::class, 'index'])->name('predictor.index');
+    Route::get('/predictor/user/{user}', [\App\Http\Controllers\Admin\AdminPredictorController::class, 'show'])->name('predictor.show');
 
     // Admin Comment Routes
     Route::get('/comments', [\App\Http\Controllers\Admin\AdminCommentController::class, 'index'])->name('comments.index');

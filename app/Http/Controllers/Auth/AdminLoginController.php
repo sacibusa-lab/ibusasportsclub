@@ -6,14 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class LoginController extends Controller
+class AdminLoginController extends Controller
 {
     public function showLoginForm()
     {
-        if (Auth::check()) {
-            return redirect()->route('predictor.index');
+        if (Auth::check() && Auth::user()->is_admin) {
+            return redirect()->route('admin.dashboard');
         }
-        return view('auth.login');
+        return view('admin.auth.login');
     }
 
     public function login(Request $request)
@@ -24,9 +24,15 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->remember)) {
-            $request->session()->regenerate();
+            if (Auth::user()->is_admin) {
+                $request->session()->regenerate();
+                return redirect()->intended(route('admin.dashboard'));
+            }
 
-            return redirect()->intended(route('predictor.index'));
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Access denied. You do not have administrative privileges.',
+            ]);
         }
 
         return back()->withErrors([
@@ -41,6 +47,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('admin.login');
     }
 }

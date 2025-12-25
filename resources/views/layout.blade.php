@@ -120,13 +120,29 @@
                     <a href="{{ route('knockout') }}" class="hover:text-secondary transition {{ request()->routeIs('knockout') ? 'text-secondary' : '' }}">Knockout</a>
                     <a href="{{ route('stats') }}" class="hover:text-secondary transition {{ request()->routeIs('stats') ? 'text-secondary' : '' }}">Stats</a>
                     <a href="{{ route('gallery') }}" class="hover:text-secondary transition {{ request()->routeIs('gallery') ? 'text-secondary' : '' }}">Gallery</a>
+                    <a href="{{ route('predictor.index') }}" class="hover:text-secondary transition {{ request()->routeIs('predictor.index') ? 'text-secondary' : '' }}">Predictor</a>
                     <a href="{{ route('news.index') }}" class="hover:text-secondary transition {{ request()->routeIs('news.index') ? 'text-secondary' : '' }}">News</a>
                     <a href="{{ route('teams') }}" class="hover:text-secondary transition {{ request()->routeIs('teams') ? 'text-secondary' : '' }}">Teams</a>
                 </nav>
             </div>
 
             <div class="flex items-center gap-2 md:gap-4">
-                <a href="{{ route('admin.dashboard') }}" class="hidden sm:block bg-primary text-white text-[10px] md:text-xs font-bold px-4 py-2 rounded-full hover:bg-primary-light transition">Sign In</a>
+                @auth
+                <div class="hidden sm:flex items-center gap-3">
+                    <div class="flex flex-col items-end">
+                        <span class="text-[10px] font-black text-primary leading-tight uppercase">{{ Auth::user()->name }}</span>
+                        <span class="text-[9px] font-bold text-secondary leading-tight uppercase tracking-widest">{{ Auth::user()->predictor_points }} PTS</span>
+                    </div>
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-zinc-100 text-zinc-500 p-2 rounded-lg hover:bg-zinc-200 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+                        </button>
+                    </form>
+                </div>
+                @else
+                <a href="{{ route('login') }}" class="hidden sm:block bg-primary text-white text-[10px] md:text-xs font-bold px-4 py-2 rounded-full hover:bg-primary-light transition">Sign In</a>
+                @endauth
                 
                 <!-- Mobile Menu Button -->
                 <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-primary hover:bg-zinc-50 rounded-lg transition">
@@ -154,10 +170,21 @@
                 <a href="{{ route('knockout') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('knockout') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Knockout</a>
                 <a href="{{ route('stats') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('stats') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Stats</a>
                 <a href="{{ route('gallery') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('gallery') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Gallery</a>
+                <a href="{{ route('predictor.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('predictor.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Predictor League</a>
                 <a href="{{ route('news.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('news.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">News</a>
                 <a href="{{ route('teams') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('teams') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Teams</a>
                 <hr class="my-2 border-zinc-100">
-                <a href="{{ route('admin.dashboard') }}" class="p-3 bg-primary text-white text-center rounded-xl font-black uppercase tracking-widest text-[10px]">Sign In</a>
+                @auth
+                <div class="p-3 flex items-center justify-between">
+                    <span class="font-black text-xs">{{ Auth::user()->predictor_points }} PTS</span>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="text-rose-500 text-[10px] uppercase font-black tracking-widest">Logout</button>
+                    </form>
+                </div>
+                @else
+                <a href="{{ route('login') }}" class="p-3 bg-primary text-white text-center rounded-xl font-black uppercase tracking-widest text-[10px]">Sign In</a>
+                @endauth
             </nav>
         </div>
     </header>
