@@ -456,7 +456,7 @@
             </h3>
 
             <!-- Upload Form -->
-            <form action="{{ route('matches.gallery.upload', $match->id) }}" method="POST" enctype="multipart/form-data" class="mb-8">
+            <form action="{{ route('admin.matches.gallery.upload', $match->id) }}" method="POST" enctype="multipart/form-data" class="mb-8">
                 @csrf
                 <div class="space-y-4">
                     <div class="border-2 border-dashed border-zinc-200 rounded-2xl p-8 text-center bg-zinc-50 hover:bg-zinc-100 transition cursor-pointer" onclick="document.getElementById('galleryImages').click()">
@@ -481,7 +481,7 @@
                 @foreach($match->images->sortBy('order') as $image)
                 <div class="relative group">
                     <img src="{{ $image->image_url }}" alt="{{ $image->caption }}" class="w-full h-32 object-cover rounded-xl border border-zinc-100">
-                    <form action="{{ route('matches.gallery.delete', [$match->id, $image->id]) }}" method="POST" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
+                    <form action="{{ route('admin.matches.gallery.delete', [$match->id, $image->id]) }}" method="POST" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
                         @csrf
                         @method('DELETE')
                         <button type="submit" onclick="return confirm('Delete this image?')" class="bg-red-500 text-white p-2 rounded-lg shadow-lg hover:bg-red-600">
