@@ -46,9 +46,9 @@ class StatisticsService
             ->get();
     }
 
-    public function getTopCards($limit = 10, $competitionId = null)
+    public function getTopYellowCards($limit = 10, $competitionId = null)
     {
-        return Player::withCount(['cards' => function($query) use ($competitionId) {
+        return Player::withCount(['yellowCards' => function($query) use ($competitionId) {
                 $query->whereHas('match', function($q) use ($competitionId) {
                     $q->where('stage', '!=', 'novelty');
                     if ($competitionId) {
@@ -57,8 +57,25 @@ class StatisticsService
                 });
             }])
             ->with('team')
-            ->having('cards_count', '>', 0)
-            ->orderBy('cards_count', 'desc')
+            ->having('yellow_cards_count', '>', 0)
+            ->orderBy('yellow_cards_count', 'desc')
+            ->take($limit)
+            ->get();
+    }
+
+    public function getTopRedCards($limit = 10, $competitionId = null)
+    {
+        return Player::withCount(['redCards' => function($query) use ($competitionId) {
+                $query->whereHas('match', function($q) use ($competitionId) {
+                    $q->where('stage', '!=', 'novelty');
+                    if ($competitionId) {
+                        $q->where('competition_id', $competitionId);
+                    }
+                });
+            }])
+            ->with('team')
+            ->having('red_cards_count', '>', 0)
+            ->orderBy('red_cards_count', 'desc')
             ->take($limit)
             ->get();
     }

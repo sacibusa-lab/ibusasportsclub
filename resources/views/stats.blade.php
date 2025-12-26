@@ -91,13 +91,10 @@
                         <div class="relative px-4 pb-4 -mt-12 flex flex-col items-center flex-1">
                             <div class="relative mb-3">
                                 <div class="absolute inset-0 bg-{{ $cat['color'] }} rounded-full animate-pulse opacity-10 group-hover:scale-105 transition duration-500"></div>
-                                @if($player->full_image_url)
-                                    <img src="{{ $player->full_image_url }}" class="w-20 h-24 object-contain relative z-10 drop-shadow-md transform group-hover:scale-110 transition duration-500">
-                                @else
-                                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center border-2 border-zinc-50 relative z-10">
-                                        <span class="text-xl font-black text-zinc-100">?</span>
-                                    </div>
-                                @endif
+                                @php
+                                    $pImg = $player->full_image_url ?: ($player->image_url ?: 'https://ui-avatars.com/api/?name='.urlencode($player->name).'&background=f4f4f5&color=a1a1aa&size=128');
+                                @endphp
+                                <img src="{{ $pImg }}" class="{{ $player->full_image_url ? 'w-20 h-24 object-contain' : 'w-16 h-16 rounded-full object-cover border-2 border-white mb-2' }} relative z-10 drop-shadow-md transform group-hover:scale-110 transition duration-500">
                             </div>
 
                             <div class="text-center space-y-1 mb-4 flex-1">

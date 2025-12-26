@@ -214,6 +214,7 @@ class TournamentController extends Controller
                 'topAssists' => collect(),
                 'topCleanSheets' => collect(),
                 'topCards' => collect(),
+                'topRedCards' => collect(),
                 'topMOTM' => collect(),
                 'topGoalsScored' => collect(),
                 'topShots' => collect(),
@@ -232,7 +233,8 @@ class TournamentController extends Controller
         $topScorers = $this->statisticsService->getTopScorers(10, $compId);
         $topAssists = $this->statisticsService->getTopAssists(10, $compId);
         $topCleanSheets = $this->statisticsService->getTopCleanSheets(10, $compId);
-        $topCards = $this->statisticsService->getTopCards(10, $compId);
+        $topCards = $this->statisticsService->getTopYellowCards(10, $compId);
+        $topRedCards = $this->statisticsService->getTopRedCards(10, $compId);
         $topMOTM = $this->statisticsService->getTopMOTM(10, $compId);
 
         // Team Stats - This needs specific CompetitionTeam logic
@@ -258,7 +260,7 @@ class TournamentController extends Controller
         $competitions = \App\Models\Competition::where('is_active', true)->get();
 
         return view('stats', compact(
-            'topScorers', 'topAssists', 'topCleanSheets', 'topCards', 'topMOTM',
+            'topScorers', 'topAssists', 'topCleanSheets', 'topCards', 'topRedCards', 'topMOTM',
             'topGoalsScored', 'topShots', 'topCorners', 'topOffsides', 'topFouls', 'topThrows', 'topSaves', 'topGoalKicks', 'topMissedChances',
             'activeCompetition', 'competitions'
         ));
