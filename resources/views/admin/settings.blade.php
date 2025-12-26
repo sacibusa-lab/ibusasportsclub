@@ -159,6 +159,49 @@
             </div>
         </div>
 
+    <!-- Cloudinary Settings -->
+    <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
+        <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-8 border-b border-zinc-50 pb-4 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+            Cloud Storage (Cloudinary)
+        </h3>
+        <div class="space-y-6">
+            @php
+                $isCloudinaryEnabled = !empty($settings['cloudinary_cloud_name']) && 
+                                       !empty($settings['cloudinary_api_key']) && 
+                                       !empty($settings['cloudinary_api_secret']);
+            @endphp
+            
+            @if($isCloudinaryEnabled)
+            <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-emerald-700 text-xs font-bold uppercase tracking-widest">Cloudinary is ACTIVE - All new media uploads to cloud</span>
+            </div>
+            @else
+            <div class="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center gap-3">
+                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span class="text-amber-700 text-xs font-bold uppercase tracking-widest">Using local storage - Configure Cloudinary to enable cloud hosting</span>
+            </div>
+            @endif
+            
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">Cloud Name</label>
+                <input type="text" name="cloudinary_cloud_name" value="{{ $settings['cloudinary_cloud_name'] ?? '' }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="my-cloud-name">
+                <p class="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Find in Cloudinary Dashboard → Settings</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">API Key</label>
+                    <input type="text" name="cloudinary_api_key" value="{{ $settings['cloudinary_api_key'] ?? '' }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-mono text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="123456789012345">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">API Secret</label>
+                    <input type="password" name="cloudinary_api_secret" value="{{ $settings['cloudinary_api_secret'] ?? '' }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-mono text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="••••••••••••••••••••">
+                </div>
+            </div>
+        </div>
+    </div>
+
         <div class="flex items-center justify-end gap-4 pt-4 pb-1">
             <button type="submit" class="bg-primary text-secondary font-black px-12 py-5 rounded-2xl hover:bg-primary-light transition uppercase tracking-widest text-xs shadow-xl flex items-center gap-3">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
