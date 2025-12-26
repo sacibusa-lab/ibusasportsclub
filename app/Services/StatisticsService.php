@@ -133,7 +133,7 @@ class StatisticsService
 
         return $gks->filter(function($gk) {
             return $gk->clean_sheets_count > 0;
-        })->sortByDesc('clean_sheets_count')->take($limit);
+        })->sortByDesc('clean_sheets_count')->take($limit)->values();
     }
 
     public function getTopMOTM($limit = 10, $competitionId = null)
@@ -178,7 +178,7 @@ class StatisticsService
 
         return $teams->filter(function($team) {
             return $team->total_stat > 0;
-        })->sortByDesc('total_stat')->take($limit);
+        })->sortByDesc('total_stat')->take($limit)->values();
     }
 
     /**
@@ -241,7 +241,7 @@ class StatisticsService
                         ->when($competitionId, fn($q) => $q->where('competition_id', $competitionId))
                         ->count();
                 }
-                $list = $teams->sortByDesc('clean_sheets_count');
+                $list = $teams->sortByDesc('clean_sheets_count')->values();
                 $key = 'clean_sheets_count';
                 break;
         }
