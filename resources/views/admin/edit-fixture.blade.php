@@ -396,17 +396,31 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 bg-zinc-50 p-6 rounded-3xl border border-zinc-100">
-                <div class="space-y-2">
-                    <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Match Highlights Video URL (YouTube/Vimeo)</label>
-                    <input type="text" name="highlights_url" value="{{ $match->highlights_url }}" class="w-full bg-white border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="https://www.youtube.com/watch?v=...">
+                <div class="space-y-4">
+                    <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Match Highlights</label>
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <span class="block text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Upload Video (Cloudinary)</span>
+                            <input type="file" name="highlights_video" class="w-full bg-white border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[10px]" accept="video/*">
+                        </div>
+                        <div class="relative py-2 flex items-center">
+                            <div class="flex-grow border-t border-zinc-200"></div>
+                            <span class="flex-shrink mx-4 text-[8px] font-black text-zinc-300 uppercase">OR</span>
+                            <div class="flex-grow border-t border-zinc-200"></div>
+                        </div>
+                        <div class="space-y-2">
+                            <span class="block text-[9px] font-bold text-zinc-400 uppercase tracking-widest">Highlights Video URL (YouTube/Direct)</span>
+                            <input type="text" name="highlights_url" value="{{ $match->highlights_url }}" class="w-full bg-white border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+                    </div>
                 </div>
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-zinc-400 border-b border-zinc-50 pb-2 uppercase tracking-widest">Highlights Thumbnail</label>
-                    <div class="flex items-center gap-4">
+                    <div class="flex flex-col gap-4">
                         @if($match->highlights_thumbnail)
-                            <img src="{{ $match->highlights_thumbnail }}" class="w-20 h-12 object-cover rounded-xl border border-zinc-200">
+                            <img src="{{ $match->highlights_thumbnail }}" class="w-full h-32 object-cover rounded-2xl border border-zinc-200">
                         @endif
-                        <input type="file" name="highlights_thumbnail" class="flex-1 bg-white border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" accept="image/*">
+                        <input type="file" name="highlights_thumbnail" class="w-full bg-white border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" accept="image/*">
                     </div>
                 </div>
             </div>

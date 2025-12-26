@@ -293,6 +293,8 @@ class AdminController extends Controller
             'referee_ar2_id' => 'nullable|exists:referees,id',
             'attendance' => 'nullable|integer|min:0',
             'lineups_json' => 'nullable|json',
+            'highlights_video' => 'nullable|file|mimetypes:video/mp4,video/mpeg,video/quicktime|max:51200', // 50MB max
+            'highlights_thumbnail' => 'nullable|image|max:5120', // 5MB max
         ]);
 
         $match = MatchModel::findOrFail($id);
@@ -339,10 +341,23 @@ class AdminController extends Controller
             'referee_ar1_id' => $request->referee_ar1_id,
             'referee_ar2_id' => $request->referee_ar2_id,
             'attendance'   => $request->attendance,
-            'highlights_url' => $request->highlights_url,
         ];
 
+        // Handle Highlights URL or Upload
+        if ($request->hasFile('highlights_video')) {
+            // Delete old video if it exists on Cloudinary/Local
+            if ($match->highlights_url) {
+                $this->imageService->delete($match->highlights_url);
+            }
+            $updateData['highlights_url'] = $this->imageService->upload($request->file('highlights_video'), 'matches/highlights');
+        } else {
+            $updateData['highlights_url'] = $request->highlights_url;
+        }
+
         if ($request->hasFile('highlights_thumbnail')) {
+            if ($match->highlights_thumbnail) {
+                $this->imageService->delete($match->highlights_thumbnail);
+            }
             $updateData['highlights_thumbnail'] = $this->imageService->upload($request->file('highlights_thumbnail'), 'matches/thumbnails');
         }
 

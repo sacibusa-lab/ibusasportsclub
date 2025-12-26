@@ -30,6 +30,13 @@
         max-width: 100%;
         height: auto;
     }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
 </style>
 @endpush
 
@@ -132,6 +139,58 @@
     </div>
     <!-- RECAP TAB -->
     <div x-show="tab === 'recap'" class="space-y-6 md:space-y-8">
+
+    <!-- Video Highlights Section -->
+    @if($match->highlights_url)
+    <div class="bg-indigo-950 rounded-3xl md:rounded-[2.5rem] overflow-hidden shadow-2xl border-2 border-white/10 group">
+        <div class="relative aspect-video bg-black flex items-center justify-center">
+            @php
+                $isCloudinary = str_contains($match->highlights_url, 'res.cloudinary.com');
+                $isDirectVideo = $isCloudinary || preg_match('/\.(mp4|webm|ogg|mov)$/i', $match->highlights_url);
+                $isYouTube = str_contains($match->highlights_url, 'youtube.com') || str_contains($match->highlights_url, 'youtu.be');
+            @endphp
+
+            @if($isDirectVideo)
+                <video 
+                    controls 
+                    poster="{{ $match->highlights_thumbnail }}"
+                    class="w-full h-full object-cover"
+                    preload="none">
+                    <source src="{{ $match->highlights_url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            @elseif($isYouTube)
+                @php
+                    preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $match->highlights_url, $match_yt);
+                    $youtubeId = $match_yt[1] ?? null;
+                @endphp
+                @if($youtubeId)
+                <iframe 
+                    class="w-full h-full" 
+                    src="https://www.youtube.com/embed/{{ $youtubeId }}?rel=0&showinfo=0&autoplay=0" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+                @endif
+            @else
+                <div class="text-center p-8 bg-zinc-900 w-full h-full flex flex-col items-center justify-center space-y-4">
+                    <p class="text-white/60 font-bold uppercase tracking-widest text-xs">External Highlights Available</p>
+                    <a href="{{ $match->highlights_url }}" target="_blank" class="bg-secondary text-primary px-8 py-3 rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 transition">Watch Highlights</a>
+                </div>
+            @endif
+        </div>
+        <div class="px-6 py-4 bg-indigo-900 border-t border-white/5 flex items-center justify-between">
+            <span class="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                Full Match Highlights
+            </span>
+            <div class="flex items-center gap-4">
+                <span class="text-[9px] font-bold text-white/40 uppercase tracking-widest">{{ $match->homeTeam->name }} vs {{ $match->awayTeam->name }}</span>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Timeline & Events -->
     @if($match->status === 'finished')
