@@ -111,41 +111,68 @@
                     <thead>
                         <tr class="bg-zinc-50 border-b border-zinc-100">
                             <th class="px-4 md:px-8 py-3 md:py-4 text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest">Metric</th>
-                            <th class="px-4 md:px-8 py-3 md:py-4 text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right">Season Record</th>
+                            <th class="px-4 md:px-8 py-3 md:py-4 text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest text-center">Value</th>
+                            <th class="px-4 md:px-8 py-3 md:py-4 text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-widest text-right">League Rank</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-50">
                         <tr>
                             <td class="px-4 md:px-8 py-4 md:py-5">
-                                <span class="block font-bold text-primary text-sm md:text-base">Goal Contributions</span>
-                                <span class="text-[9px] md:text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Combined Goals + Assists</span>
+                                <span class="block font-bold text-primary text-sm md:text-base">Goals</span>
+                                <span class="text-[9px] md:text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Total balls in net</span>
                             </td>
-                            <td class="px-4 md:px-8 py-4 md:py-5 text-right font-black text-lg md:text-xl text-primary">{{ $player->goals_count + $player->assists_count }}</td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 md:px-8 py-4 md:py-5">
-                                <span class="block font-bold text-primary text-sm md:text-base">Efficiency</span>
-                                <span class="text-[9px] md:text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Goals per Appearance</span>
-                            </td>
-                            <td class="px-4 md:px-8 py-4 md:py-5 text-right font-black text-lg md:text-xl text-primary">{{ $player->match_lineups_count > 0 ? number_format($player->goals_count / $player->match_lineups_count, 2) : '0.00' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 md:px-8 py-4 md:py-5">
-                                <span class="block font-bold text-primary text-sm md:text-base">Discipline Level</span>
-                                <span class="text-[9px] md:text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Total Cards Received</span>
-                            </td>
-                            <td class="px-4 md:px-8 py-4 md:py-5 text-right font-black text-lg md:text-xl text-primary">
-                                <span class="{{ ($player->yellow_cards_count + $player->red_cards_count) > 3 ? 'text-rose-600' : 'text-primary' }}">
-                                    {{ $player->yellow_cards_count + $player->red_cards_count }}
-                                </span>
+                            <td class="px-4 md:px-8 py-4 md:py-5 text-center font-black text-lg md:text-xl text-primary">{{ $player->goals_count }}</td>
+                            <td class="px-4 md:px-8 py-4 md:py-5 text-right">
+                                @if($rankings['goals'])
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-black italic border border-secondary/20">#{{ $rankings['goals'] }}</span>
+                                @else
+                                    <span class="text-zinc-300 text-xs font-bold uppercase tracking-widest">Unranked</span>
+                                @endif
                             </td>
                         </tr>
                         <tr>
                             <td class="px-4 md:px-8 py-4 md:py-5">
-                                <span class="block font-bold text-primary text-sm md:text-base">MOTM Achievements</span>
-                                <span class="text-[9px] md:text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Individual Excellence Awards</span>
+                                <span class="block font-bold text-primary text-sm md:text-base">Assists</span>
+                                <span class="text-[9px] md:text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Goal setups</span>
                             </td>
-                            <td class="px-4 md:px-8 py-4 md:py-5 text-right font-black text-lg md:text-xl text-secondary">{{ $player->motm_awards_count }}</td>
+                            <td class="px-4 md:px-8 py-4 md:py-5 text-center font-black text-lg md:text-xl text-primary">{{ $player->assists_count }}</td>
+                            <td class="px-4 md:px-8 py-4 md:py-5 text-right">
+                                @if($rankings['assists'])
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-400 text-xs font-black italic border border-indigo-100">#{{ $rankings['assists'] }}</span>
+                                @else
+                                    <span class="text-zinc-300 text-xs font-bold uppercase tracking-widest">Unranked</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @if($player->position === 'GK')
+                        <tr>
+                            <td class="px-4 md:px-8 py-4 md:py-5">
+                                <span class="block font-bold text-primary text-sm md:text-base">Clean Sheets</span>
+                                <span class="text-[9px] md:text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Games with zero conceded</span>
+                            </td>
+                            <td class="px-4 md:px-8 py-4 md:py-5 text-center font-black text-lg md:text-xl text-primary">{{ $player->clean_sheets_count ?? 0 }}</td>
+                            <td class="px-4 md:px-8 py-4 md:py-5 text-right">
+                                @if(isset($rankings['clean_sheets']) && $rankings['clean_sheets'])
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-500 text-xs font-black italic border border-emerald-100">#{{ $rankings['clean_sheets'] }}</span>
+                                @else
+                                    <span class="text-zinc-300 text-xs font-bold uppercase tracking-widest">Unranked</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endif
+                        <tr>
+                            <td class="px-4 md:px-8 py-4 md:py-5">
+                                <span class="block font-bold text-primary text-sm md:text-base">MOTM Awards</span>
+                                <span class="text-[9px] md:text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Individual Excellence</span>
+                            </td>
+                            <td class="px-4 md:px-8 py-4 md:py-5 text-center font-black text-lg md:text-xl text-secondary">{{ $player->motm_awards_count }}</td>
+                            <td class="px-4 md:px-8 py-4 md:py-5 text-right">
+                                @if($rankings['motm'])
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-amber-50 text-amber-500 text-xs font-black italic border border-amber-100">#{{ $rankings['motm'] }}</span>
+                                @else
+                                    <span class="text-zinc-300 text-xs font-bold uppercase tracking-widest">Unranked</span>
+                                @endif
+                            </td>
                         </tr>
                     </tbody>
                 </table>

@@ -78,7 +78,12 @@
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
             <!-- Goals Scored -->
-            <div class="bg-gradient-to-br from-green-50 to-white rounded-2xl p-4 md:p-5 border border-green-100 hover:shadow-lg transition">
+            <div class="bg-gradient-to-br from-green-50 to-white rounded-2xl p-4 md:p-5 border border-green-100 hover:shadow-lg transition relative group">
+                @if(isset($rankings['goals_for']) && $rankings['goals_for'])
+                <div class="absolute top-3 right-3 px-2 py-0.5 md:px-3 md:py-1 rounded-lg bg-green-500 text-white text-[8px] md:text-[10px] font-black italic shadow-lg transform group-hover:-translate-y-1 transition duration-300">
+                    RANK #{{ $rankings['goals_for'] }}
+                </div>
+                @endif
                 <div class="flex items-center gap-2 mb-2">
                     <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-green-500 flex items-center justify-center">
                         <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
@@ -89,7 +94,12 @@
             </div>
 
             <!-- Goals Conceded -->
-            <div class="bg-gradient-to-br from-red-50 to-white rounded-2xl p-4 md:p-5 border border-red-100 hover:shadow-lg transition">
+            <div class="bg-gradient-to-br from-red-50 to-white rounded-2xl p-4 md:p-5 border border-red-100 hover:shadow-lg transition relative group">
+                @if(isset($rankings['goals_against']) && $rankings['goals_against'])
+                <div class="absolute top-3 right-3 px-2 py-0.5 md:px-3 md:py-1 rounded-lg bg-red-600 text-white text-[8px] md:text-[10px] font-black italic shadow-lg transform group-hover:-translate-y-1 transition duration-300">
+                    RANK #{{ $rankings['goals_against'] }}
+                </div>
+                @endif
                 <div class="flex items-center gap-2 mb-2">
                     <div class="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-red-500 flex items-center justify-center">
                         <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>

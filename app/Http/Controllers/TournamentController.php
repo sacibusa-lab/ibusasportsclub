@@ -285,88 +285,61 @@ class TournamentController extends Controller
             $q->withCount(['goals', 'assists', 'matchLineups']);
         }, 'group'])->findOrFail($id);
 
-        // Calculate Rank
-        $teams = Team::orderBy('points', 'desc')
-            ->orderByRaw('(goals_for - goals_against) DESC')
-            ->orderBy('goals_for', 'desc')
-            ->get();
-        $rank = $teams->search(function($t) use ($id) { return $t->id == $id; }) + 1;
-        
-        $nextMatch = MatchModel::where(function($q) use ($id) {
-            $q->where('home_team_id', $id)->orWhere('away_team_id', $id);
-        })->where('match_date', '>', now())->orderBy('match_date', 'asc')->first();
+        $activeCompetition = $this->getActiveCompetition();
+        $compId = $activeCompetition ? $activeCompetition->id : null;
 
-        $recentMatches = MatchModel::where(function($q) use ($id) {
-            $q->where('home_team_id', $id)->orWhere('away_team_id', $id);
-        })->where('match_date', '<=', now())->where('status', 'finished')->orderBy('match_date', 'desc')->take(5)->get();
+        $team = Team::with(['players', 'group', 'homeMatches.awayTeam', 'awayMatches.homeTeam'])
+            ->findOrFail($id);
+
+        // Get rankings
+        $rankings = [
+            'goals_for' => $this->statisticsService->getTeamRank($id, 'goals_for', $compId),
+            'goals_against' => $this->statisticsService->getTeamRank($id, 'goals_against', $compId),
+        ];
+
+        $rank = $this->tournamentService->getTeamRankInGroup($team, $team->group);
+        
+        $recentMatches = MatchModel::where('status', 'finished')
+            ->where('stage', '!=', 'novelty')
+            ->where(function($query) use ($id) {
+                $query->where('home_team_id', $id)
+                      ->orWhere('away_team_id', $id);
+            })
+            ->orderBy('match_date', 'desc')
+            ->take(5)
+            ->get();
+
+        $nextMatch = MatchModel::where('status', 'upcoming')
+            ->where(function($query) use ($id) {
+                $query->where('home_team_id', $id)
+                      ->orWhere('away_team_id', $id);
+            })
+            ->orderBy('match_date', 'asc')
+            ->first();
+
+        $formString = $this->tournamentService->getTeamFormString($team, $recentMatches);
+        $cleanSheets = $this->tournamentService->getTeamCleanSheets($team);
+        $winRate = $team->played > 0 ? round(($team->wins / $team->played) * 100) : 0;
+        $goalsPerGame = $team->played > 0 ? round($team->goals_for / $team->played, 2) : 0;
+        $goalsConcededPerGame = $team->played > 0 ? round($team->goals_against / $team->played, 2) : 0;
+        $totalMissedChances = $this->tournamentService->getTeamTotalStat($team, 'missed_chances');
+        $biggestWin = $this->tournamentService->getTeamBiggestWin($team);
+        $biggestLoss = $this->tournamentService->getTeamBiggestLoss($team);
 
         $squad = $team->players->groupBy('position');
 
-        // Calculate additional statistics
-        $allMatches = MatchModel::where(function($q) use ($id) {
-            $q->where('home_team_id', $id)->orWhere('away_team_id', $id);
-        })->where('status', 'finished')->get();
-
-        $cleanSheets = $allMatches->filter(function($match) use ($id) {
-            if ($match->home_team_id == $id) {
-                return $match->away_score == 0;
-            } else {
-                return $match->home_score == 0;
-            }
-        })->count();
-
-        $goalsPerGame = $team->played > 0 ? round($team->goals_for / $team->played, 2) : 0;
-        $goalsConcededPerGame = $team->played > 0 ? round($team->goals_against / $team->played, 2) : 0;
-        $winRate = $team->played > 0 ? round(($team->wins / $team->played) * 100, 1) : 0;
-
-        $totalMissedChances = $allMatches->sum(function($match) use ($id) {
-            return $match->home_team_id == $id ? $match->home_missed_chances : $match->away_missed_chances;
-        });
-
-        // Calculate biggest win and biggest loss
-        $biggestWin = null;
-        $biggestLoss = null;
-        $biggestWinMargin = 0;
-        $biggestLossMargin = 0;
-
-        foreach ($allMatches as $match) {
-            $isHome = $match->home_team_id == $id;
-            $teamScore = $isHome ? $match->home_score : $match->away_score;
-            $opponentScore = $isHome ? $match->away_score : $match->home_score;
-            $margin = $teamScore - $opponentScore;
-
-            if ($margin > $biggestWinMargin) {
-                $biggestWinMargin = $margin;
-                $biggestWin = $match;
-            }
-
-            if ($margin < $biggestLossMargin) {
-                $biggestLossMargin = $margin;
-                $biggestLoss = $match;
-            }
-        }
-
-        // Calculate form string (last 5 matches)
-        $formString = '';
-        foreach ($recentMatches as $match) {
-            $isHome = $match->home_team_id == $id;
-            $teamScore = $isHome ? $match->home_score : $match->away_score;
-            $opponentScore = $isHome ? $match->away_score : $match->home_score;
-            
-            if ($teamScore > $opponentScore) {
-                $formString .= 'W';
-            } elseif ($teamScore == $opponentScore) {
-                $formString .= 'D';
-            } else {
-                $formString .= 'L';
-            }
-        }
-
-        return view('team-details', compact('team', 'totalMissedChances', 'nextMatch', 'recentMatches', 'rank', 'squad', 'cleanSheets', 'goalsPerGame', 'goalsConcededPerGame', 'winRate', 'biggestWin', 'biggestLoss', 'formString'));
+        return view('team-details', compact(
+            'team', 'rank', 'recentMatches', 'nextMatch', 'formString', 'cleanSheets', 
+            'winRate', 'goalsPerGame', 'goalsConcededPerGame', 'totalMissedChances',
+            'biggestWin', 'biggestLoss', 'squad', 'rankings', 'activeCompetition'
+        ));
     }
 
     public function player($id)
     {
+        $activeCompetition = $this->getActiveCompetition();
+        $compId = $activeCompetition ? $activeCompetition->id : null;
+
         $player = Player::with(['team', 'goals', 'assists', 'matchLineups'])
             ->withCount(['goals', 'assists', 'matchLineups', 'yellowCards', 'redCards', 'motmAwards'])
             ->findOrFail($id);
@@ -380,7 +353,18 @@ class TournamentController extends Controller
             ->orderBy('match_date', 'asc')
             ->first();
 
-        return view('player-details', compact('player', 'nextMatch'));
+        // Get Rankings
+        $rankings = [
+            'goals' => $this->statisticsService->getPlayerRank($id, 'goals', $compId),
+            'assists' => $this->statisticsService->getPlayerRank($id, 'assists', $compId),
+            'motm' => $this->statisticsService->getPlayerRank($id, 'motm', $compId),
+        ];
+
+        if ($player->position === 'GK') {
+            $rankings['clean_sheets'] = $this->statisticsService->getPlayerRank($id, 'clean_sheets', $compId);
+        }
+
+        return view('player-details', compact('player', 'nextMatch', 'rankings', 'activeCompetition'));
     }
 
     public function matchDetails($id)
