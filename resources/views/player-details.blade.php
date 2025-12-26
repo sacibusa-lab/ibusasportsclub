@@ -62,6 +62,31 @@
     </div>
 
     <!-- Quick Stats Bar -->
+    <div class="space-y-6">
+        @if($player->is_suspended)
+            <div class="bg-rose-600 text-white p-6 rounded-3xl flex items-center justify-between shadow-xl shadow-rose-200 animate-fade-in">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl backdrop-blur-md">🚫</div>
+                    <div>
+                        <p class="font-black uppercase tracking-[0.2em] text-[10px] md:text-xs">Suspension Alert</p>
+                        <p class="text-xs md:text-sm font-bold opacity-90">{{ $player->suspension_status['reason'] }}</p>
+                    </div>
+                </div>
+                <div class="hidden md:block text-[10px] font-black uppercase tracking-widest bg-black/20 px-4 py-2 rounded-xl backdrop-blur-md">
+                    Match Eligibility: Ineligible
+                </div>
+            </div>
+        @elseif($player->suspension_status['remaining_yellows'] == 1)
+             <div class="bg-amber-500 text-white p-4 md:p-6 rounded-3xl flex items-center justify-between shadow-xl shadow-amber-100">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-2xl flex items-center justify-center text-xl md:text-2xl backdrop-blur-md">⚠️</div>
+                    <div>
+                        <p class="font-black uppercase tracking-[0.2em] text-[10px]">Suspension Warning</p>
+                        <p class="text-xs md:text-sm font-bold opacity-90">1 Yellow Card away from a 1-match suspension</p>
+                    </div>
+                </div>
+            </div>
+        @endif
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-6">
         <div class="bg-white rounded-2xl md:rounded-[2rem] p-4 md:p-6 shadow-sm border border-zinc-100 flex flex-col items-center justify-center text-center group hover:bg-zinc-50 transition-colors">
             <span class="text-2xl md:text-4xl font-black text-primary mb-0.5 md:mb-1 group-hover:scale-110 transition-transform">{{ $player->match_lineups_count }}</span>
@@ -77,9 +102,14 @@
         </div>
         <div class="bg-white rounded-2xl md:rounded-[2rem] p-4 md:p-6 shadow-sm border border-zinc-100 flex flex-col items-center justify-center text-center group hover:bg-zinc-50 transition-colors">
             <span class="text-2xl md:text-4xl font-black text-amber-500 mb-0.5 md:mb-1 group-hover:scale-110 transition-transform">{{ $player->yellow_cards_count }}</span>
-            <div class="flex items-center gap-1">
-                <div class="w-1.5 h-2 md:w-2.5 md:h-3.5 bg-amber-400 rounded-sm"></div>
-                <span class="text-[8px] md:text-[9px] font-black text-zinc-400 uppercase tracking-widest">Yellows</span>
+            <div class="flex flex-col items-center gap-1">
+                <div class="flex items-center gap-1">
+                    <div class="w-1.5 h-2 md:w-2.5 md:h-3.5 bg-amber-400 rounded-sm"></div>
+                    <span class="text-[8px] md:text-[9px] font-black text-zinc-400 uppercase tracking-widest">Yellows</span>
+                </div>
+                @if($player->suspension_status['remaining_yellows'] == 1)
+                    <span class="text-[7px] font-black text-amber-600 uppercase tracking-tighter">1 From Susp.</span>
+                @endif
             </div>
         </div>
         <div class="bg-white rounded-2xl md:rounded-[2rem] p-4 md:p-6 shadow-sm border border-zinc-100 flex flex-col items-center justify-center text-center group hover:bg-zinc-50 transition-colors">

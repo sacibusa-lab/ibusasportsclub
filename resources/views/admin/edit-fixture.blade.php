@@ -189,7 +189,24 @@
                                             <td class="py-3 px-4">
                                                 <div class="flex items-center gap-3">
                                                     <span class="text-[10px] font-black text-zinc-300 w-4">#{{ $player->shirt_number }}</span>
-                                                    <span class="text-xs font-bold text-primary uppercase">{{ $player->name }}</span>
+                                                    <div class="flex flex-col">
+                                                        <div class="flex items-center gap-2">
+                                                            <span class="text-xs font-bold text-primary uppercase">{{ $player->name }}</span>
+                                                            @if($player->is_suspended)
+                                                                <span class="flex items-center gap-1 bg-rose-50 text-[8px] font-black text-rose-600 px-1.5 py-0.5 rounded-md uppercase tracking-tight" title="{{ $player->suspension_status['reason'] }}">
+                                                                    <span class="w-1 h-1 rounded-full bg-rose-500 animate-pulse"></span>
+                                                                    Suspended
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        @if($player->suspension_status['yellow_count'] > 0)
+                                                            <div class="flex items-center gap-1 mt-0.5">
+                                                                @for($i = 0; $i < ($player->suspension_status['yellow_count'] % 2); $i++)
+                                                                    <div class="w-1.5 h-2.5 bg-yellow-400 rounded-sm" title="1 Yellow Card accumulated"></div>
+                                                                @endfor
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td class="py-3 px-2">
@@ -246,7 +263,24 @@
                                         <tr class="group hover:bg-white transition">
                                             <td class="py-3 px-4 text-right">
                                                 <div class="flex items-center justify-end gap-3">
-                                                    <span class="text-xs font-bold text-primary uppercase">{{ $player->name }}</span>
+                                                    <div class="flex flex-col items-end">
+                                                        <div class="flex items-center gap-2">
+                                                            @if($player->is_suspended)
+                                                                <span class="flex items-center gap-1 bg-rose-50 text-[8px] font-black text-rose-600 px-1.5 py-0.5 rounded-md uppercase tracking-tight" title="{{ $player->suspension_status['reason'] }}">
+                                                                    Suspended
+                                                                    <span class="w-1 h-1 rounded-full bg-rose-500 animate-pulse"></span>
+                                                                </span>
+                                                            @endif
+                                                            <span class="text-xs font-bold text-primary uppercase">{{ $player->name }}</span>
+                                                        </div>
+                                                        @if($player->suspension_status['yellow_count'] > 0)
+                                                            <div class="flex items-center gap-1 mt-0.5">
+                                                                @for($i = 0; $i < ($player->suspension_status['yellow_count'] % 2); $i++)
+                                                                    <div class="w-1.5 h-2.5 bg-yellow-400 rounded-sm" title="1 Yellow Card accumulated"></div>
+                                                                @endfor
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                     <span class="text-[10px] font-black text-zinc-300 w-4">#{{ $player->shirt_number }}</span>
                                                 </div>
                                             </td>

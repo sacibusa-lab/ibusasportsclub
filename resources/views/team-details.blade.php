@@ -252,6 +252,14 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                             @foreach($squad[$pos] as $player)
                             <a href="{{ route('player.details', $player->id) }}" class="bg-white rounded-2xl border border-zinc-100 flex flex-col hover:shadow-xl transition-all duration-500 group overflow-hidden relative">
+                                <!-- Suspension Ribbon -->
+                                @if($player->is_suspended)
+                                    <div class="absolute top-2 right-2 z-30">
+                                        <span class="flex items-center gap-1 bg-rose-600 text-[7px] md:text-[8px] font-black text-white px-2 py-1 rounded-lg uppercase tracking-widest shadow-lg animate-pulse" title="{{ $player->suspension_status['reason'] }}">
+                                            Suspended
+                                        </span>
+                                    </div>
+                                @endif
                                 <!-- Background Team Color Accent -->
                                 <div class="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 -mr-12 -mt-12 md:-mr-16 md:-mt-16 rounded-full opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none" style="background-color: {{ $team->primary_color }}"></div>
                                 

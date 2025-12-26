@@ -50,4 +50,14 @@ class Player extends Model
     {
         return $this->belongsToMany(MatchModel::class, 'match_lineups', 'player_id', 'match_id');
     }
+
+    public function getSuspensionStatusAttribute()
+    {
+        return app(\App\Services\SuspensionService::class)->getSuspensionStatus($this);
+    }
+
+    public function getIsSuspendedAttribute()
+    {
+        return $this->suspension_status['is_suspended'];
+    }
 }
