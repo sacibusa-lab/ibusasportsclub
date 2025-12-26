@@ -797,39 +797,73 @@
     </div>
 
     <!-- GALLERY TAB -->
-    <div x-show="tab === 'gallery'" x-cloak class="space-y-8">
+    <div x-show="tab === 'gallery'" 
+         x-data="{ 
+            showLightbox: false, 
+            currentIndex: 0, 
+            images: [
+                @foreach($match->images as $image)
+                { id: {{ $image->id }}, url: '{{ $image->image_url }}', caption: '{{ addslashes($image->caption) }}' }{{ !$loop->last ? ',' : '' }}
+                @endforeach
+            ],
+            next() { this.currentIndex = (this.currentIndex + 1) % this.images.length },
+            prev() { this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length }
+         }" 
+         x-cloak class="space-y-8">
         <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-6 md:p-8">
             <h3 class="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest border-b border-zinc-50 pb-4 mb-6">Match Gallery</h3>
             
             @if($match->images->count() > 0)
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                    @foreach($match->images as $image)
-                    <div x-data="{ open: false }">
-                        <div @click="open = true" class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer bg-zinc-50 border border-zinc-100 transition hover:shadow-xl">
-                            <img src="{{ $image->image_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $image->caption }}">
-                            @if($image->caption)
-                            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <p class="text-[10px] text-white font-bold truncate">{{ $image->caption }}</p>
-                            </div>
-                            @endif
+                    @foreach($match->images as $index => $image)
+                    <div @click="showLightbox = true; currentIndex = {{ $index }}" class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer bg-zinc-50 border border-zinc-100 transition hover:shadow-xl">
+                        <img src="{{ $image->image_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $image->caption }}">
+                        @if($image->caption)
+                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p class="text-[10px] text-white font-bold truncate">{{ $image->caption }}</p>
                         </div>
-
-                        <!-- Lightbox -->
-                        <div x-show="open" 
-                             class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-md" 
-                             @click.away="open = false" 
-                             x-cloak>
-                            <button @click="open = false" class="absolute top-8 right-8 text-white text-4xl">&times;</button>
-                            <div class="max-w-5xl w-full">
-                                <img src="{{ $image->image_url }}" class="w-full h-auto max-h-[85vh] object-contain rounded-xl shadow-2xl">
-                                @if($image->caption)
-                                <p class="text-center text-white font-black uppercase tracking-widest mt-6 italic">{{ $image->caption }}</p>
-                                @endif
-                            </div>
-                        </div>
+                        @endif
                     </div>
                     @endforeach
                 </div>
+
+                <!-- Centralized Lightbox -->
+                <template x-if="showLightbox">
+                    <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-md" 
+                         @keydown.window.escape="showLightbox = false"
+                         @keydown.window.left="prev()"
+                         @keydown.window.right="next()">
+                        
+                        <!-- Close Button -->
+                        <button @click="showLightbox = false" class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-[110]">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+
+                        <!-- Navigation Arrows -->
+                        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 md:px-12 pointer-events-none">
+                            <button @click.stop="prev()" class="pointer-events-auto bg-white/10 hover:bg-white/20 text-white p-3 md:p-5 rounded-full backdrop-blur-sm transition transition-all group">
+                                <svg class="w-6 h-6 md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <button @click.stop="next()" class="pointer-events-auto bg-white/10 hover:bg-white/20 text-white p-3 md:p-5 rounded-full backdrop-blur-sm transition transition-all group">
+                                <svg class="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="max-w-5xl w-full flex flex-col items-center" @click.away="showLightbox = false">
+                            <div class="relative w-full">
+                                <img :src="images[currentIndex].url" class="w-full h-auto max-h-[80vh] object-contain rounded-xl shadow-2xl">
+                                
+                                <!-- Counter -->
+                                <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">
+                                    <span x-text="currentIndex + 1" class="text-white"></span> / <span x-text="images.length"></span>
+                                </div>
+                            </div>
+                            
+                            <p x-text="images[currentIndex].caption" x-show="images[currentIndex].caption" class="text-center text-white font-black uppercase tracking-widest mt-12 italic animate-fade-in"></p>
+                        </div>
+                    </div>
+                </template>
             @else
                 <div class="py-20 text-center space-y-4">
                     <div class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-2 text-zinc-200">
