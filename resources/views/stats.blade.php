@@ -50,6 +50,8 @@
             $playerCategories = [
                 ['title' => 'Top Scorers', 'icon' => '⚽', 'data' => $topScorers, 'key' => 'goals_count', 'color' => 'secondary'],
                 ['title' => 'Top Assists', 'icon' => '🎯', 'data' => $topAssists, 'key' => 'assists_count', 'color' => 'indigo-400'],
+                ['title' => 'Yellow Cards', 'icon' => '🟨', 'data' => $topCards, 'key' => 'cards_count', 'color' => 'amber-400'],
+                ['title' => 'Red Cards', 'icon' => '🟥', 'data' => $topRedCards ?? collect(), 'key' => 'red_cards_count', 'color' => 'rose-500'],
                 ['title' => 'Clean Sheets', 'icon' => '🧤', 'data' => $topCleanSheets, 'key' => 'clean_sheets_count', 'color' => 'emerald-400'],
                 ['title' => 'Man of the Match', 'icon' => '🏆', 'data' => $topMOTM, 'key' => 'motm_awards_count', 'color' => 'amber-400'],
             ];
@@ -71,7 +73,7 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-4 md:gap-6">
                 @foreach($cat['data']->take(10) as $index => $player)
                 <div class="relative group">
-                    <!-- Rank Badge (Smaller) -->
+                    <!-- Rank Badge -->
                     <div class="absolute -top-2 -left-2 w-8 h-8 rounded-lg {{ $index == 0 ? 'bg-secondary text-primary' : ($index < 3 ? 'bg-primary text-white' : 'bg-zinc-100 text-zinc-400') }} flex items-center justify-center text-xs font-black italic shadow-lg z-20 transform group-hover:-translate-y-1 transition-transform">
                         {{ $index + 1 }}
                     </div>
@@ -130,7 +132,7 @@
             <div class="h-1 bg-secondary flex-1"></div>
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             @php
                 $teamStats = [
                     ['title' => 'Goals Scored', 'icon' => '⚽', 'data' => $topGoalsScored, 'key' => 'goals_for', 'color' => 'bg-green-600'],
@@ -139,6 +141,7 @@
                     ['title' => 'Team Discipline', 'icon' => '⚠️', 'data' => $topFouls, 'key' => 'total_stat', 'color' => 'bg-rose-600'],
                     ['title' => 'Offsides', 'icon' => '🏁', 'data' => $topOffsides, 'key' => 'total_stat', 'color' => 'bg-zinc-600'],
                     ['title' => 'GK Presence', 'icon' => '🧱', 'data' => $topSaves, 'key' => 'total_stat', 'color' => 'bg-cyan-600'],
+                    ['title' => 'Missed Chances', 'icon' => '💨', 'data' => $topMissedChances, 'key' => 'total_stat', 'color' => 'bg-rose-600'],
                 ];
             @endphp
 
