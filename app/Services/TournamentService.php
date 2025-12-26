@@ -150,6 +150,103 @@ class TournamentService
             ->first();
     }
 
+    public function getTeamRankInGroup(Team $team, Group $group)
+    {
+        $standings = $this->getSortedStandings($group);
+        $rank = $standings->search(function($t) use ($team) {
+            return $t->id == $team->id;
+        });
+        return $rank !== false ? $rank + 1 : null;
+    }
+
+    public function getTeamFormString(Team $team, $matches)
+    {
+        $form = [];
+        foreach ($matches as $match) {
+            if ($match->home_team_id == $team->id) {
+                if ($match->home_score > $match->away_score) $form[] = 'W';
+                elseif ($match->home_score < $match->away_score) $form[] = 'L';
+                else $form[] = 'D';
+            } else {
+                if ($match->away_score > $match->home_score) $form[] = 'W';
+                elseif ($match->away_score < $match->home_score) $form[] = 'L';
+                else $form[] = 'D';
+            }
+        }
+        return implode(' ', array_reverse($form));
+    }
+
+    public function getTeamCleanSheets(Team $team)
+    {
+        return MatchModel::where('status', 'finished')
+            ->where(function($q) use ($team) {
+                $q->where(fn($sq) => $sq->where('home_team_id', $team->id)->where('away_score', 0))
+                  ->orWhere(fn($sq) => $sq->where('away_team_id', $team->id)->where('home_score', 0));
+            })
+            ->count();
+    }
+
+    public function getTeamTotalStat(Team $team, $stat)
+    {
+        $home = MatchModel::where('home_team_id', $team->id)->sum('home_' . $stat);
+        $away = MatchModel::where('away_team_id', $team->id)->sum('away_' . $stat);
+        return $home + $away;
+    }
+
+    public function getTeamBiggestWin(Team $team)
+    {
+        $matches = MatchModel::where('status', 'finished')
+            ->where(function($q) use ($team) {
+                $q->where('home_team_id', $team->id)
+                  ->orWhere('away_team_id', $team->id);
+            })->get();
+
+        $biggestWin = null;
+        $maxDiff = -1;
+
+        foreach ($matches as $match) {
+            if ($match->home_team_id == $team->id) {
+                $diff = $match->home_score - $match->away_score;
+            } else {
+                $diff = $match->away_score - $match->home_score;
+            }
+
+            if ($diff > $maxDiff) {
+                $maxDiff = $diff;
+                $biggestWin = $match;
+            }
+        }
+
+        return ($maxDiff > 0) ? $biggestWin : null;
+    }
+
+    public function getTeamBiggestLoss(Team $team)
+    {
+        $matches = MatchModel::where('status', 'finished')
+            ->where(function($q) use ($team) {
+                $q->where('home_team_id', $team->id)
+                  ->orWhere('away_team_id', $team->id);
+            })->get();
+
+        $biggestLoss = null;
+        $maxDiff = -1;
+
+        foreach ($matches as $match) {
+            if ($match->home_team_id == $team->id) {
+                $diff = $match->away_score - $match->home_score;
+            } else {
+                $diff = $match->home_score - $match->away_score;
+            }
+
+            if ($diff > $maxDiff) {
+                $maxDiff = $diff;
+                $biggestLoss = $match;
+            }
+        }
+
+        return ($maxDiff > 0) ? $biggestLoss : null;
+    }
+
     public function generateKnockouts()
     {
         $groupA = Group::where('name', 'Group A')->first();
