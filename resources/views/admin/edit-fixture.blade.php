@@ -447,6 +447,62 @@
             </div>
         </form>
 
+        <!-- Match Gallery Section -->
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100 mt-8">
+            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-8 border-b border-zinc-50 pb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Match Gallery
+                <span class="ml-auto text-[9px] text-zinc-400 font-bold">({{ $match->images->count() }} images)</span>
+            </h3>
+
+            <!-- Upload Form -->
+            <form action="{{ route('matches.gallery.upload', $match->id) }}" method="POST" enctype="multipart/form-data" class="mb-8">
+                @csrf
+                <div class="space-y-4">
+                    <div class="border-2 border-dashed border-zinc-200 rounded-2xl p-8 text-center bg-zinc-50 hover:bg-zinc-100 transition cursor-pointer" onclick="document.getElementById('galleryImages').click()">
+                        <svg class="w-12 h-12 mx-auto text-zinc-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p class="text-sm font-black text-zinc-400 uppercase tracking-widest">Click to select multiple images</p>
+                        <p class="text-[10px] text-zinc-400 mt-2">or drag and drop</p>
+                        <input type="file" id="galleryImages" name="images[]" multiple accept="image/*" class="hidden" onchange="previewImages(this)">
+                    </div>
+                    
+                    <div id="imagePreview" class="grid grid-cols-4 gap-4 hidden"></div>
+                    
+                    <button type="submit" class="w-full bg-primary text-secondary font-black py-4 rounded-2xl hover:bg-primary-light transition uppercase tracking-widest text-xs shadow-lg">
+                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        Upload Selected Images
+                    </button>
+                </div>
+            </form>
+
+            <!-- Existing Gallery Images -->
+            @if($match->images->count() > 0)
+            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                @foreach($match->images->sortBy('order') as $image)
+                <div class="relative group">
+                    <img src="{{ $image->image_url }}" alt="{{ $image->caption }}" class="w-full h-32 object-cover rounded-xl border border-zinc-100">
+                    <form action="{{ route('matches.gallery.delete', [$match->id, $image->id]) }}" method="POST" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" onclick="return confirm('Delete this image?')" class="bg-red-500 text-white p-2 rounded-lg shadow-lg hover:bg-red-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </form>
+                    @if($image->caption)
+                    <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white text-[9px] p-2 rounded-b-xl">
+                        {{ $image->caption }}
+                    </div>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+            @else
+            <div class="text-center py-8 text-zinc-400 text-xs font-bold uppercase tracking-widest">
+                No images in gallery yet
+            </div>
+            @endif
+        </div>
+
         @if($match->status === 'upcoming' && !$match->prediction_closes_at)
         <form id="startMatchForm" action="{{ route('admin.matches.start', $match->id) }}" method="POST" class="hidden">
             @csrf
@@ -849,5 +905,27 @@
         
         // Optional: validation could go here
     };
+
+    function previewImages(input) {
+        const preview = document.getElementById('imagePreview');
+        preview.innerHTML = '';
+        preview.classList.remove('hidden');
+        
+        if (input.files) {
+            Array.from(input.files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'relative';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" class="w-full h-32 object-cover rounded-xl border border-zinc-200">
+                        <span class="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">${index + 1}</span>
+                    `;
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
 </script>
 @endpush

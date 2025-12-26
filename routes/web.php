@@ -68,6 +68,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/matches/{match}/events', [AdminController::class, 'storeEvent'])->name('matches.events.store');
     Route::delete('/events/{id}', [AdminController::class, 'destroyEvent'])->name('matches.events.destroy');
 
+    // Match Gallery
+    Route::post('/matches/{id}/gallery', [AdminController::class, 'uploadGalleryImages'])->name('matches.gallery.upload');
+    Route::delete('/matches/{matchId}/gallery/{imageId}', [AdminController::class, 'deleteGalleryImage'])->name('matches.gallery.delete');
+
     // Gallery Management
     Route::post('/matches/{match}/gallery', [AdminController::class, 'storeMatchImage'])->name('matches.gallery.store');
     Route::delete('/gallery/{id}', [AdminController::class, 'destroyMatchImage'])->name('matches.gallery.destroy');

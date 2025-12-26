@@ -241,7 +241,7 @@ class AdminController extends Controller
 
     public function editFixture($id)
     {
-        $match = MatchModel::with(['homeTeam.players', 'awayTeam.players', 'lineups', 'matchEvents.team', 'assignedReferee', 'assignedAssistant1', 'assignedAssistant2'])->findOrFail($id);
+        $match = MatchModel::with(['homeTeam.players', 'awayTeam.players', 'lineups', 'matchEvents.team', 'assignedReferee', 'assignedAssistant1', 'assignedAssistant2', 'images'])->findOrFail($id);
         $teams = Team::with('players')->get();
         $referees = \App\Models\Referee::all();
         $groups = Group::all();
@@ -548,5 +548,64 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', 'Match started! Predictions will close in 5 minutes.');
+    }
+
+    /**
+     * Upload multiple images to match gallery
+     */
+    public function uploadGalleryImages(Request $request, $id)
+    {
+        $request->validate([
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240', // 10MB max
+            'captions' => 'nullable|array',
+            'captions.*' => 'nullable|string|max:255',
+        ]);
+
+        $match = MatchModel::findOrFail($id);
+        $uploadedCount = 0;
+
+        if ($request->hasFile('images')) {
+            // Get the current highest order number
+            $maxOrder = \App\Models\MatchImage::where('match_id', $id)->max('order') ?? 0;
+
+            foreach ($request->file('images') as $index => $image) {
+                try {
+                    $imageUrl = $this->imageService->upload($image, 'match-gallery');
+                    $caption = $request->input("captions.{$index}");
+
+                    \App\Models\MatchImage::create([
+                        'match_id' => $id,
+                        'image_url' => $imageUrl,
+                        'caption' => $caption,
+                        'order' => ++$maxOrder,
+                    ]);
+
+                    $uploadedCount++;
+                } catch (\Exception $e) {
+                    \Log::error("Failed to upload gallery image: " . $e->getMessage());
+                }
+            }
+        }
+
+        return back()->with('success', "Successfully uploaded {$uploadedCount} image(s) to gallery.");
+    }
+
+    /**
+     * Delete a single image from match gallery
+     */
+    public function deleteGalleryImage($matchId, $imageId)
+    {
+        $image = \App\Models\MatchImage::where('match_id', $matchId)
+            ->where('id', $imageId)
+            ->firstOrFail();
+
+        // Delete the image from storage (Cloudinary or local)
+        $this->imageService->delete($image->image_url);
+
+        // Delete database record
+        $image->delete();
+
+        return back()->with('success', 'Image deleted from gallery.');
     }
 }
