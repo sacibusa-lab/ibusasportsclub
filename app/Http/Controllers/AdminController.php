@@ -538,4 +538,15 @@ class AdminController extends Controller
         $image->delete();
         return back()->with('success', 'Image removed from gallery.');
     }
+
+    public function startMatch(Request $request, $id)
+    {
+        $match = MatchModel::findOrFail($id);
+        
+        $match->update([
+            'prediction_closes_at' => now()->addMinutes(5)
+        ]);
+
+        return back()->with('success', 'Match started! Predictions will close in 5 minutes.');
+    }
 }

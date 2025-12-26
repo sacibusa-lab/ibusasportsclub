@@ -60,7 +60,12 @@ class PredictorController extends Controller
 
         $match = MatchModel::findOrFail($request->match_id);
 
-        if ($match->match_date->isPast()) {
+        // Check if predictions are closed
+        if ($match->prediction_closes_at) {
+            if ($match->prediction_closes_at->isPast()) {
+                return back()->with('error', 'Predictions closed for this match.');
+            }
+        } elseif ($match->match_date->isPast()) {
             return back()->with('error', 'Predictions closed for this match.');
         }
 

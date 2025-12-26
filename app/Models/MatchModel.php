@@ -20,11 +20,13 @@ class MatchModel extends Model
         'home_saves', 'away_saves', 'home_goal_kicks', 'away_goal_kicks',
         'home_missed_chances', 'away_missed_chances',
         'home_scorers', 'away_scorers', 'report', 'motm_player_id',
-        'referee', 'referee_ar1', 'referee_ar2', 'referee_id', 'referee_ar1_id', 'referee_ar2_id', 'attendance', 'highlights_url', 'highlights_thumbnail'
+        'referee', 'referee_ar1', 'referee_ar2', 'referee_id', 'referee_ar1_id', 'referee_ar2_id', 'attendance', 'highlights_url', 'highlights_thumbnail',
+        'prediction_closes_at'
     ];
 
     protected $casts = [
         'match_date' => 'datetime',
+        'prediction_closes_at' => 'datetime',
     ];
 
     public function competition()

@@ -36,13 +36,42 @@
             @if($upcomingMatches->count() > 0)
             <div class="space-y-4">
                 @foreach($upcomingMatches as $match)
-                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-zinc-100">
+                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-zinc-100" 
+                    x-data="{ 
+                        closesAt: '{{ $match->prediction_closes_at ? $match->prediction_closes_at->toIso8601String() : $match->match_date->toIso8601String() }}',
+                        isLocked: false,
+                        timer: '',
+                        updateTimer() {
+                            const now = new Date().getTime();
+                            const limit = new Date(this.closesAt).getTime();
+                            const diff = limit - now;
+                            
+                            if (diff <= 0) {
+                                this.isLocked = true;
+                                this.timer = 'CLOSED';
+                                return;
+                            }
+                            
+                            const mins = Math.floor(diff / 60000);
+                            const secs = Math.floor((diff % 60000) / 1000);
+                            this.timer = mins + ':' + (secs < 10 ? '0' : '') + secs;
+                        }
+                    }"
+                    x-init="updateTimer(); setInterval(() => updateTimer(), 1000)">
                     <div class="flex items-center justify-between mb-6">
-                        <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">{{ $match->match_date->format('D, j M - H:i') }}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">{{ $match->match_date->format('D, j M - H:i') }}</span>
+                            @if($match->prediction_closes_at && $match->prediction_closes_at->isFuture())
+                            <span class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-100 animate-pulse">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span class="text-[8px] font-black text-emerald-600 uppercase tracking-widest" x-text="'Closes in ' + timer"></span>
+                            </span>
+                            @endif
+                        </div>
                         <span class="text-[9px] font-black text-primary bg-secondary/20 px-3 py-1 rounded-full uppercase tracking-widest">{{ $match->venue }}</span>
                     </div>
 
-                    <form action="{{ route('predictor.predict') }}" method="POST" class="flex items-center justify-between gap-4 md:gap-8">
+                    <form action="{{ route('predictor.predict') }}" method="POST" class="flex items-center justify-between gap-4 md:gap-8" x-show="!isLocked">
                         @csrf
                         <input type="hidden" name="match_id" value="{{ $match->id }}">
                         
@@ -87,6 +116,12 @@
                             @endauth
                         </div>
                     </form>
+
+                    <!-- Closed State -->
+                    <div x-show="isLocked" class="flex flex-col items-center justify-center py-4 space-y-2 opacity-50 bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-200">
+                        <svg class="w-6 h-6 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Predictions Closed</span>
+                    </div>
                     
                     @if(in_array($match->id, $userPredictions))
                     <div class="mt-4 pt-4 border-t border-dashed border-zinc-100 text-center">

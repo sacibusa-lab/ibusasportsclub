@@ -59,7 +59,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/fixtures', [AdminController::class, 'fixtures'])->name('fixtures');
     Route::post('/fixtures', [AdminController::class, 'storeFixture'])->name('fixtures.store');
     Route::get('/fixtures/{id}/edit', [AdminController::class, 'editFixture'])->name('fixtures.edit');
-    Route::put('/fixtures/{id}', [AdminController::class, 'updateFixture'])->name('fixtures.update');
+    Route::post('/fixtures/{id}', [AdminController::class, 'updateFixture'])->name('fixtures.update');
+    Route::post('/matches/{id}/start', [AdminController::class, 'startMatch'])->name('matches.start');
     Route::delete('/fixtures/{id}', [AdminController::class, 'destroyFixture'])->name('fixtures.destroy');
     Route::post('/fixtures/{id}/results', [AdminController::class, 'updateResult'])->name('results.update');
 

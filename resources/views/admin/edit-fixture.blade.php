@@ -431,9 +431,28 @@
 
             <div class="flex items-center gap-4 pt-6 pb-6 border-b border-zinc-50 mb-6">
                 <button type="submit" class="flex-1 bg-primary text-secondary font-black py-5 rounded-2xl hover:bg-primary-light transition uppercase tracking-widest text-xs shadow-lg">Save Match Data & Lineups</button>
+                
+                @if($match->status === 'upcoming' && !$match->prediction_closes_at)
+                <button type="submit" form="startMatchForm" class="flex-1 bg-emerald-500 text-white font-black py-5 rounded-2xl hover:bg-emerald-600 transition uppercase tracking-widest text-xs shadow-lg flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Start Match & Countdown
+                </button>
+                @elseif($match->prediction_closes_at && $match->prediction_closes_at->isFuture())
+                <div class="flex-1 bg-emerald-50 text-emerald-600 font-black py-5 rounded-2xl border border-emerald-100 uppercase tracking-widest text-xs flex items-center justify-center gap-2 animate-pulse">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Predictions Closing Soon
+                </div>
+                @endif
+
                 <a href="{{ route('admin.fixtures') }}" class="px-10 py-5 border border-zinc-200 rounded-2xl font-black text-[10px] text-zinc-400 uppercase tracking-widest hover:bg-zinc-50 transition">Cancel</a>
             </div>
         </form>
+
+        @if($match->status === 'upcoming' && !$match->prediction_closes_at)
+        <form id="startMatchForm" action="{{ route('admin.matches.start', $match->id) }}" method="POST" class="hidden">
+            @csrf
+        </form>
+        @endif
 
         <!-- Match Events Section -->
         <div class="mt-16 space-y-10">
