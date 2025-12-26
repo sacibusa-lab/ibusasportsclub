@@ -167,13 +167,29 @@ class StatisticsService
                 $baseQuery->where('competition_id', $competitionId);
             }
 
+            // Map stats to correct columns
+            $homeCol = 'home_' . $stat;
+            $awayCol = 'away_' . $stat;
+
+            if ($stat === 'for') {
+                $homeCol = 'home_score';
+                $awayCol = 'away_score';
+            } elseif ($stat === 'against') {
+                $homeCol = 'away_score';
+                $awayCol = 'home_score';
+            }
+
             $homeStat = (clone $baseQuery)->where('home_team_id', $team->id)
-                ->sum('home_' . $stat);
+                ->sum($homeCol);
                 
             $awayStat = (clone $baseQuery)->where('away_team_id', $team->id)
-                ->sum('away_' . $stat);
+                ->sum($awayCol);
                 
             $team->total_stat = $homeStat + $awayStat;
+
+            // Optional: set the specific property if needed for views
+            if ($stat === 'for') $team->goals_for = $team->total_stat;
+            if ($stat === 'against') $team->goals_against = $team->total_stat;
         }
 
         return $teams->filter(function($team) {
