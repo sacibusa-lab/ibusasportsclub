@@ -283,14 +283,12 @@ class TournamentController extends Controller
 
     public function team($id)
     {
-        $team = Team::with(['players' => function($q) {
-            $q->withCount(['goals', 'assists', 'matchLineups']);
-        }, 'group'])->findOrFail($id);
-
         $activeCompetition = $this->getActiveCompetition();
         $compId = $activeCompetition ? $activeCompetition->id : null;
 
-        $team = Team::with(['players', 'group', 'homeMatches.awayTeam', 'awayMatches.homeTeam'])
+        $team = Team::with(['players' => function($q) {
+                $q->withCount(['goals', 'assists', 'matchLineups', 'yellowCards', 'redCards']);
+            }, 'group', 'homeMatches.awayTeam', 'awayMatches.homeTeam'])
             ->findOrFail($id);
 
         // Get rankings

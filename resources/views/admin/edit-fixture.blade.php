@@ -192,6 +192,9 @@
                                                     <div class="flex flex-col">
                                                         <div class="flex items-center gap-2">
                                                             <span class="text-xs font-bold text-primary uppercase">{{ $player->name }}</span>
+                                                            @if($player->yellow_cards_count > 0 || $player->red_cards_count > 0)
+                                                                <span class="text-[8px] font-black text-zinc-400">({{ $player->yellow_cards_count }}Y / {{ $player->red_cards_count }}R)</span>
+                                                            @endif
                                                             @if($player->is_suspended)
                                                                 <span class="flex items-center gap-1 bg-rose-50 text-[8px] font-black text-rose-600 px-1.5 py-0.5 rounded-md uppercase tracking-tight" title="{{ $player->suspension_status['reason'] }}">
                                                                     <span class="w-1 h-1 rounded-full bg-rose-500 animate-pulse"></span>
@@ -272,6 +275,9 @@
                                                                 </span>
                                                             @endif
                                                             <span class="text-xs font-bold text-primary uppercase">{{ $player->name }}</span>
+                                                            @if($player->yellow_cards_count > 0 || $player->red_cards_count > 0)
+                                                                <span class="text-[8px] font-black text-zinc-400">({{ $player->yellow_cards_count }}Y / {{ $player->red_cards_count }}R)</span>
+                                                            @endif
                                                         </div>
                                                         @if($player->suspension_status['yellow_count'] > 0)
                                                             <div class="flex items-center gap-1 mt-0.5">

@@ -50,7 +50,7 @@
             $playerCategories = [
                 ['title' => 'Top Scorers', 'icon' => '⚽', 'data' => $topScorers, 'key' => 'goals_count', 'color' => 'secondary'],
                 ['title' => 'Top Assists', 'icon' => '🎯', 'data' => $topAssists, 'key' => 'assists_count', 'color' => 'indigo-400'],
-                ['title' => 'Yellow Cards', 'icon' => '🟨', 'data' => $topCards, 'key' => 'cards_count', 'color' => 'amber-400'],
+                ['title' => 'Yellow Cards', 'icon' => '🟨', 'data' => $topCards, 'key' => 'yellow_cards_count', 'color' => 'amber-400'],
                 ['title' => 'Red Cards', 'icon' => '🟥', 'data' => $topRedCards ?? collect(), 'key' => 'red_cards_count', 'color' => 'rose-500'],
                 ['title' => 'Clean Sheets', 'icon' => '🧤', 'data' => $topCleanSheets, 'key' => 'clean_sheets_count', 'color' => 'emerald-400'],
                 ['title' => 'Man of the Match', 'icon' => '🏆', 'data' => $topMOTM, 'key' => 'motm_awards_count', 'color' => 'amber-400'],

@@ -241,7 +241,11 @@ class AdminController extends Controller
 
     public function editFixture($id)
     {
-        $match = MatchModel::with(['homeTeam.players', 'awayTeam.players', 'lineups', 'matchEvents.team', 'assignedReferee', 'assignedAssistant1', 'assignedAssistant2', 'images'])->findOrFail($id);
+        $match = MatchModel::with([
+            'homeTeam.players' => fn($q) => $q->withCount(['yellowCards', 'redCards']), 
+            'awayTeam.players' => fn($q) => $q->withCount(['yellowCards', 'redCards']), 
+            'lineups', 'matchEvents.team', 'assignedReferee', 'assignedAssistant1', 'assignedAssistant2', 'images'
+        ])->findOrFail($id);
         $teams = Team::with('players')->get();
         $referees = \App\Models\Referee::all();
         $groups = Group::all();

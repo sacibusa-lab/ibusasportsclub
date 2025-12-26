@@ -302,6 +302,14 @@
                                             <span class="block text-[9px] md:text-[10px] font-black text-primary leading-none">{{ $player->assists_count }}</span>
                                             <span class="text-[6px] md:text-[7px] font-bold text-zinc-400 uppercase tracking-tighter">Asst</span>
                                         </div>
+                                        <div class="text-center">
+                                            <span class="block text-[9px] md:text-[10px] font-black text-amber-500 leading-none">{{ $player->yellow_cards_count }}</span>
+                                            <span class="text-[6px] md:text-[7px] font-bold text-zinc-400 uppercase tracking-tighter">Yel</span>
+                                        </div>
+                                        <div class="text-center">
+                                            <span class="block text-[9px] md:text-[10px] font-black text-rose-600 leading-none">{{ $player->red_cards_count }}</span>
+                                            <span class="text-[6px] md:text-[7px] font-bold text-zinc-400 uppercase tracking-tighter">Red</span>
+                                        </div>
                                     </div>
                                     <div class="w-5 h-5 md:w-6 md:h-6 rounded-md md:rounded-lg bg-white border border-zinc-200 flex items-center justify-center text-zinc-300 group-hover:bg-primary group-hover:text-white transition-all transform group-hover:rotate-45">
                                         <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
