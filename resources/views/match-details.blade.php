@@ -204,20 +204,27 @@
             <!-- Home Team Events (Left) -->
             <div class="flex justify-end items-center gap-2 md:gap-3 text-right">
                 @if($event->team_id == $match->home_team_id)
-                    @if($event->event_type === 'goal' || $event->event_type === 'yellow_card' || $event->event_type === 'red_card' || $event->event_type === 'penalty')
+                    @if(in_array($event->event_type, ['goal', 'yellow_card', 'red_card', 'penalty', 'penalty_goal', 'penalty_missed']))
                         <div class="flex flex-col items-end">
                             <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
                             @if($event->assistant)
                             <span class="text-[8px] md:text-[10px] text-zinc-400 font-bold uppercase tracking-wide">{{ $event->assistant->name }} (Assist)</span>
                             @endif
-                            @if($event->event_type === 'penalty')
-                            <span class="text-[8px] md:text-[10px] text-zinc-400 font-black uppercase tracking-widest">(Penalty)</span>
+                            @if($event->event_type === 'penalty' || $event->event_type === 'penalty_goal')
+                            <span class="text-[8px] md:text-[10px] text-emerald-500 font-black uppercase tracking-widest">(Penalty Goal)</span>
+                            @endif
+                            @if($event->event_type === 'penalty_missed')
+                            <span class="text-[8px] md:text-[10px] text-rose-500 font-black uppercase tracking-widest">(Penalty Missed)</span>
                             @endif
                         </div>
                         
                         <div class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
-                            @if($event->event_type === 'goal' || $event->event_type === 'penalty')
+                            @if($event->event_type === 'goal')
                                 <span class="text-base md:text-lg">⚽</span>
+                            @elseif($event->event_type === 'penalty' || $event->event_type === 'penalty_goal')
+                                <span class="text-base md:text-lg">⚽🎯</span>
+                            @elseif($event->event_type === 'penalty_missed')
+                                <span class="text-base md:text-lg">❌🧤</span>
                             @elseif($event->event_type === 'yellow_card')
                                 <div class="w-3 md:w-4 h-4 md:h-5 bg-yellow-400 rounded-sm shadow-sm rotate-6"></div>
                             @elseif($event->event_type === 'red_card')
@@ -259,11 +266,15 @@
             <!-- Away Team Events (Right) -->
             <div class="flex justify-start items-center gap-2 md:gap-3 text-left">
                 @if($event->team_id == $match->away_team_id)
-                    @if($event->event_type === 'goal' || $event->event_type === 'yellow_card' || $event->event_type === 'red_card' || $event->event_type === 'penalty')
+                    @if(in_array($event->event_type, ['goal', 'yellow_card', 'red_card', 'penalty', 'penalty_goal', 'penalty_missed']))
                         <div class="flex items-center gap-2 md:gap-3">
                             <div class="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center">
-                                @if($event->event_type === 'goal' || $event->event_type === 'penalty')
+                                @if($event->event_type === 'goal')
                                     <span class="text-base md:text-lg">⚽</span>
+                                @elseif($event->event_type === 'penalty' || $event->event_type === 'penalty_goal')
+                                    <span class="text-base md:text-lg">⚽🎯</span>
+                                @elseif($event->event_type === 'penalty_missed')
+                                    <span class="text-base md:text-lg">❌🧤</span>
                                 @elseif($event->event_type === 'yellow_card')
                                     <div class="w-3 md:w-4 h-4 md:h-5 bg-yellow-400 rounded-sm shadow-sm -rotate-6"></div>
                                 @elseif($event->event_type === 'red_card')
@@ -275,8 +286,11 @@
                                 @if($event->assistant)
                                 <span class="text-[8px] md:text-[10px] text-zinc-400 font-bold uppercase tracking-wide">{{ $event->assistant->name }} (Assist)</span>
                                 @endif
-                                @if($event->event_type === 'penalty')
-                                <span class="text-[8px] md:text-[10px] text-zinc-400 font-black uppercase tracking-widest">(Penalty)</span>
+                                @if($event->event_type === 'penalty' || $event->event_type === 'penalty_goal')
+                                <span class="text-[8px] md:text-[10px] text-emerald-500 font-black uppercase tracking-widest">(Penalty Goal)</span>
+                                @endif
+                                @if($event->event_type === 'penalty_missed')
+                                <span class="text-[8px] md:text-[10px] text-rose-500 font-black uppercase tracking-widest">(Penalty Missed)</span>
                                 @endif
                             </div>
                         </div>

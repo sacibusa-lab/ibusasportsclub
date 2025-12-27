@@ -20,28 +20,31 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 1.25rem 0.75rem;
-        border-radius: 1.5rem;
+        padding: 2rem 1rem;
+        border-radius: 2rem;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         border: 2px solid rgba(255,255,255,0.1);
     }
     .btn-stat-box:hover {
         filter: brightness(1.1);
-        transform: translateY(-2px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+        box-shadow: 0 25px 30px -10px rgba(0, 0, 0, 0.2);
     }
     .count-badge {
         font-weight: 900;
+        font-size: 2.5rem;
+        line-height: 1;
+        margin-top: 0.5rem;
     }
     @keyframes slideIn {
-        from { opacity: 0; transform: translateY(10px); }
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
     .animate-slide-in {
-        animation: slideIn 0.3s ease-out forwards;
+        animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -49,80 +52,85 @@
 @endpush
 
 @section('content')
-<div class="max-w-[1600px] mx-auto space-y-12">
+<div class="max-w-[1800px] mx-auto space-y-12 pb-20">
     <!-- Header / Scoreboard -->
-    <div class="bg-white rounded-[3rem] p-8 shadow-xl border border-zinc-100 flex items-center justify-between">
-        <div class="flex items-center gap-6 flex-1">
+    <div class="bg-white rounded-[3.5rem] p-10 shadow-xl border border-zinc-100 flex items-center justify-between relative overflow-hidden">
+        <!-- Home Team Header -->
+        <div class="flex items-center gap-8 flex-1">
             @if($match->homeTeam->logo_url)
-            <img src="{{ $match->homeTeam->logo_url }}" class="w-16 h-16 object-contain">
+            <img src="{{ $match->homeTeam->logo_url }}" class="w-24 h-24 object-contain">
             @endif
             <div>
-                <h2 class="text-2xl font-black text-primary tracking-tighter uppercase leading-none mb-1">{{ $match->homeTeam->name }}</h2>
-                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Home Team</span>
+                <h2 class="text-4xl font-black text-primary tracking-tighter uppercase leading-none mb-2">{{ $match->homeTeam->name }}</h2>
+                <span class="text-xs font-bold text-zinc-400 uppercase tracking-widest bg-zinc-50 px-3 py-1 rounded-full">Home Team</span>
             </div>
         </div>
 
-        <div class="flex flex-col items-center gap-4 px-12 border-x border-zinc-100">
-            <div id="match-timer" class="text-5xl font-black text-rose-500 tabular-nums tracking-tighter">
+        <!-- Center Scoreboard -->
+        <div class="flex flex-col items-center gap-4 px-16">
+            <div id="match-timer" class="text-6xl font-black text-rose-500 tabular-nums tracking-tighter mb-2">
                 00:00
             </div>
             
-            <div class="flex items-center gap-8 py-2">
-                <span id="home-score" class="text-8xl font-black text-zinc-900 leading-none">{{ $match->home_score ?? 0 }}</span>
-                <span class="text-5xl text-zinc-200 font-thin">-</span>
-                <span id="away-score" class="text-8xl font-black text-zinc-900 leading-none">{{ $match->away_score ?? 0 }}</span>
+            <div class="flex flex-col items-center gap-4">
+                @if(!$match->started_at)
+                <button id="start-match-btn" onclick="startMatch()" class="bg-rose-500 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:bg-rose-600 transition-all hover:scale-105 active:scale-95">
+                    START MATCH
+                </button>
+                @endif
+                
+                @if($match->started_at && $match->status !== 'finished')
+                <button id="end-match-btn" onclick="endMatch()" class="bg-zinc-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95">
+                    END MATCH
+                </button>
+                @endif
+
+                <select onchange="updateMatchStatus(this.value)" class="bg-zinc-50 border border-zinc-100 px-4 py-2 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-[10px] tracking-widest cursor-pointer">
+                    <option value="upcoming" {{ $match->status == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
+                    <option value="live" {{ $match->status == 'live' ? 'selected' : '' }}>Live</option>
+                    <option value="finished" {{ $match->status == 'finished' ? 'selected' : '' }}>Finished</option>
+                </select>
             </div>
 
-            <div class="flex flex-col items-center gap-3">
-                <div class="flex items-center gap-3">
-                    <div class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></div>
-                    <span id="live-indicator-text" class="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em]">{{ $match->status == 'live' ? 'Live Match' : 'Live Console' }}</span>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    @if(!$match->started_at)
-                    <button id="start-match-btn" onclick="startMatch()" class="bg-rose-500 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:bg-rose-600 transition-all hover:scale-105 active:scale-95">
-                        START MATCH
-                    </button>
-                    @endif
-                    
-                    @if($match->started_at && $match->status !== 'finished')
-                    <button id="end-match-btn" onclick="endMatch()" class="bg-zinc-900 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95">
-                        END MATCH
-                    </button>
-                    @endif
+            <div class="flex items-center gap-12 mt-4">
+                <span id="home-score" class="text-[10rem] font-black text-zinc-900 leading-none drop-shadow-sm">{{ $match->home_score ?? 0 }}</span>
+                <span class="text-5xl text-zinc-200 font-thin">-</span>
+                <span id="away-score" class="text-[10rem] font-black text-zinc-900 leading-none drop-shadow-sm">{{ $match->away_score ?? 0 }}</span>
+            </div>
 
-                    <select onchange="updateMatchStatus(this.value)" class="bg-zinc-50 border border-zinc-100 px-3 py-2 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-[9px] tracking-widest cursor-pointer">
-                        <option value="upcoming" {{ $match->status == 'upcoming' ? 'selected' : '' }}>Upcoming</option>
-                        <option value="live" {{ $match->status == 'live' ? 'selected' : '' }}>Live</option>
-                        <option value="finished" {{ $match->status == 'finished' ? 'selected' : '' }}>Finished</option>
-                    </select>
+            <div class="flex flex-col items-center gap-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 bg-rose-500/20 rounded-full flex items-center justify-center">
+                        <div class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></div>
+                    </div>
+                    <span id="live-indicator-text" class="text-[11px] font-black text-zinc-300 uppercase tracking-[0.5em]">{{ $match->status == 'live' ? 'Live Match' : 'Live Console' }}</span>
                 </div>
             </div>
         </div>
 
-        <div class="flex items-center gap-6 flex-1 justify-end text-right">
+        <!-- Away Team Header -->
+        <div class="flex items-center gap-8 flex-1 justify-end text-right">
             <div>
-                <h2 class="text-2xl font-black text-primary tracking-tighter uppercase leading-none mb-1">{{ $match->awayTeam->name }}</h2>
-                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Away Team</span>
+                <h2 class="text-4xl font-black text-primary tracking-tighter uppercase leading-none mb-2">{{ $match->awayTeam->name }}</h2>
+                <span class="text-xs font-bold text-zinc-400 uppercase tracking-widest bg-zinc-50 px-3 py-1 rounded-full">Away Team</span>
             </div>
             @if($match->awayTeam->logo_url)
-            <img src="{{ $match->awayTeam->logo_url }}" class="w-16 h-16 object-contain">
+            <img src="{{ $match->awayTeam->logo_url }}" class="w-24 h-24 object-contain">
             @endif
         </div>
     </div>
 
-    <!-- Interface Grid: 3 Columns -->
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+    <!-- Interface Grid: 2 Columns -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
         
-        <!-- COLUMN 1: HOME TEAM CONTROL (4/12) -->
-        <div class="xl:col-span-4 home-theme space-y-8 animate-slide-in">
-            <div class="bg-blue-600 text-white p-5 rounded-3xl text-center font-black text-xl tracking-widest uppercase shadow-xl">
-                HOME CONTROL
+        <!-- COLUMN 1: HOME TEAM -->
+        <div class="home-theme space-y-8 animate-slide-in">
+            <div class="bg-blue-600 text-white py-10 rounded-[2.5rem] text-center font-black text-4xl tracking-widest uppercase shadow-2xl border-4 border-white/20">
+                HOME
             </div>
 
             <!-- Stat Buttons Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @php
                     $stats = [
                         ['id' => 'throw_ins', 'label' => 'Throw In'],
@@ -133,52 +141,49 @@
                         ['id' => 'offsides', 'label' => 'Offside'],
                         ['id' => 'shots', 'label' => 'Shot On Target'],
                         ['id' => 'saves', 'label' => 'Save'],
-                        ['id' => 'missed_chances', 'label' => 'Missed', 'full' => true],
+                        ['id' => 'missed_chances', 'label' => 'Missed Chances'],
                     ];
                 @endphp
 
                 @foreach($stats as $stat)
-                <button onclick="updateStat('home', '{{ $stat['id'] }}')" class="stat-btn btn-stat-box {{ isset($stat['full']) ? 'col-span-2' : '' }}">
-                    <span class="text-[9px] opacity-80">{{ $stat['label'] }}</span>
-                    <div id="home-{{ $stat['id'] }}-count" class="count-badge text-xl leading-none mt-2">{{ $match->{'home_'.$stat['id']} }}</div>
+                <button onclick="updateStat('home', '{{ $stat['id'] }}')" class="stat-btn btn-stat-box">
+                    <span class="text-[10px] opacity-80 mb-2">{{ $stat['label'] }}</span>
+                    <div id="home-{{ $stat['id'] }}-count" class="count-badge text-3xl leading-none">{{ $match->{'home_'.$stat['id']} }}</div>
                 </button>
                 @endforeach
             </div>
 
             <!-- Player List -->
-            <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-zinc-100">
-                <h3 class="text-[11px] font-black text-blue-600 uppercase tracking-[0.2em] border-b border-blue-50 pb-3 mb-4 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                    Starting XI
+            <div class="bg-white rounded-[3rem] p-8 shadow-sm border border-zinc-100">
+                <h3 class="text-xs font-black text-blue-600 uppercase tracking-[0.25em] border-b border-blue-50 pb-5 mb-6 flex items-center justify-between">
+                    <span>Starting XI</span>
+                    <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
                 </h3>
-                <div class="space-y-2.5">
+                <div class="space-y-3">
                     @foreach($homeXI as $player)
-                    <div class="group bg-zinc-50 hover:bg-white p-3 rounded-2xl border border-transparent hover:border-blue-100 flex items-center justify-between transition-all hover:shadow-md">
-                        <div class="flex items-center gap-3">
-                            <span class="w-7 h-7 bg-white rounded-lg flex items-center justify-center text-[10px] font-black text-blue-600 shadow-sm">{{ $player->pivot->shirt_number }}</span>
-                            <span class="text-[11px] font-black text-primary uppercase tracking-tight">{{ $player->name }}</span>
+                    <div class="group bg-zinc-50 hover:bg-white p-4 rounded-2xl border border-transparent hover:border-blue-100 flex items-center justify-between transition-all hover:shadow-lg">
+                        <div class="flex items-center gap-4">
+                            <span class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-black shadow-sm">{{ $player->pivot->shirt_number }}</span>
+                            <span class="text-sm font-black text-primary uppercase tracking-tight">{{ $player->name }}</span>
                         </div>
-                        <div class="flex gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
-                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'goal')" class="px-2.5 py-1.5 bg-blue-600 text-white text-[8px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform shadow-md">G</button>
-                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'penalty_goal')" class="px-2.5 py-1.5 bg-emerald-500 text-white text-[8px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform shadow-md">PG</button>
-                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'yellow_card')" class="px-1.5 py-1.5 bg-amber-400 text-white font-black rounded-lg hover:scale-105 active:scale-95 transition-transform shadow-md"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></button>
-                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'red_card')" class="px-1.5 py-1.5 bg-rose-600 text-white font-black rounded-lg hover:scale-105 active:scale-95 transition-transform shadow-md"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></button>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-
-                <h3 class="text-[11px] font-black text-blue-600 uppercase tracking-[0.2em] border-b border-blue-50 pb-3 mb-4 mt-8 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                    Bench
-                </h3>
-                <div class="grid grid-cols-2 gap-2">
-                    @foreach($homeSubs as $player)
-                    <div class="bg-zinc-50 p-2.5 rounded-xl border border-zinc-100 flex items-center justify-between hover:bg-white hover:border-blue-50 transition-colors">
-                        <span class="text-[10px] font-bold text-primary uppercase truncate pr-1">{{ $player->name }}</span>
-                        <div class="flex gap-1 shrink-0">
-                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'goal')" class="w-5 h-5 flex items-center justify-center bg-blue-100 text-blue-600 text-[8px] font-black rounded-md uppercase hover:bg-blue-600 hover:text-white transition-colors">G</button>
-                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'sub_on')" class="w-7 h-5 flex items-center justify-center bg-emerald-100 text-emerald-600 text-[8px] font-black rounded-md uppercase hover:bg-emerald-600 hover:text-white transition-colors">IN</button>
+                        <div class="flex gap-2 flex-wrap justify-end">
+                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'goal')" class="px-3 py-2 bg-blue-600 text-white text-[10px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 shadow-md flex items-center gap-1">
+                                <span>Goal</span>
+                            </button>
+                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'penalty_goal')" class="px-3 py-2 bg-emerald-500 text-white text-[10px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 shadow-md flex items-center gap-1">
+                                <span>P.Goal</span>
+                            </button>
+                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'penalty_missed')" class="px-3 py-2 bg-zinc-400 text-white text-[10px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 shadow-md flex items-center gap-1">
+                                <span>P.Miss</span>
+                            </button>
+                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'yellow_card')" class="px-3 py-2 bg-amber-400 text-white font-black text-[10px] rounded-lg hover:scale-105 active:scale-95 shadow-md flex items-center gap-1 uppercase tracking-wider">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                                <span>Yel</span>
+                            </button>
+                            <button onclick="logPlayerEvent({{ $match->home_team_id }}, {{ $player->id }}, 'red_card')" class="px-3 py-2 bg-rose-600 text-white font-black text-[10px] rounded-lg hover:scale-105 active:scale-95 shadow-md flex items-center gap-1 uppercase tracking-wider">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                                <span>Red</span>
+                            </button>
                         </div>
                     </div>
                     @endforeach
@@ -186,121 +191,122 @@
             </div>
         </div>
 
-        <!-- COLUMN 2: AWAY TEAM CONTROL (4/12) -->
-        <div class="xl:col-span-4 away-theme space-y-8 animate-slide-in" style="animation-delay: 0.1s">
-            <div class="bg-red-600 text-white p-5 rounded-3xl text-center font-black text-xl tracking-widest uppercase shadow-xl">
-                AWAY CONTROL
+        <!-- COLUMN 2: AWAY TEAM -->
+        <div class="away-theme space-y-8 animate-slide-in" style="animation-delay: 0.1s">
+            <div class="bg-rose-600 text-white py-10 rounded-[2.5rem] text-center font-black text-4xl tracking-widest uppercase shadow-2xl border-4 border-white/20">
+                AWAY
             </div>
 
             <!-- Stat Buttons Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @foreach($stats as $stat)
-                <button onclick="updateStat('away', '{{ $stat['id'] }}')" class="stat-btn btn-stat-box {{ isset($stat['full']) ? 'col-span-2' : '' }}">
-                    <span class="text-[9px] opacity-80">{{ $stat['label'] }}</span>
-                    <div id="away-{{ $stat['id'] }}-count" class="count-badge text-xl leading-none mt-2">{{ $match->{'away_'.$stat['id']} }}</div>
+                <button onclick="updateStat('away', '{{ $stat['id'] }}')" class="stat-btn btn-stat-box">
+                    <span class="text-[10px] opacity-80 mb-2">{{ $stat['label'] }}</span>
+                    <div id="away-{{ $stat['id'] }}-count" class="count-badge text-3xl leading-none">{{ $match->{'away_'.$stat['id']} }}</div>
                 </button>
                 @endforeach
             </div>
 
             <!-- Player List -->
-            <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-zinc-100">
-                <h3 class="text-[11px] font-black text-red-600 uppercase tracking-[0.2em] border-b border-red-50 pb-3 mb-4 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
-                    Starting XI
+            <div class="bg-white rounded-[3rem] p-8 shadow-sm border border-zinc-100">
+                <h3 class="text-xs font-black text-rose-600 uppercase tracking-[0.25em] border-b border-rose-50 pb-5 mb-6 flex items-center justify-between">
+                    <span>Starting XI</span>
+                    <span class="w-2 h-2 bg-rose-600 rounded-full mr-2"></span>
                 </h3>
-                <div class="space-y-2.5">
+                <div class="space-y-3">
                     @foreach($awayXI as $player)
-                    <div class="group bg-zinc-50 hover:bg-white p-3 rounded-2xl border border-transparent hover:border-red-100 flex items-center justify-between transition-all hover:shadow-md">
-                        <div class="flex items-center gap-3">
-                            <span class="w-7 h-7 bg-white rounded-lg flex items-center justify-center text-[10px] font-black text-red-600 shadow-sm">{{ $player->pivot->shirt_number }}</span>
-                            <span class="text-[11px] font-black text-primary uppercase tracking-tight">{{ $player->name }}</span>
+                    <div class="group bg-zinc-50 hover:bg-white p-4 rounded-2xl border border-transparent hover:border-red-100 flex items-center justify-between transition-all hover:shadow-lg">
+                        <div class="flex items-center gap-4">
+                            <span class="w-8 h-8 bg-rose-600 text-white rounded-lg flex items-center justify-center text-xs font-black shadow-sm">{{ $player->pivot->shirt_number }}</span>
+                            <span class="text-sm font-black text-primary uppercase tracking-tight">{{ $player->name }}</span>
                         </div>
-                        <div class="flex gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
-                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'goal')" class="px-2.5 py-1.5 bg-red-600 text-white text-[8px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform shadow-md">G</button>
-                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'penalty_goal')" class="px-2.5 py-1.5 bg-emerald-500 text-white text-[8px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 transition-transform shadow-md">PG</button>
-                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'yellow_card')" class="px-1.5 py-1.5 bg-amber-400 text-white font-black rounded-lg hover:scale-105 active:scale-95 transition-transform shadow-md"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></button>
-                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'red_card')" class="px-1.5 py-1.5 bg-rose-600 text-white font-black rounded-lg hover:scale-105 active:scale-95 transition-transform shadow-md"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></button>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-
-                <h3 class="text-[11px] font-black text-red-600 uppercase tracking-[0.2em] border-b border-red-50 pb-3 mb-4 mt-8 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
-                    Bench
-                </h3>
-                <div class="grid grid-cols-2 gap-2">
-                    @foreach($awaySubs as $player)
-                    <div class="bg-zinc-50 p-2.5 rounded-xl border border-zinc-100 flex items-center justify-between hover:bg-white hover:border-red-50 transition-colors">
-                        <span class="text-[10px] font-bold text-primary uppercase truncate pr-1">{{ $player->name }}</span>
-                        <div class="flex gap-1 shrink-0">
-                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'goal')" class="w-5 h-5 flex items-center justify-center bg-red-100 text-red-600 text-[8px] font-black rounded-md uppercase hover:bg-red-600 hover:text-white transition-colors">G</button>
-                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'sub_on')" class="w-7 h-5 flex items-center justify-center bg-emerald-100 text-emerald-600 text-[8px] font-black rounded-md uppercase hover:bg-emerald-600 hover:text-white transition-colors">IN</button>
+                        <div class="flex gap-2 flex-wrap justify-end">
+                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'goal')" class="px-3 py-2 bg-rose-600 text-white text-[10px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 shadow-md flex items-center gap-1">
+                                <span>Goal</span>
+                            </button>
+                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'penalty_goal')" class="px-3 py-2 bg-emerald-500 text-white text-[10px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 shadow-md flex items-center gap-1">
+                                <span>P.Goal</span>
+                            </button>
+                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'penalty_missed')" class="px-3 py-2 bg-zinc-400 text-white text-[10px] font-black rounded-lg uppercase tracking-wider hover:scale-105 active:scale-95 shadow-md flex items-center gap-1">
+                                <span>P.Miss</span>
+                            </button>
+                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'yellow_card')" class="px-3 py-2 bg-amber-400 text-white font-black text-[10px] rounded-lg hover:scale-105 active:scale-95 shadow-md flex items-center gap-1 uppercase tracking-wider">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                                <span>Yel</span>
+                            </button>
+                            <button onclick="logPlayerEvent({{ $match->away_team_id }}, {{ $player->id }}, 'red_card')" class="px-3 py-2 bg-rose-600 text-white font-black text-[10px] rounded-lg hover:scale-105 active:scale-95 shadow-md flex items-center gap-1 uppercase tracking-wider">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                                <span>Red</span>
+                            </button>
                         </div>
                     </div>
                     @endforeach
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- COLUMN 3: LIVE TIMELINE (4/12) -->
-        <div class="xl:col-span-4 h-full animate-slide-in" style="animation-delay: 0.2s">
-            <div class="bg-white rounded-[3rem] p-8 shadow-xl border border-zinc-100 h-full flex flex-col sticky top-8">
-                <div class="flex items-center justify-between mb-8 border-b border-zinc-50 pb-6 shrink-0">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-primary text-secondary rounded-2xl flex items-center justify-center font-black shadow-lg">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-black text-primary uppercase tracking-tight">Timeline</h3>
-                            <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest leading-none">Match Events</p>
-                        </div>
+    <!-- TIMELINE: FULL WIDTH AT BOTTOM -->
+    <div class="animate-slide-in" style="animation-delay: 0.2s">
+        <div class="bg-white rounded-[3.5rem] p-10 shadow-xl border border-zinc-100 flex flex-col">
+            <div class="flex items-center justify-between mb-10 border-b border-zinc-50 pb-8">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-primary text-secondary rounded-[1.5rem] flex items-center justify-center font-black shadow-lg">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                        <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Active</span>
+                    <div>
+                        <h3 class="text-3xl font-black text-primary uppercase tracking-tight">Match Timeline</h3>
+                        <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest mt-1">Live Event Feed</p>
                     </div>
                 </div>
-
-                <div id="event-feed" class="flex-1 space-y-4 max-h-[1000px] overflow-y-auto pr-4 no-scrollbar pb-12">
-                    @foreach($match->matchEvents->sortByDesc('created_at') as $event)
-                    <div class="flex items-start gap-4 p-4 rounded-3xl bg-zinc-50 border border-zinc-100 group hover:border-primary/20 hover:bg-white transition-all hover:shadow-md animate-slide-in">
-                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-zinc-100 flex items-center justify-center font-black text-primary italic text-sm group-hover:scale-110 transition-transform">
-                            {{ $event->minute }}'
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-[9px] font-black uppercase tracking-[0.2em] {{ $event->team_id == $match->home_team_id ? 'text-blue-600' : 'text-red-600' }}">
-                                    {{ $event->team_id == $match->home_team_id ? $match->homeTeam->name : $match->awayTeam->name }}
-                                </span>
-                            </div>
-                            <div class="text-[13px] font-black text-primary uppercase tracking-tight leading-tight">
-                                @if(in_array($event->event_type, ['goal', 'penalty_goal']))
-                                    <span class="text-emerald-500">GOAL!</span> 
-                                @endif
-                                {{ str_replace('_', ' ', $event->event_type) }} 
-                                @if($event->player_name)
-                                    <div class="text-[11px] text-zinc-400 font-bold mt-0.5 tracking-normal">
-                                        {{ $event->player_name }}
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="text-[9px] font-black text-zinc-300 uppercase italic">
-                            {{ $event->created_at->format('H:i:s') }}
-                        </div>
-                    </div>
-                    @endforeach
-
-                    @if($match->matchEvents->isEmpty())
-                    <div id="no-events-msg" class="text-center py-24">
-                        <div class="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-100">
-                             <svg class="w-8 h-8 text-zinc-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <p class="text-[10px] font-black text-zinc-300 uppercase tracking-[0.3em]">Awaiting Kickoff</p>
-                    </div>
-                    @endif
+                <div class="bg-emerald-50 px-6 py-2 rounded-full flex items-center gap-3">
+                    <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <span class="text-xs font-black text-emerald-600 uppercase tracking-widest">Active Stream</span>
                 </div>
+            </div>
+
+            <div id="event-feed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($match->matchEvents->sortByDesc('created_at') as $event)
+                <div class="flex items-start gap-4 p-5 rounded-[2rem] bg-zinc-50 border border-zinc-100 group hover:border-primary/20 hover:bg-white transition-all hover:shadow-xl animate-slide-in">
+                    <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-zinc-100 flex items-center justify-center font-black text-primary italic text-lg group-hover:scale-110 transition-transform shrink-0">
+                        {{ $event->minute }}'
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em] {{ $event->team_id == $match->home_team_id ? 'text-blue-600' : 'text-red-600' }}">
+                                {{ $event->team_id == $match->home_team_id ? $match->homeTeam->name : $match->awayTeam->name }}
+                            </span>
+                        </div>
+                        <div class="text-[15px] font-black text-primary uppercase tracking-tight leading-tight">
+                            @if($event->event_type === 'goal')
+                                <span class="text-emerald-500">GOAL! ⚽</span> 
+                            @elseif($event->event_type === 'penalty_goal')
+                                <span class="text-emerald-500">PENALTY GOAL! ⚽🎯</span>
+                            @elseif($event->event_type === 'penalty_missed')
+                                <span class="text-rose-500">PENALTY MISSED ❌🧤</span>
+                            @endif
+                            {{ str_replace('_', ' ', $event->event_type) }} 
+                            @if($event->player_name)
+                                <div class="text-xs text-zinc-400 font-bold mt-1 tracking-normal">
+                                    {{ $event->player_name }}
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="text-[10px] font-black text-zinc-300 uppercase italic">
+                        {{ $event->created_at->format('H:i:s') }}
+                    </div>
+                </div>
+                @endforeach
+
+                @if($match->matchEvents->isEmpty())
+                <div id="no-events-msg" class="col-span-full text-center py-20 bg-zinc-50/50 rounded-[3rem] border-2 border-dashed border-zinc-100">
+                    <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                         <svg class="w-10 h-10 text-zinc-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <p class="text-[11px] font-black text-zinc-300 uppercase tracking-[0.4em]">Awaiting Kickoff & First Events</p>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -402,26 +408,27 @@
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         const teamName = event.team_id == {{ $match->home_team_id }} ? '{{ $match->homeTeam->name }}' : '{{ $match->awayTeam->name }}';
         const teamClass = event.team_id == {{ $match->home_team_id }} ? 'text-blue-600' : 'text-red-600';
-        const isGoal = ['goal', 'penalty_goal'].includes(event.event_type);
 
         const eventHtml = `
-            <div class="flex items-start gap-4 p-4 rounded-3xl bg-zinc-50 border border-zinc-100 group hover:border-primary/20 hover:bg-white transition-all hover:shadow-md animate-slide-in">
-                <div class="w-12 h-12 bg-white rounded-2xl shadow-sm border border-zinc-100 flex items-center justify-center font-black text-primary italic text-sm group-hover:scale-110 transition-transform">
+            <div class="flex items-start gap-4 p-5 rounded-[2rem] bg-zinc-50 border border-zinc-100 group hover:border-primary/20 hover:bg-white transition-all hover:shadow-xl animate-slide-in">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm border border-zinc-100 flex items-center justify-center font-black text-primary italic text-lg group-hover:scale-110 transition-transform shrink-0">
                     ${event.minute}'
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em] ${teamClass}">
+                        <span class="text-[10px] font-black uppercase tracking-[0.2em] ${teamClass}">
                             ${teamName}
                         </span>
                     </div>
-                    <div class="text-[13px] font-black text-primary uppercase tracking-tight leading-tight">
-                        ${isGoal ? '<span class="text-emerald-500">GOAL!</span> ' : ''}
+                    <div class="text-[15px] font-black text-primary uppercase tracking-tight leading-tight">
+                        ${event.event_type === 'goal' ? '<span class="text-emerald-500">GOAL! ⚽</span> ' : ''}
+                        ${event.event_type === 'penalty_goal' ? '<span class="text-emerald-500">PENALTY GOAL! ⚽🎯</span> ' : ''}
+                        ${event.event_type === 'penalty_missed' ? '<span class="text-rose-500">PENALTY MISSED ❌🧤</span> ' : ''}
                         ${event.event_type.replace('_', ' ')} 
-                        ${event.player_name ? `<div class="text-[11px] text-zinc-400 font-bold mt-0.5 tracking-normal">${event.player_name}</div>` : ''}
+                        ${event.player_name ? `<div class="text-xs text-zinc-400 font-bold mt-1 tracking-normal">${event.player_name}</div>` : ''}
                     </div>
                 </div>
-                <div class="text-[9px] font-black text-zinc-300 uppercase italic">
+                <div class="text-[10px] font-black text-zinc-300 uppercase italic">
                     ${time}
                 </div>
             </div>
