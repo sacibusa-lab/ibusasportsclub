@@ -64,6 +64,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('/fixtures/{id}', [AdminController::class, 'destroyFixture'])->name('fixtures.destroy');
     Route::post('/fixtures/{id}/results', [AdminController::class, 'updateResult'])->name('results.update');
 
+    // Live Console
+    Route::get('/live-console', [AdminController::class, 'liveConsole'])->name('live-console');
+    Route::get('/live-console/{id}', [AdminController::class, 'liveConsoleControl'])->name('live-console.control');
+    Route::post('/matches/{id}/start-timer', [AdminController::class, 'startMatchTimer'])->name('matches.start-timer');
+    Route::post('/matches/{id}/end-match', [AdminController::class, 'endMatch'])->name('matches.end-match');
+    Route::post('/matches/{id}/quick-stat', [AdminController::class, 'updateQuickStat'])->name('matches.quick-stat');
+    Route::post('/matches/{id}/quick-event', [AdminController::class, 'storeQuickEvent'])->name('matches.quick-event');
+
     // Match Events
     Route::post('/matches/{match}/events', [AdminController::class, 'storeEvent'])->name('matches.events.store');
     Route::delete('/events/{id}', [AdminController::class, 'destroyEvent'])->name('matches.events.destroy');

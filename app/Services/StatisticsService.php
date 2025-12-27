@@ -101,7 +101,7 @@ class StatisticsService
             ->get();
         
         foreach ($gks as $gk) {
-            $baseQuery = MatchModel::where('status', 'finished')
+            $baseQuery = MatchModel::whereIn('status', ['live', 'finished'])
                 ->where('stage', '!=', 'novelty')
                 ->where(function($q) use ($gk) {
                     // Played as starter
@@ -160,7 +160,7 @@ class StatisticsService
         })->get();
         
         foreach ($teams as $team) {
-            $baseQuery = MatchModel::where('status', 'finished')
+            $baseQuery = MatchModel::whereIn('status', ['live', 'finished'])
                 ->where('stage', '!=', 'novelty');
             
             if ($competitionId) {
@@ -249,7 +249,7 @@ class StatisticsService
                 // Custom logic for team clean sheets
                 $teams = \App\Models\Team::all();
                 foreach ($teams as $team) {
-                    $team->clean_sheets_count = MatchModel::where('status', 'finished')
+                    $team->clean_sheets_count = MatchModel::whereIn('status', ['live', 'finished'])
                         ->where(function($q) use ($team) {
                             $q->where(fn($sq) => $sq->where('home_team_id', $team->id)->where('away_score', 0))
                               ->orWhere(fn($sq) => $sq->where('away_team_id', $team->id)->where('home_score', 0));

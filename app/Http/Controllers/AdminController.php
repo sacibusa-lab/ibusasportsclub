@@ -265,7 +265,7 @@ class AdminController extends Controller
             'matchday' => 'nullable|integer|min:0',
             'broadcaster_logo' => 'nullable|string',
             'stage' => 'required|in:group,semifinal,final,novelty',
-            'status' => 'required|in:upcoming,finished',
+            'status' => 'required|in:upcoming,live,finished',
             'home_score' => 'nullable|integer|min:0',
             'away_score' => 'nullable|integer|min:0',
             'home_possession' => 'nullable|integer|min:0|max:100',
@@ -424,6 +424,10 @@ class AdminController extends Controller
 
         if ($match->status === 'finished') {
             \App\Models\Prediction::calculatePointsForMatch($match->id);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Fixture updated successfully.']);
         }
 
         return back()->with('success', 'Fixture updated successfully.');
@@ -626,5 +630,137 @@ class AdminController extends Controller
         $image->delete();
 
         return back()->with('success', 'Image deleted from gallery.');
+    }
+
+    public function liveConsole()
+    {
+        $matches = \App\Models\MatchModel::whereIn('status', ['upcoming', 'live'])
+            ->orderByRaw("CASE WHEN status = 'live' THEN 1 ELSE 2 END")
+            ->orderBy('match_date', 'asc')
+            ->get();
+        return view('admin.live-console.index', compact('matches'));
+    }
+
+    public function liveConsoleControl($id)
+    {
+        $match = \App\Models\MatchModel::with(['homeTeam.players', 'awayTeam.players', 'lineups', 'matchEvents'])
+            ->findOrFail($id);
+        
+        $homeXI = $match->lineups()
+            ->where('match_lineups.team_id', $match->home_team_id)
+            ->where('is_substitute', false)
+            ->get();
+            
+        $homeSubs = $match->lineups()
+            ->where('match_lineups.team_id', $match->home_team_id)
+            ->where('is_substitute', true)
+            ->get();
+            
+        $awayXI = $match->lineups()
+            ->where('match_lineups.team_id', $match->away_team_id)
+            ->where('is_substitute', false)
+            ->get();
+            
+        $awaySubs = $match->lineups()
+            ->where('match_lineups.team_id', $match->away_team_id)
+            ->where('is_substitute', true)
+            ->get();
+
+        return view('admin.live-console.control', compact('match', 'homeXI', 'homeSubs', 'awayXI', 'awaySubs'));
+    }
+
+    public function startMatchTimer(Request $request, $id)
+    {
+        $match = MatchModel::findOrFail($id);
+        $match->update([
+            'status' => 'live',
+            'started_at' => now()
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'started_at' => $match->started_at->toIso8601String()
+        ]);
+    }
+
+    public function endMatch(Request $request, $id)
+    {
+        $match = MatchModel::findOrFail($id);
+        $match->update(['status' => 'finished']);
+
+        if ($match->stage === 'group' && $match->group) {
+            $this->tournamentService->updateStandings($match->group);
+        }
+
+        // Calculate prediction points
+        if (class_exists('\App\Models\Prediction')) {
+            \App\Models\Prediction::calculatePointsForMatch($match->id);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Match ended and points calculated.'
+        ]);
+    }
+
+    public function updateQuickStat(\Illuminate\Http\Request $request, $id)
+    {
+        $match = \App\Models\MatchModel::findOrFail($id);
+        $side = $request->side; // 'home' or 'away'
+        $stat = $request->stat; // e.g. 'corners', 'shots'
+        
+        $column = "{$side}_{$stat}";
+        
+        // Allowed stats to prevent arbitrary column updates
+        $allowedStats = [
+            'shots', 'corners', 'offsides', 'fouls', 'free_kicks', 
+            'throw_ins', 'saves', 'goal_kicks', 'missed_chances'
+        ];
+
+        if (!in_array($stat, $allowedStats)) {
+            return response()->json(['error' => 'Invalid stat'], 400);
+        }
+
+        $match->increment($column);
+        
+        return response()->json([
+            'success' => true,
+            'new_value' => $match->$column,
+            'stat' => $stat,
+            'side' => $side
+        ]);
+    }
+
+    public function storeQuickEvent(\Illuminate\Http\Request $request, $id)
+    {
+        $match = \App\Models\MatchModel::findOrFail($id);
+        
+        $event = \App\Models\MatchEvent::create([
+            'match_id' => $id,
+            'team_id' => $request->team_id,
+            'player_id' => $request->player_id,
+            'player_name' => \App\Models\Player::find($request->player_id)->name ?? 'Unknown',
+            'event_type' => $request->event_type,
+            'minute' => $request->minute ?? 0,
+        ]);
+
+        if ($request->event_type === 'goal' || $request->event_type === 'penalty_goal') {
+            if ($request->team_id == $match->home_team_id) {
+                $match->increment('home_score');
+            } else {
+                $match->increment('away_score');
+            }
+            
+            if ($match->stage === 'group' && $match->group) {
+                $this->tournamentService->updateStandings($match->group);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'home_score' => $match->home_score,
+            'away_score' => $match->away_score,
+            'event' => $event
+        ]);
     }
 }

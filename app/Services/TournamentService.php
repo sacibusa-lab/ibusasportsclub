@@ -20,13 +20,13 @@ class TournamentService
         foreach ($teams as $team) {
             $homeMatches = MatchModel::where('home_team_id', $team->id)
                 ->where('competition_id', $competitionId)
-                ->where('status', 'finished')
+                ->whereIn('status', ['live', 'finished'])
                 ->where('stage', 'group')
                 ->get();
                 
             $awayMatches = MatchModel::where('away_team_id', $team->id)
                 ->where('competition_id', $competitionId)
-                ->where('status', 'finished')
+                ->whereIn('status', ['live', 'finished'])
                 ->where('stage', 'group')
                 ->get();
 
