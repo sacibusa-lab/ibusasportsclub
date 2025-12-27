@@ -60,7 +60,11 @@
                 <div class="flex flex-col gap-4">
                     <!-- Top Info Line (Mobile Only) -->
                     <div class="flex md:hidden items-center justify-between text-[9px] font-black uppercase tracking-widest text-zinc-300">
+                        @if($match->status === 'live')
+                        <span class="text-rose-500 animate-pulse">LIVE</span>
+                        @else
                         <span>FULL TIME</span>
+                        @endif
                         <div class="flex items-center gap-2">
                              @if($match->broadcaster_logo)
                             <img src="{{ $match->broadcaster_logo }}" class="h-3 object-contain">
@@ -71,9 +75,15 @@
                     <div class="flex items-center gap-3">
                         <!-- Left Icon/Time (Desktop) -->
                         <div class="hidden md:flex w-12 shrink-0 items-center justify-center">
+                            @if($match->status === 'live')
+                            <div class="w-10 h-10 rounded-full bg-rose-500 ring-4 ring-rose-500/20 flex items-center justify-center animate-pulse">
+                                <span class="text-[8px] font-black text-white uppercase tracking-tighter">LIVE</span>
+                            </div>
+                            @else
                             <div class="w-10 h-10 rounded-full bg-zinc-50 flex items-center justify-center group-hover:bg-primary transition-colors">
                                 <svg class="w-5 h-5 text-zinc-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15l-3-3 3-3m0 6l3-3-3-3"/></svg>
                             </div>
+                            @endif
                         </div>
 
                         <!-- Teams & Score Container -->

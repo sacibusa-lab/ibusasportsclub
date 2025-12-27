@@ -72,7 +72,14 @@
                                         {{ substr($team->name, 0, 1) }}
                                     </div>
                                     @endif
-                                    <span class="font-black text-primary text-sm md:text-base tracking-tight uppercase group-hover:text-secondary transition-colors truncate max-w-[120px] md:max-w-none">{{ $team->name }}</span>
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-black text-primary text-sm md:text-base tracking-tight uppercase group-hover:text-secondary transition-colors truncate max-w-[120px] md:max-w-none">{{ $team->name }}</span>
+                                            @if($team->is_playing)
+                                            <span class="bg-rose-500 text-white text-[6px] md:text-[7px] font-black px-1.5 py-0.5 rounded animate-pulse uppercase tracking-widest">LIVE</span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                             <td class="px-2 py-4 md:px-4 md:py-5 text-center text-xs md:text-sm font-bold text-zinc-500">{{ $team->played }}</td>

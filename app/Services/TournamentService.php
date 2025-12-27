@@ -96,6 +96,12 @@ class TournamentService
             $team->goal_difference = $compTeam->goals_for - $compTeam->goals_against;
             $team->form = $this->getTeamForm($team, $compTeam->competition_id);
             $team->next_match = $this->getNextMatch($team, $compTeam->competition_id);
+            
+            $team->is_playing = \App\Models\MatchModel::where('status', 'live')
+                ->where(function($q) use ($team) {
+                    $q->where('home_team_id', $team->id)->orWhere('away_team_id', $team->id);
+                })->exists();
+
             return $team;
         });
 

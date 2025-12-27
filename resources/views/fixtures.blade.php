@@ -26,9 +26,24 @@
                         <img src="{{ $match->homeTeam->logo_url }}" class="w-6 h-6 md:w-8 md:h-8 object-contain shrink-0">
                         @endif
                     </div>
-                    <div class="bg-zinc-50 border border-zinc-200 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-black text-primary text-xs md:text-sm shadow-inner group-hover:bg-white transition whitespace-nowrap">
-                        {{ \Carbon\Carbon::parse($match->match_date)->format('H:i') }}
+                    
+                    <div class="flex flex-col items-center gap-1">
+                        @if($match->status === 'live')
+                        <div class="flex flex-col items-center gap-1">
+                            <span class="bg-rose-500 text-white text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded-full animate-pulse uppercase tracking-widest">LIVE</span>
+                            <div class="bg-zinc-900 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-black text-white text-xs md:text-sm shadow-lg flex items-center gap-2">
+                                <span>{{ $match->home_score ?? 0 }}</span>
+                                <span class="text-zinc-500">-</span>
+                                <span>{{ $match->away_score ?? 0 }}</span>
+                            </div>
+                        </div>
+                        @else
+                        <div class="bg-zinc-50 border border-zinc-200 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-black text-primary text-xs md:text-sm shadow-inner group-hover:bg-white transition whitespace-nowrap">
+                            {{ \Carbon\Carbon::parse($match->match_date)->format('H:i') }}
+                        </div>
+                        @endif
                     </div>
+
                     <div class="flex-1 flex items-center justify-start gap-2 md:gap-3 font-black text-primary text-xs md:text-base">
                         @if($match->awayTeam->logo_url)
                         <img src="{{ $match->awayTeam->logo_url }}" class="w-6 h-6 md:w-8 md:h-8 object-contain shrink-0">

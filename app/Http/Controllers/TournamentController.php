@@ -58,9 +58,9 @@ class TournamentController extends Controller
 
         $compId = $activeCompetition->id;
 
-        $upcomingMatch = MatchModel::where('competition_id', $compId)->where('status', 'upcoming')->orderBy('match_date', 'asc')->first();
-        $upcomingMatches = MatchModel::where('competition_id', $compId)->where('status', 'upcoming')->orderBy('match_date', 'asc')->limit(4)->get();
-        $latestResult = MatchModel::where('competition_id', $compId)->where('status', 'finished')->orderBy('match_date', 'desc')->first();
+        $upcomingMatch = MatchModel::where('competition_id', $compId)->whereIn('status', ['upcoming', 'live'])->orderByRaw("CASE WHEN status = 'live' THEN 1 ELSE 2 END")->orderBy('match_date', 'asc')->first();
+        $upcomingMatches = MatchModel::where('competition_id', $compId)->whereIn('status', ['upcoming', 'live'])->orderByRaw("CASE WHEN status = 'live' THEN 1 ELSE 2 END")->orderBy('match_date', 'asc')->limit(4)->get();
+        $latestResult = MatchModel::where('competition_id', $compId)->whereIn('status', ['live', 'finished'])->orderBy('match_date', 'desc')->first();
         
         // News items (News are global, but we could link them to competitions if needed)
         $heroPost = Post::where('is_published', true)->with('category')->orderBy('published_at', 'desc')->first();
@@ -124,7 +124,8 @@ class TournamentController extends Controller
             return view('fixtures', ['fixtures' => collect(), 'noveltyFixtures' => collect(), 'activeCompetition' => null, 'competitions' => collect()]);
         }
         $allFixtures = MatchModel::where('competition_id', $activeCompetition->id)
-            ->where('status', 'upcoming')
+            ->whereIn('status', ['upcoming', 'live'])
+            ->orderByRaw("CASE WHEN status = 'live' THEN 1 ELSE 2 END")
             ->orderBy('match_date', 'asc')
             ->get();
 
@@ -156,7 +157,7 @@ class TournamentController extends Controller
         $matchdayId = $request->query('matchday');
         $teamId = $request->query('team');
         
-        $query = MatchModel::where('competition_id', $activeCompetition->id)->where('status', 'finished');
+        $query = MatchModel::where('competition_id', $activeCompetition->id)->whereIn('status', ['live', 'finished']);
         
         if ($matchdayId) {
             $query->where('matchday', $matchdayId);

@@ -23,9 +23,10 @@ class AdminGroupController extends Controller
             'competition_id' => 'required|exists:competitions,id',
         ]);
 
-        Group::create([
+        $competition = Competition::findOrFail($request->competition_id);
+        
+        $competition->groups()->create([
             'name' => $request->name,
-            'competition_id' => $request->competition_id,
         ]);
 
         return back()->with('success', 'Group created successfully.');
@@ -40,9 +41,11 @@ class AdminGroupController extends Controller
             'competition_id' => 'required|exists:competitions,id',
         ]);
 
+        $competition = Competition::findOrFail($request->competition_id);
+
         $group->update([
             'name' => $request->name,
-            'competition_id' => $request->competition_id,
+            'competition_id' => $competition->id,
         ]);
 
         return back()->with('success', 'Group updated successfully.');

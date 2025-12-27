@@ -13,9 +13,20 @@
         <div class="flex-none w-[300px] md:w-[350px] snap-start">
             <div class="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden group hover:shadow-md transition-all duration-300">
                 <!-- Header -->
-                <div class="px-5 py-3 bg-zinc-50 border-b border-zinc-100 flex justify-between items-center">
+                <div class="px-5 py-3 bg-zinc-50 border-b border-zinc-100 flex justify-between items-center relative overflow-hidden">
+                    @if($match->status === 'live')
+                    <div class="absolute inset-0 bg-rose-500/5 animate-pulse"></div>
+                    <span class="text-[9px] md:text-[10px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping"></span>
+                        LIVE
+                    </span>
+                    <span class="text-[9px] md:text-[10px] font-black text-rose-500 uppercase tracking-widest tabular-nums">
+                        {{ $match->home_score ?? 0 }} - {{ $match->away_score ?? 0 }}
+                    </span>
+                    @else
                     <span class="text-[9px] md:text-[10px] font-black text-zinc-800 uppercase tracking-widest">{{ $match->match_date->format('D d.m.Y') }}</span>
                     <span class="text-[9px] md:text-[10px] font-black text-zinc-800 uppercase tracking-widest">{{ $match->match_date->format('H:i') }}</span>
+                    @endif
                 </div>
 
                 <!-- Body -->
