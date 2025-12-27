@@ -25,12 +25,18 @@ class AdminGroupController extends Controller
 
         $compId = (int) $request->competition_id;
         
-        // Diagnostic: Check record existence using various methods
+        // Diagnostic: Deeper inspection
         $rawExists = \Illuminate\Support\Facades\DB::table('competitions')->where('id', $compId)->exists();
         
+        $dbName = \Illuminate\Support\Facades\DB::getDatabaseName();
+        $prefix = \Illuminate\Support\Facades\DB::getTablePrefix();
+        
+        $groupsCreate = \Illuminate\Support\Facades\DB::select("SHOW CREATE TABLE groups")[0]->{'Create Table'} ?? 'N/A';
+        $compsCreate = \Illuminate\Support\Facades\DB::select("SHOW CREATE TABLE competitions")[0]->{'Create Table'} ?? 'N/A';
+
         if (!$rawExists) {
             $allIds = \Illuminate\Support\Facades\DB::table('competitions')->pluck('id')->implode(', ');
-            return back()->with('error', "Diagnostic Failed: Competition $compId NOT found in DB. Existing IDs are: [$allIds]. Please ensure migrations were run.");
+            return back()->with('error', "Diagnostic Failed: ID $compId NOT found. Database: $dbName, Prefix: '$prefix'. Comps Available: [$allIds]");
         }
 
         try {
@@ -41,7 +47,8 @@ class AdminGroupController extends Controller
                 'updated_at' => now(),
             ]);
         } catch (\Exception $e) {
-            return back()->with('error', "Database Integrity Error: " . $e->getMessage() . " (Internal Check - ID exists: " . ($rawExists ? 'YES' : 'NO') . ")");
+            $msg = "DB Integrity Error: " . $e->getMessage() . " | DB: $dbName | Prefix: '$prefix' | GROUPS SQL: $groupsCreate | COMPS SQL: $compsCreate";
+            return back()->with('error', $msg);
         }
 
         return back()->with('success', 'Group created successfully.');
