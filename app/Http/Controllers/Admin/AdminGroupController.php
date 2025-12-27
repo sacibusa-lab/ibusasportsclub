@@ -20,36 +20,14 @@ class AdminGroupController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'competition_id' => 'required',
+            'competition_id' => 'required|exists:competitions,id',
         ]);
 
-        $compId = (int) $request->competition_id;
+        $competition = Competition::findOrFail($request->competition_id);
         
-        // Diagnostic: Deeper inspection
-        $rawExists = \Illuminate\Support\Facades\DB::table('competitions')->where('id', $compId)->exists();
-        
-        $dbName = \Illuminate\Support\Facades\DB::getDatabaseName();
-        $prefix = \Illuminate\Support\Facades\DB::getTablePrefix();
-        
-        $groupsCreate = \Illuminate\Support\Facades\DB::select("SHOW CREATE TABLE groups")[0]->{'Create Table'} ?? 'N/A';
-        $compsCreate = \Illuminate\Support\Facades\DB::select("SHOW CREATE TABLE competitions")[0]->{'Create Table'} ?? 'N/A';
-
-        if (!$rawExists) {
-            $allIds = \Illuminate\Support\Facades\DB::table('competitions')->pluck('id')->implode(', ');
-            return back()->with('error', "Diagnostic Failed: ID $compId NOT found. Database: $dbName, Prefix: '$prefix'. Comps Available: [$allIds]");
-        }
-
-        try {
-            \Illuminate\Support\Facades\DB::table('groups')->insert([
-                'name' => $request->name,
-                'competition_id' => $compId,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        } catch (\Exception $e) {
-            $msg = "DB Integrity Error: " . $e->getMessage() . " | DB: $dbName | Prefix: '$prefix' | GROUPS SQL: $groupsCreate | COMPS SQL: $compsCreate";
-            return back()->with('error', $msg);
-        }
+        $competition->groups()->create([
+            'name' => $request->name,
+        ]);
 
         return back()->with('success', 'Group created successfully.');
     }
@@ -60,30 +38,15 @@ class AdminGroupController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'competition_id' => 'required',
+            'competition_id' => 'required|exists:competitions,id',
         ]);
 
-        $compId = (int) $request->competition_id;
+        $competition = Competition::findOrFail($request->competition_id);
 
-        // Diagnostic: Check record existence
-        $rawExists = \Illuminate\Support\Facades\DB::table('competitions')->where('id', $compId)->exists();
-
-        if (!$rawExists) {
-            $allIds = \Illuminate\Support\Facades\DB::table('competitions')->pluck('id')->implode(', ');
-            return back()->with('error', "Update Diagnostic Failed: Competition $compId NOT found in DB. Existing IDs are: [$allIds].");
-        }
-
-        try {
-            \Illuminate\Support\Facades\DB::table('groups')
-                ->where('id', $id)
-                ->update([
-                    'name' => $request->name,
-                    'competition_id' => $compId,
-                    'updated_at' => now(),
-                ]);
-        } catch (\Exception $e) {
-            return back()->with('error', "Update Integrity Error: " . $e->getMessage());
-        }
+        $group->update([
+            'name' => $request->name,
+            'competition_id' => $competition->id,
+        ]);
 
         return back()->with('success', 'Group updated successfully.');
     }
