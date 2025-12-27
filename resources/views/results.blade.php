@@ -60,7 +60,7 @@
                 <div class="flex flex-col gap-4">
                     <!-- Top Info Line (Mobile Only) -->
                     <div class="flex md:hidden items-center justify-between text-[9px] font-black uppercase tracking-widest text-zinc-300">
-                        @if($match->status === 'live')
+                        @if(($match->status === 'live' || $match->started_at) && $match->status !== 'finished')
                         <span class="text-rose-500 animate-pulse">LIVE</span>
                         @else
                         <span>FULL TIME</span>
@@ -75,7 +75,7 @@
                     <div class="flex items-center gap-3">
                         <!-- Left Icon/Time (Desktop) -->
                         <div class="hidden md:flex w-12 shrink-0 items-center justify-center">
-                            @if($match->status === 'live')
+                            @if(($match->status === 'live' || $match->started_at) && $match->status !== 'finished')
                             <div class="w-10 h-10 rounded-full bg-rose-500 ring-4 ring-rose-500/20 flex items-center justify-center animate-pulse">
                                 <span class="text-[8px] font-black text-white uppercase tracking-tighter">LIVE</span>
                             </div>

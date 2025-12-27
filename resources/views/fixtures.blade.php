@@ -28,7 +28,7 @@
                     </div>
                     
                     <div class="flex flex-col items-center gap-1">
-                        @if($match->status === 'live')
+                        @if($match->status === 'live' || $match->started_at)
                         <div class="flex flex-col items-center gap-1">
                             <span class="bg-rose-500 text-white text-[7px] md:text-[8px] font-black px-2 py-0.5 rounded-full animate-pulse uppercase tracking-widest">LIVE</span>
                             <div class="bg-zinc-900 px-3 py-1.5 md:px-4 md:py-2 rounded-lg font-black text-white text-xs md:text-sm shadow-lg flex items-center gap-2">

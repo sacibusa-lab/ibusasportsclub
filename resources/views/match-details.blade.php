@@ -78,14 +78,18 @@
                 <!-- Score / VS Center -->
                 <div class="flex flex-col items-center justify-center md:order-2">
                     <div class="bg-white/10 backdrop-blur-2xl rounded-2xl md:rounded-3xl p-4 md:p-8 border border-white/30 shadow-2xl min-w-[140px] md:min-w-[180px]">
-                        @if($match->status === 'finished')
+                        @if($match->status === 'finished' || $match->status === 'live' || $match->started_at)
                         <div class="flex flex-col items-center">
                             <div class="text-4xl md:text-6xl font-black text-white tracking-[0.2em] md:tracking-widest flex items-center gap-3 md:gap-6 drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)]">
-                                <span class="text-secondary">{{ $match->home_score }}</span>
+                                <span class="text-white">{{ $match->home_score ?? 0 }}</span>
                                 <span class="text-white/40 text-2xl md:text-4xl">:</span>
-                                <span class="text-accent">{{ $match->away_score }}</span>
+                                <span class="text-white">{{ $match->away_score ?? 0 }}</span>
                             </div>
-                            <div class="mt-3 md:mt-4 px-3 py-1 md:px-4 md:py-1.5 bg-secondary text-primary rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest shadow-lg shadow-secondary/20">Full Time</div>
+                            @if($match->status === 'finished')
+                                <div class="mt-3 md:mt-4 px-3 py-1 md:px-4 md:py-1.5 bg-secondary text-primary rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest shadow-lg shadow-secondary/20">Full Time</div>
+                            @else
+                                <div class="mt-3 md:mt-4 px-3 py-1 md:px-4 md:py-1.5 bg-rose-500 text-white rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest shadow-lg animate-pulse">Live Match</div>
+                            @endif
                         </div>
                         @else
                         <div class="flex flex-col items-center">
@@ -193,7 +197,7 @@
     @endif
 
     <!-- Timeline & Events -->
-    @if($match->status === 'finished')
+    @if($match->status === 'finished' || $match->status === 'live' || $match->started_at)
     <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-4 md:p-8">
         @forelse($match->matchEvents as $event)
         <div class="grid grid-cols-[1fr,auto,1fr] gap-2 md:gap-4 items-center mb-6 md:mb-8 last:mb-0 relative group">
