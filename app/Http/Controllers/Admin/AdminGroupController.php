@@ -53,18 +53,30 @@ class AdminGroupController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'competition_id' => 'required|exists:competitions,id',
+            'competition_id' => 'required',
         ]);
 
         $compId = (int) $request->competition_id;
 
-        \Illuminate\Support\Facades\DB::table('groups')
-            ->where('id', $id)
-            ->update([
-                'name' => $request->name,
-                'competition_id' => $compId,
-                'updated_at' => now(),
-            ]);
+        // Diagnostic: Check record existence
+        $rawExists = \Illuminate\Support\Facades\DB::table('competitions')->where('id', $compId)->exists();
+
+        if (!$rawExists) {
+            $allIds = \Illuminate\Support\Facades\DB::table('competitions')->pluck('id')->implode(', ');
+            return back()->with('error', "Update Diagnostic Failed: Competition $compId NOT found in DB. Existing IDs are: [$allIds].");
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::table('groups')
+                ->where('id', $id)
+                ->update([
+                    'name' => $request->name,
+                    'competition_id' => $compId,
+                    'updated_at' => now(),
+                ]);
+        } catch (\Exception $e) {
+            return back()->with('error', "Update Integrity Error: " . $e->getMessage());
+        }
 
         return back()->with('success', 'Group updated successfully.');
     }

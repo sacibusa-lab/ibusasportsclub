@@ -211,8 +211,18 @@
         </header>
 
         @if(session('success'))
-        <div class="mb-8 bg-zinc-900 text-secondary px-8 py-4 rounded-2xl font-black shadow-lg flex items-center justify-between animate-fade-in">
+        <div class="mb-8 bg-zinc-900 text-secondary px-8 py-4 rounded-2xl font-black shadow-lg flex items-center justify-between animate-fade-in border-l-4 border-secondary">
             <span>{{ session('success') }}</span>
+            <button onclick="this.parentElement.remove()" class="text-white/40 hover:text-white">✕</button>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="mb-8 bg-rose-500 text-white px-8 py-4 rounded-2xl font-black shadow-lg flex items-center justify-between animate-fade-in border-l-4 border-white">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>{{ session('error') }}</span>
+            </div>
             <button onclick="this.parentElement.remove()" class="text-white/40 hover:text-white">✕</button>
         </div>
         @endif
