@@ -7,7 +7,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         @foreach($matches as $match)
         <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100 flex flex-col items-center text-center space-y-6 relative overflow-hidden">
-            @if($match->status === 'live')
+            @if($match->status === 'live' || $match->started_at)
             <div class="absolute top-4 right-4 flex items-center gap-2 px-3 py-1 bg-rose-500 text-white text-[10px] font-black rounded-full uppercase tracking-widest animate-pulse">
                 <span class="w-1.5 h-1.5 bg-white rounded-full"></span>
                 LIVE

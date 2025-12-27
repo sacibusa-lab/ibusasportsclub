@@ -58,9 +58,12 @@ class TournamentController extends Controller
 
         $compId = $activeCompetition->id;
 
-        $upcomingMatch = MatchModel::where('competition_id', $compId)->whereIn('status', ['upcoming', 'live'])->orderByRaw("CASE WHEN status = 'live' THEN 1 ELSE 2 END")->orderBy('match_date', 'asc')->first();
-        $upcomingMatches = MatchModel::where('competition_id', $compId)->whereIn('status', ['upcoming', 'live'])->orderByRaw("CASE WHEN status = 'live' THEN 1 ELSE 2 END")->orderBy('match_date', 'asc')->limit(4)->get();
-        $latestResult = MatchModel::where('competition_id', $compId)->whereIn('status', ['live', 'finished'])->orderBy('match_date', 'desc')->first();
+        $upcomingMatch = MatchModel::where(function($q) { $q->where('status', 'live')->orWhereNotNull('started_at'); })->where('status', '!=', 'finished')->orderBy('match_date', 'asc')->first() 
+            ?? MatchModel::where('competition_id', $compId)->whereIn('status', ['upcoming', 'live'])->orderByRaw("CASE WHEN status = 'live' OR started_at IS NOT NULL THEN 1 ELSE 2 END")->orderBy('match_date', 'asc')->first();
+            
+        $upcomingMatches = MatchModel::where('competition_id', $compId)->where(function($q) { $q->whereIn('status', ['upcoming', 'live'])->orWhereNotNull('started_at'); })->where('status', '!=', 'finished')->orderByRaw("CASE WHEN status = 'live' OR started_at IS NOT NULL THEN 1 ELSE 2 END")->orderBy('match_date', 'asc')->limit(4)->get();
+        $latestResult = MatchModel::where(function($q) { $q->where('status', 'live')->orWhereNotNull('started_at'); })->where('status', '!=', 'finished')->orderBy('match_date', 'desc')->first()
+            ?? MatchModel::where('competition_id', $compId)->whereIn('status', ['live', 'finished'])->orderBy('match_date', 'desc')->first();
         
         // News items (News are global, but we could link them to competitions if needed)
         $heroPost = Post::where('is_published', true)->with('category')->orderBy('published_at', 'desc')->first();
@@ -124,8 +127,12 @@ class TournamentController extends Controller
             return view('fixtures', ['fixtures' => collect(), 'noveltyFixtures' => collect(), 'activeCompetition' => null, 'competitions' => collect()]);
         }
         $allFixtures = MatchModel::where('competition_id', $activeCompetition->id)
-            ->whereIn('status', ['upcoming', 'live'])
-            ->orderByRaw("CASE WHEN status = 'live' THEN 1 ELSE 2 END")
+            ->where(function($q) {
+                $q->whereIn('status', ['upcoming', 'live'])
+                  ->orWhereNotNull('started_at');
+            })
+            ->where('status', '!=', 'finished')
+            ->orderByRaw("CASE WHEN status = 'live' OR started_at IS NOT NULL THEN 1 ELSE 2 END")
             ->orderBy('match_date', 'asc')
             ->get();
 
@@ -157,7 +164,11 @@ class TournamentController extends Controller
         $matchdayId = $request->query('matchday');
         $teamId = $request->query('team');
         
-        $query = MatchModel::where('competition_id', $activeCompetition->id)->whereIn('status', ['live', 'finished']);
+        $query = MatchModel::where('competition_id', $activeCompetition->id)
+            ->where(function($q) {
+                $q->whereIn('status', ['live', 'finished'])
+                  ->orWhereNotNull('started_at');
+            });
         
         if ($matchdayId) {
             $query->where('matchday', $matchdayId);

@@ -20,13 +20,19 @@ class TournamentService
         foreach ($teams as $team) {
             $homeMatches = MatchModel::where('home_team_id', $team->id)
                 ->where('competition_id', $competitionId)
-                ->whereIn('status', ['live', 'finished'])
+                ->where(function($q) {
+                    $q->whereIn('status', ['live', 'finished'])
+                      ->orWhereNotNull('started_at');
+                })
                 ->where('stage', 'group')
                 ->get();
                 
             $awayMatches = MatchModel::where('away_team_id', $team->id)
                 ->where('competition_id', $competitionId)
-                ->whereIn('status', ['live', 'finished'])
+                ->where(function($q) {
+                    $q->whereIn('status', ['live', 'finished'])
+                      ->orWhereNotNull('started_at');
+                })
                 ->where('stage', 'group')
                 ->get();
 
@@ -97,10 +103,14 @@ class TournamentService
             $team->form = $this->getTeamForm($team, $compTeam->competition_id);
             $team->next_match = $this->getNextMatch($team, $compTeam->competition_id);
             
-            $team->is_playing = \App\Models\MatchModel::where('status', 'live')
+            $team->is_playing = \App\Models\MatchModel::where(function($q) {
+                    $q->where('status', 'live')->orWhereNotNull('started_at');
+                })
+                ->where('status', '!=', 'finished')
                 ->where(function($q) use ($team) {
                     $q->where('home_team_id', $team->id)->orWhere('away_team_id', $team->id);
-                })->exists();
+                })
+                ->exists();
 
             return $team;
         });

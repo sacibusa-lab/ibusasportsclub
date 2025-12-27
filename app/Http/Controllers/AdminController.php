@@ -302,50 +302,27 @@ class AdminController extends Controller
         ]);
 
         $match = MatchModel::findOrFail($id);
-        $homeTeam = Team::find($request->home_team_id);
+        
+        $updateData = [];
+        $fillable = $match->getFillable();
+        
+        foreach ($fillable as $field) {
+            if ($request->has($field)) {
+                $updateData[$field] = $request->get($field);
+            }
+        }
 
-        $updateData = [
-            'home_team_id' => $request->home_team_id,
-            'away_team_id' => $request->away_team_id,
-            'competition_id' => $request->competition_id,
-            'match_date'   => $request->match_date,
-            'venue'        => $request->venue,
-            'matchday'     => $request->matchday,
-            'broadcaster_logo' => $request->broadcaster_logo,
-            'stage'        => $request->stage,
-            'group_id'     => $request->stage === 'group' ? $homeTeam->group_id : null,
-            'status'       => $request->status,
-            'home_score'   => $request->home_score,
-            'away_score'   => $request->away_score,
-            'home_possession' => $request->home_possession ?? 50,
-            'away_possession' => $request->away_possession ?? 50,
-            'home_shots'   => $request->home_shots ?? 0,
-            'away_shots'   => $request->away_shots ?? 0,
-            'home_corners' => $request->home_corners ?? 0,
-            'away_corners' => $request->away_corners ?? 0,
-            'home_offsides' => $request->home_offsides ?? 0,
-            'away_offsides' => $request->away_offsides ?? 0,
-            'home_fouls'   => $request->home_fouls ?? 0,
-            'away_fouls'   => $request->away_fouls ?? 0,
-            'home_free_kicks' => $request->home_free_kicks ?? 0,
-            'away_free_kicks' => $request->away_free_kicks ?? 0,
-            'home_throw_ins' => $request->home_throw_ins ?? 0,
-            'away_throw_ins' => $request->away_throw_ins ?? 0,
-            'home_saves'   => $request->home_saves ?? 0,
-            'away_saves'   => $request->away_saves ?? 0,
-            'home_goal_kicks' => $request->home_goal_kicks ?? 0,
-            'away_goal_kicks' => $request->away_goal_kicks ?? 0,
-            'home_missed_chances' => $request->home_missed_chances ?? 0,
-            'away_missed_chances' => $request->away_missed_chances ?? 0,
-            'home_scorers' => $request->home_scorers,
-            'away_scorers' => $request->away_scorers,
-            'report'       => $request->report,
-            'motm_player_id' => $request->motm_player_id,
-            'referee_id'   => $request->referee_id,
-            'referee_ar1_id' => $request->referee_ar1_id,
-            'referee_ar2_id' => $request->referee_ar2_id,
-            'attendance'   => $request->attendance,
-        ];
+        // Handle Special Case: group_id should be synced from home team if stage is group
+        if ($request->has('stage') && $request->get('stage') === 'group' && $request->has('home_team_id')) {
+            $homeTeam = Team::find($request->home_team_id);
+            if ($homeTeam) {
+                $updateData['group_id'] = $homeTeam->group_id;
+            }
+        }
+
+        if (!empty($updateData)) {
+            $match->update($updateData);
+        }
 
         // Handle Highlights URL or Upload
         if ($request->hasFile('highlights_video')) {
@@ -634,8 +611,12 @@ class AdminController extends Controller
 
     public function liveConsole()
     {
-        $matches = \App\Models\MatchModel::whereIn('status', ['upcoming', 'live'])
-            ->orderByRaw("CASE WHEN status = 'live' THEN 1 ELSE 2 END")
+        $matches = \App\Models\MatchModel::where(function($query) {
+                $query->whereIn('status', ['upcoming', 'live'])
+                      ->orWhereNotNull('started_at');
+            })
+            ->where('status', '!=', 'finished')
+            ->orderByRaw("CASE WHEN status = 'live' OR started_at IS NOT NULL THEN 1 ELSE 2 END")
             ->orderBy('match_date', 'asc')
             ->get();
         return view('admin.live-console.index', compact('matches'));
@@ -721,13 +702,38 @@ class AdminController extends Controller
             return response()->json(['error' => 'Invalid stat'], 400);
         }
 
+        // Auto-start match if not started
+        if (!$match->started_at) {
+            $match->update([
+                'status' => 'live',
+                'started_at' => now()
+            ]);
+        }
+
         $match->increment($column);
+        $match->refresh();
+
+        // Calculate minute
+        $minute = $match->started_at ? now()->diffInMinutes($match->started_at) + 1 : 0;
+
+        // Log as MatchEvent for the feed
+        $event = \App\Models\MatchEvent::create([
+            'match_id' => $id,
+            'team_id' => $side === 'home' ? $match->home_team_id : $match->away_team_id,
+            'event_type' => $stat,
+            'player_name' => ($side === 'home' ? $match->homeTeam->name : $match->awayTeam->name) . " ({$stat})",
+            'minute' => $minute,
+        ]);
         
         return response()->json([
             'success' => true,
             'new_value' => $match->$column,
             'stat' => $stat,
-            'side' => $side
+            'side' => $side,
+            'event' => $event,
+            'home_score' => $match->home_score,
+            'away_score' => $match->away_score,
+            'status' => $match->status
         ]);
     }
 
@@ -744,13 +750,29 @@ class AdminController extends Controller
             'minute' => $request->minute ?? 0,
         ]);
 
+        // Auto-start match if not started (ANY event should trigger this)
+        if (!$match->started_at) {
+            $match->update([
+                'status' => 'live',
+                'started_at' => now()
+            ]);
+            $match->refresh();
+        }
+
         if ($request->event_type === 'goal' || $request->event_type === 'penalty_goal') {
+            // Defensive: ensure scores are never NULL before increment
+            if ($match->home_score === null) $match->home_score = 0;
+            if ($match->away_score === null) $match->away_score = 0;
+            $match->save();
+
             if ($request->team_id == $match->home_team_id) {
                 $match->increment('home_score');
             } else {
                 $match->increment('away_score');
             }
             
+            $match->refresh();
+
             if ($match->stage === 'group' && $match->group) {
                 $this->tournamentService->updateStandings($match->group);
             }
@@ -760,7 +782,8 @@ class AdminController extends Controller
             'success' => true,
             'home_score' => $match->home_score,
             'away_score' => $match->away_score,
-            'event' => $event
+            'event' => $event,
+            'status' => $match->status
         ]);
     }
 }

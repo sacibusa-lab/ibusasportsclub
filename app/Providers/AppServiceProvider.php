@@ -73,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
 
         view()->composer('admin.layout', function ($view) {
             $view->with('pendingCommentsCount', \App\Models\Comment::where('is_approved', false)->count());
+            $view->with('isAnyMatchLive', \App\Models\MatchModel::where('status', 'live')->exists());
         });
     }
 }
