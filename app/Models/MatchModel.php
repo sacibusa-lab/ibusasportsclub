@@ -53,13 +53,17 @@ class MatchModel extends Model
         'referee_ar1_id',
         'referee_ar2_id',
         'attendance',
-        'prediction_closes_at'
+        'prediction_closes_at',
+        'is_paused',
+        'paused_at',
+        'total_paused_seconds',
     ];
 
     protected $casts = [
         'match_date' => 'datetime',
         'prediction_closes_at' => 'datetime',
         'started_at' => 'datetime',
+        'paused_at' => 'datetime',
     ];
 
     public function competition()

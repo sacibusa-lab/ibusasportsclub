@@ -80,9 +80,14 @@
                 @endif
                 
                 @if($match->started_at && $match->status !== 'finished')
-                <button id="end-match-btn" onclick="endMatch()" class="bg-zinc-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95">
-                    END MATCH
-                </button>
+                <div class="flex gap-2">
+                    <button id="pause-match-btn" onclick="togglePause()" class="{{ $match->is_paused ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-600' }} text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all hover:scale-105 active:scale-95">
+                        {{ $match->is_paused ? 'RESUME' : 'PAUSE' }}
+                    </button>
+                    <button id="end-match-btn" onclick="endMatch()" class="bg-zinc-900 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95">
+                        END
+                    </button>
+                </div>
                 @endif
 
                 <select onchange="updateMatchStatus(this.value)" class="bg-zinc-50 border border-zinc-100 px-4 py-2 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-[10px] tracking-widest cursor-pointer">
@@ -315,19 +320,25 @@
 @push('scripts')
 <script>
     let matchStartedAt = @json($match->started_at ? $match->started_at->toIso8601String() : null);
+    let isPaused = @json($match->is_paused);
+    let totalPausedSeconds = {{ $match->total_paused_seconds ?? 0 }};
+    let pausedAt = @json($match->paused_at ? $match->paused_at->toIso8601String() : null);
     let timerInterval;
 
     function updateTimer() {
         if (!matchStartedAt) return;
         
         const start = new Date(matchStartedAt);
-        const now = new Date();
-        const diff = Math.floor((now - start) / 1000); // seconds
+        const now = isPaused ? new Date(pausedAt) : new Date();
+        const diffInSeconds = Math.floor((now - start) / 1000) - totalPausedSeconds;
         
-        if (diff < 0) return;
+        if (diffInSeconds < 0) {
+            document.getElementById('match-timer').textContent = "00:00";
+            return;
+        }
 
-        const mins = Math.floor(diff / 60);
-        const secs = diff % 60;
+        const mins = Math.floor(diffInSeconds / 60);
+        const secs = diffInSeconds % 60;
         
         document.getElementById('match-timer').textContent = 
             `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -336,6 +347,36 @@
     if (matchStartedAt) {
         timerInterval = setInterval(updateTimer, 1000);
         updateTimer();
+    }
+
+    function togglePause() {
+        fetch(`{{ route('admin.matches.toggle-pause', $match->id) }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                isPaused = data.is_paused;
+                totalPausedSeconds = data.total_paused_seconds;
+                pausedAt = data.paused_at;
+                
+                const btn = document.getElementById('pause-match-btn');
+                if (isPaused) {
+                    btn.textContent = 'RESUME';
+                    btn.classList.remove('bg-amber-500', 'hover:bg-amber-600');
+                    btn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
+                } else {
+                    btn.textContent = 'PAUSE';
+                    btn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+                    btn.classList.add('bg-amber-500', 'hover:bg-amber-600');
+                }
+                updateTimer();
+            }
+        });
     }
 
     function startMatch() {
@@ -350,8 +391,9 @@
         .then(data => {
             if (data.success) {
                 matchStartedAt = data.started_at;
-                document.getElementById('start-match-btn')?.remove();
-                timerInterval = setInterval(updateTimer, 1000);
+                isPaused = false;
+                totalPausedSeconds = 0;
+                location.reload();
             }
         });
     }
@@ -377,8 +419,9 @@
     function getMatchMinute() {
         if (!matchStartedAt) return 0;
         const start = new Date(matchStartedAt);
-        const now = new Date();
-        return Math.floor((now - start) / 60000) + 1; // Current minute
+        const now = isPaused ? new Date(pausedAt) : new Date();
+        const diffInSeconds = Math.floor((now - start) / 1000) - totalPausedSeconds;
+        return Math.floor(diffInSeconds / 60) + 1; // Current minute
     }
 
     function updateMatchStatus(status) {

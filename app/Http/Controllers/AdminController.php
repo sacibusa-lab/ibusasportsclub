@@ -655,12 +655,42 @@ class AdminController extends Controller
         $match = MatchModel::findOrFail($id);
         $match->update([
             'status' => 'live',
-            'started_at' => now()
+            'started_at' => now(),
+            'is_paused' => false,
+            'total_paused_seconds' => 0
         ]);
 
         return response()->json([
             'success' => true,
             'started_at' => $match->started_at->toIso8601String()
+        ]);
+    }
+
+    public function togglePauseMatch(Request $request, $id)
+    {
+        $match = MatchModel::findOrFail($id);
+        
+        if ($match->is_paused) {
+            // Resuming
+            $pausedDuration = now()->diffInSeconds($match->paused_at);
+            $match->update([
+                'is_paused' => false,
+                'total_paused_seconds' => $match->total_paused_seconds + $pausedDuration,
+                'paused_at' => null
+            ]);
+        } else {
+            // Pausing
+            $match->update([
+                'is_paused' => true,
+                'paused_at' => now()
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_paused' => $match->is_paused,
+            'total_paused_seconds' => $match->total_paused_seconds,
+            'paused_at' => $match->paused_at ? $match->paused_at->toIso8601String() : null
         ]);
     }
 
