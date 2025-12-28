@@ -254,6 +254,13 @@
                                  <div class="w-4 h-4 md:w-5 md:h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px]">⬇</div>
                             </div>
                         </div>
+                    @else
+                        <div class="flex flex-col items-end">
+                            <span class="font-bold text-primary text-xs md:text-sm leading-tight">{{ $event->player_name }}</span>
+                            @if($event->assistant)
+                            <span class="text-[8px] md:text-[10px] text-zinc-400 font-bold uppercase tracking-wide">{{ $event->assistant->name }} (Assist)</span>
+                            @endif
+                        </div>
                     @endif
                 @endif
             </div>
