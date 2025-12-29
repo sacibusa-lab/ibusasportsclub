@@ -898,17 +898,22 @@
             <h3 class="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest border-b border-zinc-50 pb-4 mb-6">Match Gallery</h3>
             
             @if($match->images->count() > 0)
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-                    @foreach($match->images as $index => $image)
-                    <div @click="showLightbox = true; currentIndex = {{ $index }}" class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer bg-zinc-50 border border-zinc-100 transition hover:shadow-xl">
-                        <img src="{{ $image->image_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $image->caption }}">
-                        @if($image->caption)
-                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <p class="text-[10px] text-white font-bold truncate">{{ $image->caption }}</p>
+                <div class="max-w-md mx-auto md:mx-0">
+                    @php $firstImage = $match->images->first(); @endphp
+                    <div @click="showLightbox = true; currentIndex = 0" class="group relative aspect-[16/9] rounded-3xl overflow-hidden border-2 border-zinc-100 shadow-lg cursor-pointer hover:shadow-2xl transition-all duration-500 bg-zinc-50">
+                        <img src="{{ $firstImage->image_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="{{ $firstImage->caption }}">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
+                            <div class="space-y-1">
+                                <p class="text-[10px] font-black text-secondary uppercase tracking-widest">Match Collection</p>
+                                <p class="text-white text-xs font-bold">{{ $match->images->count() }} Snapshots Available</p>
+                            </div>
                         </div>
-                        @endif
+
+                        <div class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
                     </div>
-                    @endforeach
                 </div>
 
                 <!-- Centralized Lightbox -->
@@ -925,10 +930,10 @@
 
                         <!-- Navigation Arrows -->
                         <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 md:px-12 pointer-events-none">
-                            <button @click.stop="prev()" class="pointer-events-auto bg-white/10 hover:bg-white/20 text-white p-3 md:p-5 rounded-full backdrop-blur-sm transition transition-all group">
+                            <button @click.stop="prev()" class="pointer-events-auto bg-white/10 hover:bg-white/20 text-white p-3 md:p-5 rounded-full backdrop-blur-sm transition-all group">
                                 <svg class="w-6 h-6 md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
                             </button>
-                            <button @click.stop="next()" class="pointer-events-auto bg-white/10 hover:bg-white/20 text-white p-3 md:p-5 rounded-full backdrop-blur-sm transition transition-all group">
+                            <button @click.stop="next()" class="pointer-events-auto bg-white/10 hover:bg-white/20 text-white p-3 md:p-5 rounded-full backdrop-blur-sm transition-all group">
                                 <svg class="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
                             </button>
                         </div>

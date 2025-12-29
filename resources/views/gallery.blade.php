@@ -12,7 +12,17 @@
     </div>
 
     @forelse($matchesWithImages as $match)
-    <div class="space-y-6">
+    <div class="space-y-6" x-data="{ 
+        showLightbox: false, 
+        currentIndex: 0, 
+        images: [
+            @foreach($match->images as $image)
+            { url: '{{ $image->image_url }}', caption: '{{ addslashes($image->caption) }}' }{{ !$loop->last ? ',' : '' }}
+            @endforeach
+        ],
+        next() { this.currentIndex = (this.currentIndex + 1) % this.images.length },
+        prev() { this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length }
+    }">
         <!-- Match Header -->
         <div class="flex items-center justify-between border-b border-zinc-100 pb-4">
             <div class="flex items-center gap-4">
@@ -32,56 +42,73 @@
             </div>
         </div>
 
-        <!-- Image Gallery Grid -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            @foreach($match->images as $image)
-            <div x-data="{ open: false }">
-                <div @click="open = true" class="group relative aspect-[4/3] rounded-2xl md:rounded-3xl overflow-hidden border border-zinc-100 shadow-sm cursor-pointer hover:shadow-xl transition-all duration-500 bg-zinc-50">
-                    <img src="{{ $image->image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt="{{ $image->caption }}">
-                    
-                    @if($image->caption)
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-4 md:p-6">
-                        <p class="text-[10px] md:text-xs font-bold text-white leading-tight translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{{ $image->caption }}</p>
-                    </div>
-                    @endif
-                    
-                    <div class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <!-- Featured Thumbnail -->
+        <div class="max-w-md">
+            @if($match->images->count() > 0)
+            @php $firstImage = $match->images->first(); @endphp
+            <div @click="showLightbox = true; currentIndex = 0" class="group relative aspect-[16/9] rounded-3xl overflow-hidden border-2 border-zinc-100 shadow-lg cursor-pointer hover:shadow-2xl transition-all duration-500 bg-zinc-50">
+                <img src="{{ $firstImage->image_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="{{ $firstImage->caption }}">
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black text-secondary uppercase tracking-widest">Featured Collection</p>
+                        <p class="text-white text-xs font-bold">{{ $match->images->count() }} Snapshots Available</p>
                     </div>
                 </div>
 
-                <!-- Lightbox (Alpine.js) -->
-                <div x-show="open" 
-                     x-transition:enter="transition ease-out duration-300"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="transition ease-in duration-200"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-primary/95 backdrop-blur-xl" 
-                     @click.away="open = false" 
-                     x-cloak>
-                    
-                    <button @click="open = false" class="absolute top-8 right-8 text-secondary/60 hover:text-secondary transition text-4xl font-light">&times;</button>
-                    
-                    <div class="max-w-5xl w-full space-y-6">
-                        <img src="{{ $image->image_url }}" class="w-full h-auto max-h-[80vh] object-contain rounded-2xl md:rounded-[2rem] shadow-2xl border-4 border-white/10" alt="{{ $image->caption }}">
-                        
-                        @if($image->caption)
-                        <div class="text-center space-y-2">
-                             <div class="h-1 w-12 bg-secondary mx-auto rounded-full"></div>
-                             <p class="text-lg md:text-2xl font-black text-white italic tracking-tighter uppercase">{{ $image->caption }}</p>
-                             <div class="flex items-center justify-center gap-4 text-secondary/40 text-[10px] font-black uppercase tracking-[0.2em]">
-                                 <span>{{ $match->homeTeam->name }}</span>
-                                 <span>VS</span>
-                                 <span>{{ $match->awayTeam->name }}</span>
-                             </div>
-                        </div>
-                        @endif
-                    </div>
+                <div class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
             </div>
-            @endforeach
+            @endif
+        </div>
+
+        <!-- Lightbox (Alpine.js) -->
+        <div x-show="showLightbox" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 bg-primary/95 backdrop-blur-xl" 
+             @keydown.window.escape="showLightbox = false"
+             @keydown.window.left="if(showLightbox) prev()"
+             @keydown.window.right="if(showLightbox) next()"
+             x-cloak>
+            
+            <button @click="showLightbox = false" class="absolute top-8 right-8 text-secondary/60 hover:text-secondary transition text-4xl font-light z-[110]">&times;</button>
+            
+            <!-- Navigation -->
+            <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-4 md:px-12 pointer-events-none">
+                <button @click.stop="prev()" class="pointer-events-auto bg-white/10 hover:bg-white/20 text-white p-3 md:p-5 rounded-full backdrop-blur-sm transition-all group">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <button @click.stop="next()" class="pointer-events-auto bg-white/10 hover:bg-white/20 text-white p-3 md:p-5 rounded-full backdrop-blur-sm transition-all group">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+            <div class="max-w-5xl w-full space-y-6" @click.away="showLightbox = false">
+                <div class="relative">
+                    <img :src="images[currentIndex].url" class="w-full h-auto max-h-[75vh] object-contain rounded-2xl md:rounded-[2rem] shadow-2xl border-4 border-white/10" :alt="images[currentIndex].caption">
+                    
+                    <!-- Counter -->
+                    <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">
+                        <span x-text="currentIndex + 1" class="text-white"></span> / <span x-text="images.length"></span>
+                    </div>
+                </div>
+                
+                <div class="text-center space-y-2 pt-8">
+                     <div class="h-1 w-12 bg-secondary mx-auto rounded-full"></div>
+                     <p x-text="images[currentIndex].caption" class="text-lg md:text-2xl font-black text-white italic tracking-tighter uppercase min-h-[1.5em]"></p>
+                     <div class="flex items-center justify-center gap-4 text-secondary/40 text-[10px] font-black uppercase tracking-[0.2em]">
+                         <span>{{ $match->homeTeam->name }}</span>
+                         <span>VS</span>
+                         <span>{{ $match->awayTeam->name }}</span>
+                     </div>
+                </div>
+            </div>
         </div>
     </div>
     @empty
