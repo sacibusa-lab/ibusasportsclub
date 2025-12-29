@@ -11,6 +11,7 @@
         <div class="h-1.5 w-24 bg-secondary mx-auto rounded-full shadow-lg shadow-secondary/20"></div>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     @forelse($matchesWithImages as $match)
     <div class="space-y-6" x-data="{ 
         showLightbox: false, 
@@ -43,22 +44,26 @@
         </div>
 
         <!-- Featured Thumbnail -->
-        <div class="max-w-md">
+        <div class="w-full">
             @if($match->images->count() > 0)
             @php $firstImage = $match->images->first(); @endphp
-            <div @click="showLightbox = true; currentIndex = 0" class="group relative aspect-[16/9] rounded-3xl overflow-hidden border-2 border-zinc-100 shadow-lg cursor-pointer hover:shadow-2xl transition-all duration-500 bg-zinc-50">
+            <div @click="showLightbox = true; currentIndex = 0" class="group relative aspect-[4/3] rounded-3xl overflow-hidden border-2 border-zinc-100 shadow-lg cursor-pointer hover:shadow-2xl transition-all duration-500 bg-zinc-50">
                 <img src="{{ $firstImage->image_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" alt="{{ $firstImage->caption }}">
                 
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6">
                     <div class="space-y-1">
-                        <p class="text-[10px] font-black text-secondary uppercase tracking-widest">Featured Collection</p>
-                        <p class="text-white text-xs font-bold">{{ $match->images->count() }} Snapshots Available</p>
+                        <p class="text-[10px] font-black text-secondary uppercase tracking-widest">Featured </p>
+                        <p class="text-white text-xs font-bold">{{ $match->images->count() }} Photos</p>
                     </div>
                 </div>
 
                 <div class="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-500">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
+            </div>
+            @else
+            <div class="aspect-[4/3] rounded-3xl overflow-hidden border-2 border-zinc-100 bg-zinc-50 flex items-center justify-center">
+                 <p class="text-[10px] font-black text-zinc-300 uppercase">No Images</p>
             </div>
             @endif
         </div>
@@ -119,6 +124,7 @@
         <p class="text-xs font-black text-zinc-300 uppercase tracking-widest">No gallery images available yet.</p>
     </div>
     @endforelse
+    </div>
 </div>
 
 <style>
