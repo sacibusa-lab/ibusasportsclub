@@ -16,6 +16,8 @@
     <div class="space-y-6" x-data="{ 
         showLightbox: false, 
         currentIndex: 0, 
+        touchStart: 0,
+        touchEnd: 0,
         images: [
             @foreach($match->images as $image)
             { url: '{{ $image->image_url }}', caption: '{{ addslashes($image->caption) }}' }{{ !$loop->last ? ',' : '' }}
@@ -80,6 +82,8 @@
              @keydown.window.escape="showLightbox = false"
              @keydown.window.left="if(showLightbox) prev()"
              @keydown.window.right="if(showLightbox) next()"
+             @touchstart="touchStart = $event.changedTouches[0].screenX"
+             @touchend="touchEnd = $event.changedTouches[0].screenX; if(touchStart - touchEnd > 50) next(); if(touchEnd - touchStart > 50) prev()"
              x-cloak>
             
             <button @click="showLightbox = false" class="absolute top-8 right-8 text-secondary/60 hover:text-secondary transition text-4xl font-light z-[110]">&times;</button>

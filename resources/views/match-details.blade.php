@@ -885,6 +885,8 @@
          x-data="{ 
             showLightbox: false, 
             currentIndex: 0, 
+            touchStart: 0,
+            touchEnd: 0,
             images: [
                 @foreach($match->images as $image)
                 { id: {{ $image->id }}, url: '{{ $image->image_url }}', caption: '{{ addslashes($image->caption) }}' }{{ !$loop->last ? ',' : '' }}
@@ -921,7 +923,9 @@
                     <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/95 backdrop-blur-md" 
                          @keydown.window.escape="showLightbox = false"
                          @keydown.window.left="prev()"
-                         @keydown.window.right="next()">
+                         @keydown.window.right="next()"
+                         @touchstart="touchStart = $event.changedTouches[0].screenX"
+                         @touchend="touchEnd = $event.changedTouches[0].screenX; if(touchStart - touchEnd > 50) next(); if(touchEnd - touchStart > 50) prev()">
                         
                         <!-- Close Button -->
                         <button @click="showLightbox = false" class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-[110]">
