@@ -434,30 +434,30 @@ class TournamentController extends Controller
         // Logic to find the most relevant match to show
         // 1. Live Match
         // 2. Started Match (not finished)
-        // 3. Upcoming Match (within 24h)
+        // 3. Upcoming Match (soonest)
+        // 4. Last Updated Match (fallback)
         
-        $match = MatchModel::where(function($query) {
-                // Priority 1: Live
-                $query->where('status', 'live');
+        $match = MatchModel::where('status', 'live')
+            ->orWhereNotNull('started_at')
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', '!=', 'finished');
             })
-            ->orWhere(function($query) {
-                // Priority 2: Started but not finished
-                $query->whereNotNull('started_at')
-                      ->where('status', '!=', 'finished');
-            })
-            ->orWhere(function($query) {
-                 // Priority 3: Upcoming within 24h
-                 $query->where('status', 'upcoming')
-                       ->where('match_date', '<=', now()->addHours(24))
-                       ->where('match_date', '>=', now()->subHours(2)); // Allow a bit of buffer
-            })
-            ->orderByRaw("CASE 
-                WHEN status = 'live' THEN 1 
-                WHEN started_at IS NOT NULL AND status != 'finished' THEN 2 
-                ELSE 3 
-            END")
+            ->orderByRaw("CASE WHEN status = 'live' THEN 1 WHEN started_at IS NOT NULL THEN 2 ELSE 3 END")
             ->orderBy('match_date', 'asc')
             ->first();
+
+        // If no live/started, check ANY upcoming match (soonest first)
+        if (!$match) {
+            $match = MatchModel::where('status', 'upcoming')
+                ->where('match_date', '>=', now()->subHours(5))
+                ->orderBy('match_date', 'asc')
+                ->first();
+        }
+
+        // Final fallback: Just get the last updated match if nothing else
+        if (!$match) {
+             $match = MatchModel::orderBy('updated_at', 'desc')->first();
+        }
 
         // If a specific active competition is selected, we might want to prioritize its matches,
         // but for a "Global Livestream" page, showing ANY live match is usually better than showing nothing.
