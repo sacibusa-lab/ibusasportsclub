@@ -264,6 +264,7 @@ class AdminController extends Controller
             'venue' => 'nullable|string',
             'matchday' => 'nullable|integer|min:0',
             'broadcaster_logo' => 'nullable|string',
+            'stream_url' => 'nullable|string',
             'stage' => 'required|in:group,semifinal,final,novelty',
             'status' => 'required|in:upcoming,live,finished',
             'home_score' => 'nullable|integer|min:0',
@@ -607,6 +608,34 @@ class AdminController extends Controller
         $image->delete();
 
         return back()->with('success', 'Image deleted from gallery.');
+    }
+
+    public function livestream()
+    {
+        // Get the most relevant match: Live > Started > Upcoming
+        $match = MatchModel::where('status', 'live')
+            ->orWhereNotNull('started_at')
+            ->where(function ($q) {
+                $q->whereNull('status')->orWhere('status', '!=', 'finished');
+            })
+            ->orderByRaw("CASE WHEN status = 'live' THEN 1 WHEN started_at IS NOT NULL THEN 2 ELSE 3 END")
+            ->orderBy('match_date', 'asc')
+            ->first();
+
+        // If no live/started, check ANY upcoming match (soonest first)
+        if (!$match) {
+            $match = MatchModel::where('status', 'upcoming')
+                ->where('match_date', '>=', now()->subHours(5)) // Show matches that just finished recently too if needed, or just strict future
+                ->orderBy('match_date', 'asc')
+                ->first();
+        }
+
+        // Final fallback: Just get the last updated match if nothing else, so the admin sees SOMETHING
+        if (!$match) {
+             $match = MatchModel::orderBy('updated_at', 'desc')->first();
+        }
+
+        return view('admin.livestream', compact('match'));
     }
 
     public function liveConsole()

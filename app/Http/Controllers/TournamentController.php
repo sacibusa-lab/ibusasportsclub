@@ -427,4 +427,58 @@ class TournamentController extends Controller
         
         return response($html);
     }
+    public function livestream()
+    {
+        $activeCompetition = $this->getActiveCompetition();
+        
+        // Logic to find the most relevant match to show
+        // 1. Live Match
+        // 2. Started Match (not finished)
+        // 3. Upcoming Match (within 24h)
+        
+        $match = MatchModel::where(function($query) {
+                // Priority 1: Live
+                $query->where('status', 'live');
+            })
+            ->orWhere(function($query) {
+                // Priority 2: Started but not finished
+                $query->whereNotNull('started_at')
+                      ->where('status', '!=', 'finished');
+            })
+            ->orWhere(function($query) {
+                 // Priority 3: Upcoming within 24h
+                 $query->where('status', 'upcoming')
+                       ->where('match_date', '<=', now()->addHours(24))
+                       ->where('match_date', '>=', now()->subHours(2)); // Allow a bit of buffer
+            })
+            ->orderByRaw("CASE 
+                WHEN status = 'live' THEN 1 
+                WHEN started_at IS NOT NULL AND status != 'finished' THEN 2 
+                ELSE 3 
+            END")
+            ->orderBy('match_date', 'asc')
+            ->first();
+
+        // If a specific active competition is selected, we might want to prioritize its matches,
+        // but for a "Global Livestream" page, showing ANY live match is usually better than showing nothing.
+        // However, if the user strictly wants to stick to the active competition context:
+        if ($activeCompetition && $match && $match->competition_id != $activeCompetition->id) {
+             // Optional: Check if the active competition has a better candidate
+             $compMatch = MatchModel::where('competition_id', $activeCompetition->id)
+                ->where(function($q) {
+                    $q->where('status', 'live')
+                      ->orWhereNotNull('started_at');
+                })
+                ->where('status', '!=', 'finished')
+                ->first();
+            
+            if ($compMatch) {
+                $match = $compMatch;
+            }
+        }
+        
+        $competitions = \App\Models\Competition::where('is_active', true)->get();
+
+        return view('livestream', compact('match', 'activeCompetition', 'competitions'));
+    }
 }

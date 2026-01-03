@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminSponsorController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [TournamentController::class, 'index'])->name('home');
+Route::get('/live', [TournamentController::class, 'livestream'])->name('livestream');
 Route::get('/fixtures', [TournamentController::class, 'fixtures'])->name('fixtures');
 Route::get('/results', [TournamentController::class, 'results'])->name('results');
 Route::get('/table', [TournamentController::class, 'table'])->name('table');
@@ -66,6 +67,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Live Console
     Route::get('/live-console', [AdminController::class, 'liveConsole'])->name('live-console');
+    Route::get('/livestream', [AdminController::class, 'livestream'])->name('livestream');
+    Route::post('/matches/{id}/stream', [AdminController::class, 'updateStream'])->name('matches.stream.update');
     Route::get('/live-console/{id}', [AdminController::class, 'liveConsoleControl'])->name('live-console.control');
     Route::post('/matches/{id}/start-timer', [AdminController::class, 'startMatchTimer'])->name('matches.start-timer');
     Route::post('/matches/{id}/toggle-pause', [AdminController::class, 'togglePauseMatch'])->name('matches.toggle-pause');

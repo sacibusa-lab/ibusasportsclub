@@ -57,6 +57,7 @@ class MatchModel extends Model
         'is_paused',
         'paused_at',
         'total_paused_seconds',
+        'stream_url',
     ];
 
     protected $casts = [

@@ -138,6 +138,10 @@
                     <a href="{{ route('fixtures') }}" class="hover:text-secondary transition {{ request()->routeIs('fixtures') ? 'text-secondary' : '' }}">Matches</a>
                     <a href="{{ route('results') }}" class="hover:text-secondary transition {{ request()->routeIs('results') ? 'text-secondary' : '' }}">Results</a>
                     <a href="{{ route('table') }}" class="hover:text-secondary transition {{ request()->routeIs('table') ? 'text-secondary' : '' }}">Table</a>
+                    <a href="{{ route('livestream') }}" class="flex items-center gap-1.5 hover:text-rose-500 transition {{ request()->routeIs('livestream') ? 'text-rose-500' : '' }}">
+                        <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
+                        Live
+                    </a>
                     <a href="{{ route('knockout') }}" class="hover:text-secondary transition {{ request()->routeIs('knockout') ? 'text-secondary' : '' }}">Knockout</a>
                     <a href="{{ route('stats') }}" class="hover:text-secondary transition {{ request()->routeIs('stats') ? 'text-secondary' : '' }}">Stats</a>
                     <a href="{{ route('gallery') }}" class="hover:text-secondary transition {{ request()->routeIs('gallery') ? 'text-secondary' : '' }}">Gallery</a>
@@ -191,6 +195,10 @@
             <a href="{{ route('fixtures') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('fixtures') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Matches</a>
             <a href="{{ route('results') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('results') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Results</a>
             <a href="{{ route('table') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('table') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Table</a>
+            <a href="{{ route('livestream') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition flex items-center gap-2 {{ request()->routeIs('livestream') ? 'bg-zinc-50 text-rose-500 border-l-4 border-rose-500 pl-2' : '' }}">
+                <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
+                Live Stream
+            </a>
             <a href="{{ route('knockout') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('knockout') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Knockout</a>
             <a href="{{ route('stats') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('stats') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Stats</a>
             <a href="{{ route('gallery') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('gallery') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Gallery</a>
