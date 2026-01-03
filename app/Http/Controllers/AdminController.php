@@ -638,6 +638,18 @@ class AdminController extends Controller
         return view('admin.livestream', compact('match'));
     }
 
+    public function updateStream(Request $request, $id)
+    {
+        $request->validate([
+            'stream_url' => 'nullable|url'
+        ]);
+
+        $match = \App\Models\MatchModel::findOrFail($id);
+        $match->update(['stream_url' => $request->stream_url]);
+
+        return back()->with('success', 'Stream URL updated successfully.');
+    }
+
     public function liveConsole()
     {
         $matches = \App\Models\MatchModel::where(function($query) {
