@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         // Convert competitions to InnoDB to support foreign keys
-        DB::statement('ALTER TABLE competitions ENGINE = InnoDB');
+        DB::statement('ALTER TABLE `competitions` ENGINE = InnoDB');
         
         // Ensure other key tables are also InnoDB
-        DB::statement('ALTER TABLE groups ENGINE = InnoDB');
-        DB::statement('ALTER TABLE matches ENGINE = InnoDB');
-        DB::statement('ALTER TABLE teams ENGINE = InnoDB');
+        DB::statement('ALTER TABLE `groups` ENGINE = InnoDB');
+        DB::statement('ALTER TABLE `matches` ENGINE = InnoDB');
+        DB::statement('ALTER TABLE `teams` ENGINE = InnoDB');
     }
 
     /**

@@ -8,47 +8,47 @@
         <h2 class="text-2xl font-black italic uppercase tracking-tighter text-secondary drop-shadow-md">
             Traffic Analytics
         </h2>
-        <span class="text-xs font-bold text-zinc-400 uppercase tracking-widest bg-white px-4 py-2 rounded-xl border border-zinc-100">
+        <span class="text-xs font-bold text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest bg-white dark:bg-zinc-900 px-4 py-2 rounded-xl border border-zinc-100 dark:border-zinc-800">
             Last 30 Days
         </span>
     </div>
 
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm relative overflow-hidden group">
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm relative overflow-hidden group">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-secondary/10 rounded-full blur-2xl group-hover:bg-secondary/20 transition"></div>
-            <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Total Page Views</h3>
-            <p class="text-4xl font-black text-primary tracking-tighter">{{ number_format($totalViews) }}</p>
+            <h3 class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Total Page Views</h3>
+            <p class="text-4xl font-black text-primary dark:text-white tracking-tighter">{{ number_format($totalViews) }}</p>
         </div>
         
-        <div class="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm relative overflow-hidden group">
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm relative overflow-hidden group">
             <div class="absolute -right-6 -top-6 w-24 h-24 bg-secondary/10 rounded-full blur-2xl group-hover:bg-secondary/20 transition"></div>
-            <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Unique Visitors</h3>
-            <p class="text-4xl font-black text-primary tracking-tighter">{{ number_format($uniqueVisitors) }}</p>
+            <h3 class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Unique Visitors</h3>
+            <p class="text-4xl font-black text-primary dark:text-white tracking-tighter">{{ number_format($uniqueVisitors) }}</p>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm relative overflow-hidden group">
-            <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Mobile Traffic</h3>
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm relative overflow-hidden group">
+            <h3 class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Mobile Traffic</h3>
             <div class="flex items-end gap-2">
-                <p class="text-2xl font-black text-primary tracking-tighter">{{ number_format($mobileVisits) }}</p>
-                <span class="text-[10px] font-bold text-zinc-400 mb-1">
+                <p class="text-2xl font-black text-primary dark:text-white tracking-tighter">{{ number_format($mobileVisits) }}</p>
+                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mb-1">
                     ({{ $totalViews > 0 ? round(($mobileVisits / $totalViews) * 100) : 0 }}%)
                 </span>
             </div>
-            <div class="w-full bg-zinc-100 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full mt-3 overflow-hidden">
                 <div class="h-full bg-secondary" style="width: {{ $totalViews > 0 ? ($mobileVisits / $totalViews) * 100 : 0 }}%"></div>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm relative overflow-hidden group">
-            <h3 class="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Desktop Traffic</h3>
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm relative overflow-hidden group">
+            <h3 class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Desktop Traffic</h3>
             <div class="flex items-end gap-2">
-                <p class="text-2xl font-black text-primary tracking-tighter">{{ number_format($desktopVisits) }}</p>
-                <span class="text-[10px] font-bold text-zinc-400 mb-1">
+                <p class="text-2xl font-black text-primary dark:text-white tracking-tighter">{{ number_format($desktopVisits) }}</p>
+                <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 mb-1">
                     ({{ $totalViews > 0 ? round(($desktopVisits / $totalViews) * 100) : 0 }}%)
                 </span>
             </div>
-            <div class="w-full bg-zinc-100 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div class="w-full bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full mt-3 overflow-hidden">
                 <div class="h-full bg-primary" style="width: {{ $totalViews > 0 ? ($desktopVisits / $totalViews) * 100 : 0 }}%"></div>
             </div>
         </div>
@@ -56,75 +56,75 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Main Chart -->
-        <div class="lg:col-span-2 bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm">
-            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-6">Traffic Trends</h3>
+        <div class="lg:col-span-2 bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+            <h3 class="text-xs font-black text-primary dark:text-white uppercase tracking-widest mb-6">Traffic Trends</h3>
             <div class="relative h-64 w-full">
                 <canvas id="trafficChart"></canvas>
             </div>
         </div>
 
         <!-- Top Pages -->
-        <div class="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm">
-            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-6">Top Pages</h3>
+        <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+            <h3 class="text-xs font-black text-primary dark:text-white uppercase tracking-widest mb-6">Top Pages</h3>
             <div class="space-y-4">
                 @foreach($topPages as $page)
                 <div class="flex items-center justify-between group">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-6 h-6 rounded-lg bg-zinc-50 flex items-center justify-center text-zinc-300 font-bold text-[10px]">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center text-zinc-300 dark:text-zinc-500 font-bold text-[10px]">
                             {{ $loop->iteration }}
                         </div>
-                        <span class="text-xs font-bold text-zinc-600 truncate group-hover:text-primary transition">
+                        <span class="text-xs font-bold text-zinc-600 dark:text-zinc-300 dark:text-zinc-500 truncate group-hover:text-primary dark:text-white transition">
                             /{{ ltrim($page->url, '/') }}
                         </span>
                     </div>
-                    <span class="text-xs font-black text-primary tabular-nums">{{ number_format($page->views) }}</span>
+                    <span class="text-xs font-black text-primary dark:text-white tabular-nums">{{ number_format($page->views) }}</span>
                 </div>
                 @endforeach
             </div>
         </div>
 
         <!-- Top Locations -->
-        <div class="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm">
-            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-6">Top Locations</h3>
+        <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+            <h3 class="text-xs font-black text-primary dark:text-white uppercase tracking-widest mb-6">Top Locations</h3>
             <div class="space-y-4">
                 @foreach($topCountries as $country)
                 <div class="flex items-center justify-between group">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-6 h-6 rounded-lg bg-zinc-50 flex items-center justify-center text-zinc-300 font-bold text-[10px]">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center text-zinc-300 dark:text-zinc-500 font-bold text-[10px]">
                             {{ $loop->iteration }}
                         </div>
-                        <span class="text-xs font-bold text-zinc-600 truncate group-hover:text-primary transition">
+                        <span class="text-xs font-bold text-zinc-600 dark:text-zinc-300 dark:text-zinc-500 truncate group-hover:text-primary dark:text-white transition">
                             {{ $country->country }}
                         </span>
                     </div>
-                    <span class="text-xs font-black text-primary tabular-nums">{{ number_format($country->count) }}</span>
+                    <span class="text-xs font-black text-primary dark:text-white tabular-nums">{{ number_format($country->count) }}</span>
                 </div>
                 @endforeach
                 @if($topCountries->isEmpty())
-                <p class="text-xs text-zinc-400 italic">No location data yet.</p>
+                <p class="text-xs text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 italic">No location data yet.</p>
                 @endif
             </div>
         </div>
 
         <!-- Top Referrers -->
-        <div class="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm">
-            <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-6">Top Referrers</h3>
+        <div class="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+            <h3 class="text-xs font-black text-primary dark:text-white uppercase tracking-widest mb-6">Top Referrers</h3>
             <div class="space-y-4">
                 @foreach($topReferrers as $referrer)
                 <div class="flex items-center justify-between group">
                     <div class="flex items-center gap-3 overflow-hidden">
-                        <div class="w-6 h-6 rounded-lg bg-zinc-50 flex items-center justify-center text-zinc-300 font-bold text-[10px]">
+                        <div class="w-6 h-6 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 flex items-center justify-center text-zinc-300 dark:text-zinc-500 font-bold text-[10px]">
                             {{ $loop->iteration }}
                         </div>
-                        <span class="text-xs font-bold text-zinc-600 truncate group-hover:text-primary transition" title="{{ $referrer->referer }}">
+                        <span class="text-xs font-bold text-zinc-600 dark:text-zinc-300 dark:text-zinc-500 truncate group-hover:text-primary dark:text-white transition" title="{{ $referrer->referer }}">
                             {{ parse_url($referrer->referer, PHP_URL_HOST) ?: $referrer->referer }}
                         </span>
                     </div>
-                    <span class="text-xs font-black text-primary tabular-nums">{{ number_format($referrer->count) }}</span>
+                    <span class="text-xs font-black text-primary dark:text-white tabular-nums">{{ number_format($referrer->count) }}</span>
                 </div>
                 @endforeach
                 @if($topReferrers->isEmpty())
-                <p class="text-xs text-zinc-400 italic">No referral data yet.</p>
+                <p class="text-xs text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 italic">No referral data yet.</p>
                 @endif
             </div>
         </div>

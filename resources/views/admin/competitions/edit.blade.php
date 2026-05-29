@@ -5,19 +5,19 @@
 @section('content')
 <div class="max-w-2xl">
     <div class="mb-8">
-        <a href="{{ route('admin.competitions.index') }}" class="text-zinc-400 hover:text-primary transition text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+        <a href="{{ route('admin.competitions.index') }}" class="text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-primary dark:text-white transition text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             Back to List
         </a>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 p-8">
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-100 dark:border-zinc-800 p-8">
         <form action="{{ route('admin.competitions.update', $competition->id) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
 
             @if ($errors->any())
-                <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl">
+                <div class="bg-rose-50 dark:bg-rose-900/30 border border-rose-100 p-4 rounded-2xl">
                     <ul class="list-disc list-inside text-rose-500 text-[10px] font-black uppercase tracking-widest leading-loose">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -27,16 +27,16 @@
             @endif
 
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-primary uppercase tracking-widest px-1">Competition Name</label>
+                <label class="text-[10px] font-black text-primary dark:text-white uppercase tracking-widest px-1">Competition Name</label>
                 <input type="text" name="name" required value="{{ $competition->name }}"
-                    class="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold text-primary placeholder:text-zinc-300 focus:ring-2 focus:ring-secondary transition">
+                    class="w-full bg-zinc-50 dark:bg-zinc-800/50 border-none rounded-2xl px-6 py-4 font-bold text-primary placeholder:text-zinc-300 dark:text-zinc-500 focus:ring-2 focus:ring-secondary transition">
             </div>
 
             <div class="grid grid-cols-2 gap-6">
                 <div class="space-y-2">
-                    <label class="text-[10px] font-black text-primary uppercase tracking-widest px-1">Competition Type</label>
+                    <label class="text-[10px] font-black text-primary dark:text-white uppercase tracking-widest px-1">Competition Type</label>
                     <select name="type" required
-                        class="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold text-primary focus:ring-2 focus:ring-secondary transition">
+                        class="w-full bg-zinc-50 dark:bg-zinc-800/50 border-none rounded-2xl px-6 py-4 font-bold text-primary dark:text-white focus:ring-2 focus:ring-secondary transition">
                         <option value="league" {{ $competition->type == 'league' ? 'selected' : '' }}>League</option>
                         <option value="knockout" {{ $competition->type == 'knockout' ? 'selected' : '' }}>Knockout</option>
                         <option value="novelty" {{ $competition->type == 'novelty' ? 'selected' : '' }}>Novelty/Friendly</option>
@@ -44,44 +44,44 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-[10px] font-black text-primary uppercase tracking-widest px-1">Status</label>
+                    <label class="text-[10px] font-black text-primary dark:text-white uppercase tracking-widest px-1">Status</label>
                     <div class="flex items-center h-[56px] px-6">
                         <label class="flex items-center cursor-pointer group">
                             <div class="relative">
                                 <input type="checkbox" name="is_active" value="1" class="sr-only peer" {{ $competition->is_active ? 'checked' : '' }}>
                                 <div class="w-10 h-6 bg-zinc-200 rounded-full shadow-inner peer-checked:bg-secondary transition-colors"></div>
-                                <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+                                <div class="dot absolute left-1 top-1 bg-white dark:bg-zinc-900 w-4 h-4 rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
                             </div>
-                            <span class="ml-3 text-[10px] font-black text-primary uppercase tracking-widest">Active</span>
+                            <span class="ml-3 text-[10px] font-black text-primary dark:text-white uppercase tracking-widest">Active</span>
                         </label>
                     </div>
                 </div>
             </div>
 
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-primary uppercase tracking-widest px-1">Description (Optional)</label>
+                <label class="text-[10px] font-black text-primary dark:text-white uppercase tracking-widest px-1">Description (Optional)</label>
                 <textarea name="description" rows="3"
-                    class="w-full bg-zinc-50 border-none rounded-2xl px-6 py-4 font-bold text-primary placeholder:text-zinc-300 focus:ring-2 focus:ring-secondary transition">{{ $competition->description }}</textarea>
+                    class="w-full bg-zinc-50 dark:bg-zinc-800/50 border-none rounded-2xl px-6 py-4 font-bold text-primary placeholder:text-zinc-300 dark:text-zinc-500 focus:ring-2 focus:ring-secondary transition">{{ $competition->description }}</textarea>
             </div>
 
-            <div class="bg-zinc-50 rounded-3xl p-6 space-y-4">
-                <h3 class="text-[10px] font-black text-primary uppercase tracking-widest px-1">Predictor League Prizes</h3>
+            <div class="bg-zinc-50 dark:bg-zinc-800/50 rounded-3xl p-6 space-y-4">
+                <h3 class="text-[10px] font-black text-primary dark:text-white uppercase tracking-widest px-1">Predictor League Prizes</h3>
                 <div class="space-y-4">
                     <div class="space-y-1">
-                        <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">1st Place Prize</label>
+                        <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest px-1">1st Place Prize</label>
                         <input type="text" name="predictor_prize_1" value="{{ $competition->predictor_prize_1 }}" placeholder="e.g. N100,000 + Trophy"
-                            class="w-full bg-white border border-zinc-100 rounded-xl px-4 py-3 font-bold text-primary focus:ring-2 focus:ring-secondary transition">
+                            class="w-full bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl px-4 py-3 font-bold text-primary dark:text-white focus:ring-2 focus:ring-secondary transition">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">2nd Place Prize</label>
+                            <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest px-1">2nd Place Prize</label>
                             <input type="text" name="predictor_prize_2" value="{{ $competition->predictor_prize_2 }}" placeholder="e.g. N50,000"
-                                class="w-full bg-white border border-zinc-100 rounded-xl px-4 py-3 font-bold text-primary focus:ring-2 focus:ring-secondary transition">
+                                class="w-full bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl px-4 py-3 font-bold text-primary dark:text-white focus:ring-2 focus:ring-secondary transition">
                         </div>
                         <div class="space-y-1">
-                            <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest px-1">3rd Place Prize</label>
+                            <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest px-1">3rd Place Prize</label>
                             <input type="text" name="predictor_prize_3" value="{{ $competition->predictor_prize_3 }}" placeholder="e.g. N20,000"
-                                class="w-full bg-white border border-zinc-100 rounded-xl px-4 py-3 font-bold text-primary focus:ring-2 focus:ring-secondary transition">
+                                class="w-full bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-xl px-4 py-3 font-bold text-primary dark:text-white focus:ring-2 focus:ring-secondary transition">
                         </div>
                     </div>
                 </div>

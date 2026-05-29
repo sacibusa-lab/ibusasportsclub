@@ -20,12 +20,12 @@
     <div class="grid lg:grid-cols-3 gap-12">
         <!-- Add Referee Form -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100 sticky top-28">
-                <h3 class="text-xl font-black mb-6 text-primary uppercase italic tracking-tighter">Add New Referee</h3>
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-sm border border-zinc-100 dark:border-zinc-800 sticky top-28">
+                <h3 class="text-xl font-black mb-6 text-primary dark:text-white uppercase italic tracking-tighter">Add New Referee</h3>
                 <form action="{{ route('admin.referees.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
                     @if ($errors->any())
-                        <div class="p-4 bg-rose-50 text-rose-500 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-rose-100">
+                        <div class="p-4 bg-rose-50 dark:bg-rose-900/30 text-rose-500 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-rose-100">
                             <ul>
                                 @foreach ($errors->all() as $error)
                                     <li>• {{ $error }}</li>
@@ -34,20 +34,20 @@
                         </div>
                     @endif
                     <div>
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Referee Name</label>
-                        <input type="text" name="name" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" placeholder="e.g. PIERLUIGI COLLINA" required>
+                        <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Referee Name</label>
+                        <input type="text" name="name" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" placeholder="e.g. PIERLUIGI COLLINA" required>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Nationality</label>
-                        <input type="text" name="nationality" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" placeholder="e.g. ITALY">
+                        <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Nationality</label>
+                        <input type="text" name="nationality" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" placeholder="e.g. ITALY">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Photo</label>
-                        <input type="file" name="image" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none text-xs" accept="image/*">
+                        <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Photo</label>
+                        <input type="file" name="image" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none text-xs" accept="image/*">
                     </div>
-                    <div class="flex items-center gap-3 bg-zinc-50 p-4 rounded-2xl border border-zinc-200">
-                        <input type="checkbox" name="has_fifa_badge" value="1" id="fifa_badge" class="w-5 h-5 rounded border-zinc-300 text-primary focus:ring-primary">
-                        <label for="fifa_badge" class="text-xs font-bold text-zinc-500 uppercase cursor-pointer">Has FIFA Badge</label>
+                    <div class="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700">
+                        <input type="checkbox" name="has_fifa_badge" value="1" id="fifa_badge" class="w-5 h-5 rounded border-zinc-300 text-primary dark:text-white focus:ring-primary">
+                        <label for="fifa_badge" class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase cursor-pointer">Has FIFA Badge</label>
                     </div>
                     <button type="submit" class="w-full bg-primary text-white font-black p-4 rounded-2xl hover:scale-[1.02] transition shadow-lg mt-4 uppercase tracking-widest text-[10px]">Add Referee</button>
                 </form>
@@ -56,44 +56,44 @@
 
         <!-- Referees List -->
         <div class="lg:col-span-2 space-y-6">
-            <h3 class="text-xl font-black text-zinc-400 uppercase italic tracking-tighter">Current Referees</h3>
+            <h3 class="text-xl font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase italic tracking-tighter">Current Referees</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @forelse($referees as $referee)
-                <div class="bg-white rounded-3xl p-6 border border-zinc-100 shadow-sm flex items-center justify-between group hover:border-zinc-200 transition">
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 border border-zinc-100 dark:border-zinc-800 shadow-sm flex items-center justify-between group hover:border-zinc-200 dark:border-zinc-700 transition">
                     <div class="flex items-center gap-4">
                         @if($referee->image_url)
-                        <img src="{{ $referee->image_url }}" class="w-16 h-16 rounded-2xl object-cover bg-zinc-50">
+                        <img src="{{ $referee->image_url }}" class="w-16 h-16 rounded-2xl object-cover bg-zinc-50 dark:bg-zinc-800/50">
                         @else
-                        <div class="w-16 h-16 rounded-2xl bg-zinc-100 flex items-center justify-center text-zinc-300 font-black text-xl uppercase">
+                        <div class="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-300 dark:text-zinc-500 font-black text-xl uppercase">
                             {{ substr($referee->name, 0, 1) }}
                         </div>
                         @endif
                         <div>
-                            <h4 class="font-black text-primary text-sm uppercase tracking-tight flex items-center gap-2">
+                            <h4 class="font-black text-primary dark:text-white text-sm uppercase tracking-tight flex items-center gap-2">
                                 {{ $referee->name }}
                                 @if($referee->has_fifa_badge)
                                 <span class="bg-primary text-white text-[8px] px-1.5 py-0.5 rounded font-black tracking-widest border border-white shadow-sm">FIFA</span>
                                 @endif
                             </h4>
-                            <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{{ $referee->nationality ?? 'Unknown' }}</p>
+                            <p class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{{ $referee->nationality ?? 'Unknown' }}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition">
-                        <button @click="openEdit({ id: {{ $referee->id }}, name: '{{ addslashes($referee->name) }}', nationality: '{{ addslashes($referee->nationality) }}', image_url: '{{ $referee->image_url }}', has_fifa_badge: {{ $referee->has_fifa_badge ? 'true' : 'false' }} })" class="w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-zinc-400 hover:text-primary hover:bg-zinc-100 transition">
+                        <button @click="openEdit({ id: {{ $referee->id }}, name: '{{ addslashes($referee->name) }}', nationality: '{{ addslashes($referee->nationality) }}', image_url: '{{ $referee->image_url }}', has_fifa_badge: {{ $referee->has_fifa_badge ? 'true' : 'false' }} })" class="w-8 h-8 flex items-center justify-center bg-zinc-50 dark:bg-zinc-800/50 rounded-lg text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-primary dark:text-white hover:bg-zinc-100 dark:bg-zinc-800 transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
                         <form action="{{ route('admin.referees.destroy', $referee->id) }}" method="POST" onsubmit="return confirm('Delete this referee?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-rose-50 transition">
+                            <button type="submit" class="w-8 h-8 flex items-center justify-center bg-zinc-50 dark:bg-zinc-800/50 rounded-lg text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:bg-rose-900/30 transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
                         </form>
                     </div>
                 </div>
                 @empty
-                <div class="col-span-2 bg-zinc-50 rounded-3xl p-12 text-center text-zinc-400 font-bold uppercase tracking-widest text-xs italic">
+                <div class="col-span-2 bg-zinc-50 dark:bg-zinc-800/50 rounded-3xl p-12 text-center text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-xs italic">
                     No referees found.
                 </div>
                 @endforelse
@@ -103,36 +103,36 @@
 
     <!-- Edit Modal -->
     <div x-show="editModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">
-        <div @click.away="editModal = false" class="bg-white rounded-3xl p-8 shadow-2xl border border-zinc-100 w-full max-w-md animate-scale-in">
+        <div @click.away="editModal = false" class="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-100 dark:border-zinc-800 w-full max-w-md animate-scale-in">
             <div class="flex items-center justify-between mb-8">
-                <h3 class="text-xl font-black text-primary uppercase italic tracking-tighter">Edit Referee</h3>
-                <button @click="editModal = false" class="text-zinc-400 hover:text-primary transition">✕</button>
+                <h3 class="text-xl font-black text-primary dark:text-white uppercase italic tracking-tighter">Edit Referee</h3>
+                <button @click="editModal = false" class="text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-primary dark:text-white transition">✕</button>
             </div>
             <form :action="'{{ url('admin/referees') }}/' + editReferee.id" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
                 <div>
-                    <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Referee Name</label>
-                    <input type="text" name="name" x-model="editReferee.name" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" required>
+                    <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Referee Name</label>
+                    <input type="text" name="name" x-model="editReferee.name" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" required>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Nationality</label>
-                    <input type="text" name="nationality" x-model="editReferee.nationality" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase">
+                    <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Nationality</label>
+                    <input type="text" name="nationality" x-model="editReferee.nationality" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase">
                 </div>
-                    <div class="flex items-center gap-3 bg-zinc-50 p-4 rounded-2xl border border-zinc-200 mb-4">
-                        <input type="checkbox" name="has_fifa_badge" value="1" x-model="editReferee.has_fifa_badge" id="edit_fifa_badge" class="w-5 h-5 rounded border-zinc-300 text-primary focus:ring-primary">
-                        <label for="edit_fifa_badge" class="text-xs font-bold text-zinc-500 uppercase cursor-pointer">Has FIFA Badge</label>
+                    <div class="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 mb-4">
+                        <input type="checkbox" name="has_fifa_badge" value="1" x-model="editReferee.has_fifa_badge" id="edit_fifa_badge" class="w-5 h-5 rounded border-zinc-300 text-primary dark:text-white focus:ring-primary">
+                        <label for="edit_fifa_badge" class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase cursor-pointer">Has FIFA Badge</label>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Update Photo</label>
+                        <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Update Photo</label>
                         <div class="flex items-center gap-4 mb-2" x-show="editReferee.image_url">
-                            <img :src="editReferee.image_url" class="w-12 h-12 object-cover bg-zinc-50 rounded-lg">
-                            <span class="text-[10px] font-bold text-zinc-400 italic">Current Photo</span>
+                            <img :src="editReferee.image_url" class="w-12 h-12 object-cover bg-zinc-50 dark:bg-zinc-800/50 rounded-lg">
+                            <span class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 italic">Current Photo</span>
                         </div>
-                        <input type="file" name="image" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none text-xs" accept="image/*">
+                        <input type="file" name="image" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none text-xs" accept="image/*">
                     </div>
                 <div class="pt-4 flex gap-3">
-                    <button type="button" @click="editModal = false" class="flex-1 bg-zinc-100 text-zinc-500 font-black p-4 rounded-2xl hover:bg-zinc-200 transition uppercase tracking-widest text-[10px]">Cancel</button>
+                    <button type="button" @click="editModal = false" class="flex-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-black p-4 rounded-2xl hover:bg-zinc-200 transition uppercase tracking-widest text-[10px]">Cancel</button>
                     <button type="submit" class="flex-1 bg-primary text-white font-black p-4 rounded-2xl hover:scale-[1.02] transition shadow-lg uppercase tracking-widest text-[10px]">Save Changes</button>
                 </div>
             </form>

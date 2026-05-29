@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-4xl">
     <div class="mb-8">
-        <a href="{{ route('admin.stories.index') }}" class="text-xs font-black text-zinc-400 hover:text-primary transition flex items-center gap-2 uppercase tracking-widest">
+        <a href="{{ route('admin.stories.index') }}" class="text-xs font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-primary dark:text-white transition flex items-center gap-2 uppercase tracking-widest">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
             Back to Stories
         </a>
@@ -18,32 +18,32 @@
         <div class="grid lg:grid-cols-2 gap-12">
             <!-- Sidebar: Details -->
             <div class="space-y-8">
-                <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100">
-                    <h3 class="text-xs font-black text-primary uppercase tracking-widest mb-6 border-b border-zinc-50 pb-4">Story Group Details</h3>
+                <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-sm border border-zinc-100 dark:border-zinc-800">
+                    <h3 class="text-xs font-black text-primary dark:text-white uppercase tracking-widest mb-6 border-b border-zinc-50 pb-4">Story Group Details</h3>
                     
                     <div class="space-y-6">
                         <div class="space-y-2">
-                            <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Story Title</label>
-                            <input type="text" name="title" value="{{ $story->title }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" required>
+                            <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Story Title</label>
+                            <input type="text" name="title" value="{{ $story->title }}" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl font-bold text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition uppercase text-xs" required>
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">External Link</label>
-                            <input type="url" name="link_url" value="{{ $story->link_url }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-2xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="https://blogspot.com/...">
+                            <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">External Link</label>
+                            <input type="url" name="link_url" value="{{ $story->link_url }}" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl font-bold text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="https://blogspot.com/...">
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Story Duration</label>
+                            <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Story Duration</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <label class="cursor-pointer group">
                                     <input type="radio" name="duration" value="24h" class="hidden peer" {{ $story->expires_at ? 'checked' : '' }}>
-                                    <div class="p-4 bg-zinc-50 border border-zinc-100 rounded-2xl text-center peer-checked:bg-primary peer-checked:text-secondary transition group-hover:bg-zinc-100 peer-checked:group-hover:bg-primary">
+                                    <div class="p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-2xl text-center peer-checked:bg-primary peer-checked:text-secondary transition group-hover:bg-zinc-100 dark:bg-zinc-800 peer-checked:group-hover:bg-primary">
                                         <span class="text-[10px] font-black uppercase tracking-widest">24 Hours</span>
                                     </div>
                                 </label>
                                 <label class="cursor-pointer group">
                                     <input type="radio" name="duration" value="permanent" class="hidden peer" {{ !$story->expires_at ? 'checked' : '' }}>
-                                    <div class="p-4 bg-zinc-50 border border-zinc-100 rounded-2xl text-center peer-checked:bg-primary peer-checked:text-secondary transition group-hover:bg-zinc-100 peer-checked:group-hover:bg-primary">
+                                    <div class="p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-2xl text-center peer-checked:bg-primary peer-checked:text-secondary transition group-hover:bg-zinc-100 dark:bg-zinc-800 peer-checked:group-hover:bg-primary">
                                         <span class="text-[10px] font-black uppercase tracking-widest">Permanent</span>
                                     </div>
                                 </label>
@@ -51,8 +51,8 @@
                         </div>
 
                         <div class="flex items-center gap-2">
-                            <input type="checkbox" name="is_active" id="is_active" {{ $story->is_active ? 'checked' : '' }} class="w-4 h-4 text-primary border-zinc-300 rounded focus:ring-primary">
-                            <label for="is_active" class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Group is Active</label>
+                            <input type="checkbox" name="is_active" id="is_active" {{ $story->is_active ? 'checked' : '' }} class="w-4 h-4 text-primary dark:text-white border-zinc-300 rounded focus:ring-primary">
+                            <label for="is_active" class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Group is Active</label>
                         </div>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                     <div class="space-y-4" x-data="{ items: [] }">
                         <div class="space-y-3">
                             <template x-for="(item, index) in items" :key="item.id">
-                                <div class="flex flex-col gap-1 p-3 bg-white/10 rounded-xl relative group">
+                                <div class="flex flex-col gap-1 p-3 bg-white/10 dark:bg-zinc-900/10 rounded-xl relative group">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2 max-w-[80%] overflow-hidden">
                                             <svg class="w-4 h-4 text-white/40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -82,27 +82,27 @@
                         
                         <div class="space-y-2 pt-4">
                             <label class="text-[9px] font-black text-white/40 uppercase tracking-widest">Type for new items</label>
-                            <select name="new_items_type" class="w-full bg-white/10 border border-white/10 p-3 rounded-xl font-bold text-white outline-none transition uppercase text-[10px]" required>
-                                <option value="image" class="text-primary">Image</option>
-                                <option value="video" class="text-primary">Video</option>
+                            <select name="new_items_type" class="w-full bg-white/10 dark:bg-zinc-900/10 border border-white/10 p-3 rounded-xl font-bold text-white outline-none transition uppercase text-[10px]" required>
+                                <option value="image" class="text-primary dark:text-white">Image</option>
+                                <option value="video" class="text-primary dark:text-white">Video</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-accent text-primary font-black py-5 rounded-3xl hover:bg-accent/90 transition uppercase tracking-widest text-xs shadow-xl">
+                <button type="submit" class="w-full bg-accent text-primary dark:text-white font-black py-5 rounded-3xl hover:bg-accent/90 transition uppercase tracking-widest text-xs shadow-xl">
                     Save Changes
                 </button>
             </div>
 
             <!-- Main Content: Slides -->
             <div class="space-y-6">
-                <h3 class="text-xs font-black text-primary uppercase tracking-widest">Current Slides ({{ $story->items->count() }})</h3>
+                <h3 class="text-xs font-black text-primary dark:text-white uppercase tracking-widest">Current Slides ({{ $story->items->count() }})</h3>
                 <div class="grid gap-6">
                     @foreach($story->items as $item)
-                    <div class="bg-white rounded-3xl p-6 border border-zinc-100 shadow-sm flex flex-col md:flex-row gap-6 group">
+                    <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 border border-zinc-100 dark:border-zinc-800 shadow-sm flex flex-col md:flex-row gap-6 group">
                         <!-- Preview -->
-                        <div class="relative w-full md:w-32 aspect-[9/16] bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 shrink-0">
+                        <div class="relative w-full md:w-32 aspect-[9/16] bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shrink-0">
                             @if($item->type === 'image')
                             <img src="{{ $item->media_url }}" class="w-full h-full object-cover">
                             @else
@@ -121,31 +121,31 @@
                         <!-- Controls -->
                         <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="space-y-2">
-                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Order</label>
-                                <input type="number" name="items[{{ $item->id }}][order]" value="{{ $item->order }}" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[11px]" required>
+                                <label class="text-[8px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest pl-1">Order</label>
+                                <input type="number" name="items[{{ $item->id }}][order]" value="{{ $item->order }}" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-3 rounded-xl font-bold text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition text-[11px]" required>
                             </div>
 
                             <div class="space-y-2">
-                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Type</label>
-                                <select name="items[{{ $item->id }}][type]" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition uppercase text-[10px]" required>
+                                <label class="text-[8px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest pl-1">Type</label>
+                                <select name="items[{{ $item->id }}][type]" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-3 rounded-xl font-bold text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition uppercase text-[10px]" required>
                                     <option value="image" {{ $item->type === 'image' ? 'selected' : '' }}>Image</option>
                                     <option value="video" {{ $item->type === 'video' ? 'selected' : '' }}>Video</option>
                                 </select>
                             </div>
 
                             <div class="sm:col-span-2 space-y-2">
-                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Slide Link (Optional)</label>
-                                <input type="url" name="items[{{ $item->id }}][link_url]" value="{{ $item->link_url }}" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-[11px]" placeholder="https://...">
+                                <label class="text-[8px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest pl-1">Slide Link (Optional)</label>
+                                <input type="url" name="items[{{ $item->id }}][link_url]" value="{{ $item->link_url }}" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-3 rounded-xl font-bold text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition text-[11px]" placeholder="https://...">
                             </div>
 
                             <div class="sm:col-span-2 space-y-2">
-                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Caption (Optional)</label>
-                                <textarea name="items[{{ $item->id }}][caption]" rows="2" class="w-full bg-zinc-50 border border-zinc-100 p-3 rounded-xl font-medium text-zinc-700 focus:ring-2 focus:ring-primary outline-none transition text-[11px]" placeholder="Add a colorful caption...">{{ $item->caption }}</textarea>
+                                <label class="text-[8px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest pl-1">Caption (Optional)</label>
+                                <textarea name="items[{{ $item->id }}][caption]" rows="2" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-3 rounded-xl font-medium text-zinc-700 focus:ring-2 focus:ring-primary outline-none transition text-[11px]" placeholder="Add a colorful caption...">{{ $item->caption }}</textarea>
                             </div>
 
                             <div class="space-y-2">
-                                <label class="text-[8px] font-black text-zinc-400 uppercase tracking-widest pl-1">Caption Color</label>
-                                <input type="color" name="items[{{ $item->id }}][caption_color]" value="{{ $item->caption_color ?? '#FFFFFF' }}" class="w-full h-10 bg-zinc-50 border border-zinc-100 rounded-xl cursor-pointer">
+                                <label class="text-[8px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest pl-1">Caption Color</label>
+                                <input type="color" name="items[{{ $item->id }}][caption_color]" value="{{ $item->caption_color ?? '#FFFFFF' }}" class="w-full h-10 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-xl cursor-pointer">
                             </div>
                         </div>
                     </div>

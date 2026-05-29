@@ -223,17 +223,23 @@
     </div>
 </div>
 
-<!-- News Ticker Placeholder -->
+<!-- Live News Ticker -->
+    @php
+        $latestNewsTicker = \App\Models\Post::where('is_published', true)->latest('published_at')->take(3)->get();
+    @endphp
+    @if($latestNewsTicker->isNotEmpty())
     <div class="bg-white border-b border-zinc-100">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex items-center gap-4 text-[10px] md:text-xs font-bold text-zinc-600 overflow-x-auto no-scrollbar whitespace-nowrap">
             <span class="text-secondary shrink-0">LATEST:</span>
-            <a href="#" class="hover:underline">Final round approaching as Dragons top Group A</a>
+            @foreach($latestNewsTicker as $newsItem)
+            <a href="{{ route('news.show', $newsItem->slug) }}" class="hover:underline hover:text-primary transition">{{ $newsItem->title }}</a>
+            @if(!$loop->last)
             <span class="text-zinc-200">|</span>
-            <a href="#" class="hover:underline">New youth academy opens this weekend</a>
-            <span class="text-zinc-200">|</span>
-            <a href="#" class="hover:underline">Top scorer race heats up with 3 games left</a>
+            @endif
+            @endforeach
         </div>
     </div>
+    @endif
 
     <main class="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
         @yield('content')

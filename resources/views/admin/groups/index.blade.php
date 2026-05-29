@@ -7,17 +7,17 @@
     <div class="grid lg:grid-cols-3 gap-12">
         <!-- Add Group Form -->
         <div class="lg:col-span-1">
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-zinc-100 italic">
-                <h3 class="text-xl font-black mb-6 text-primary uppercase tracking-tighter">Create New Group</h3>
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-sm border border-zinc-100 dark:border-zinc-800 italic">
+                <h3 class="text-xl font-black mb-6 text-primary dark:text-white uppercase tracking-tighter">Create New Group</h3>
                 <form action="{{ route('admin.groups.store') }}" method="POST" class="space-y-6">
                     @csrf
                     <div>
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Group Name</label>
-                        <input type="text" name="name" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" placeholder="e.g. Group A" required>
+                        <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Group Name</label>
+                        <input type="text" name="name" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" placeholder="e.g. Group A" required>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Assign to Competition</label>
-                        <select name="competition_id" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none appearance-none uppercase" required>
+                        <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Assign to Competition</label>
+                        <select name="competition_id" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none appearance-none uppercase" required>
                             @foreach($competitions as $competition)
                             <option value="{{ $competition->id }}">{{ $competition->name }}</option>
                             @endforeach
@@ -30,10 +30,10 @@
 
         <!-- Groups List -->
         <div class="lg:col-span-2">
-            <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
+            <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-100 dark:border-zinc-800 overflow-hidden">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-zinc-50 text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-100">
+                        <tr class="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">
                             <th class="px-6 py-4">Group Name</th>
                             <th class="px-6 py-4">Competition</th>
                             <th class="px-6 py-4">Teams</th>
@@ -42,17 +42,17 @@
                     </thead>
                     <tbody class="divide-y divide-zinc-50">
                         @foreach($groups as $group)
-                        <tr class="hover:bg-zinc-50/50 transition">
+                        <tr class="hover:bg-zinc-50 dark:bg-zinc-800/50/50 transition">
                             <td class="px-6 py-4">
-                                <span class="font-extrabold text-primary text-sm uppercase tracking-tighter">{{ $group->name }}</span>
+                                <span class="font-extrabold text-primary dark:text-white text-sm uppercase tracking-tighter">{{ $group->name }}</span>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{{ $group->competition->name }}</span>
+                                <span class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{{ $group->competition->name ?? 'Unassigned' }}</span>
                             </td>
-                            <td class="px-6 py-4 text-zinc-500 text-[10px] font-black uppercase italic">{{ $group->teams->count() }} Teams</td>
+                            <td class="px-6 py-4 text-zinc-500 dark:text-zinc-400 text-[10px] font-black uppercase italic">{{ $group->teams->count() }} Teams</td>
                             <td class="px-6 py-4 text-right">
-                                <div class="flex justify-end gap-2 text-zinc-300">
-                                    <button @click="activeGroup = { id: {{ $group->id }}, name: '{{ addslashes($group->name) }}', competition_id: '{{ $group->competition_id }}' }; editModal = true" class="p-2 hover:text-primary transition">
+                                <div class="flex justify-end gap-2 text-zinc-300 dark:text-zinc-500">
+                                    <button @click="activeGroup = { id: {{ $group->id }}, name: '{{ addslashes($group->name) }}', competition_id: '{{ $group->competition_id }}' }; editModal = true" class="p-2 hover:text-primary dark:text-white transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </button>
                                     <form action="{{ route('admin.groups.destroy', $group->id) }}" method="POST" onsubmit="return confirm('Delete this group? Teams will lose their group association.')">
@@ -74,28 +74,28 @@
 
     <!-- Edit Modal -->
     <div x-show="editModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm">
-        <div @click.away="editModal = false" class="bg-white rounded-3xl p-8 shadow-2xl border border-zinc-100 w-full max-w-md animate-scale-in">
+        <div @click.away="editModal = false" class="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-100 dark:border-zinc-800 w-full max-w-md animate-scale-in">
             <div class="flex items-center justify-between mb-8">
-                <h3 class="text-xl font-black text-primary uppercase italic tracking-tighter">Edit Group</h3>
-                <button @click="editModal = false" class="text-zinc-400 hover:text-primary transition">✕</button>
+                <h3 class="text-xl font-black text-primary dark:text-white uppercase italic tracking-tighter">Edit Group</h3>
+                <button @click="editModal = false" class="text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 hover:text-primary dark:text-white transition">✕</button>
             </div>
             <form :action="'{{ url('admin/groups') }}/' + activeGroup.id" method="POST" class="space-y-6">
                 @csrf
                 @method('PUT')
                 <div>
-                    <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Group Name</label>
-                    <input type="text" name="name" x-model="activeGroup.name" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" required>
+                    <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Group Name</label>
+                    <input type="text" name="name" x-model="activeGroup.name" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none uppercase" required>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-2">Competition</label>
-                    <select name="competition_id" x-model="activeGroup.competition_id" class="w-full p-4 rounded-2xl border border-zinc-200 bg-zinc-50 font-bold focus:ring-2 focus:ring-secondary outline-none appearance-none uppercase" required>
+                    <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-2">Competition</label>
+                    <select name="competition_id" x-model="activeGroup.competition_id" class="w-full p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 font-bold focus:ring-2 focus:ring-secondary outline-none appearance-none uppercase" required>
                         @foreach($competitions as $competition)
                         <option value="{{ $competition->id }}">{{ $competition->name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="pt-4 flex gap-3">
-                    <button type="button" @click="editModal = false" class="flex-1 bg-zinc-100 text-zinc-500 font-black p-4 rounded-2xl hover:bg-zinc-200 transition uppercase tracking-widest text-[10px]">Cancel</button>
+                    <button type="button" @click="editModal = false" class="flex-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 font-black p-4 rounded-2xl hover:bg-zinc-200 transition uppercase tracking-widest text-[10px]">Cancel</button>
                     <button type="submit" class="flex-1 bg-primary text-secondary font-black p-4 rounded-2xl hover:scale-[1.02] transition shadow-lg uppercase tracking-widest text-[10px]">Save Changes</button>
                 </div>
             </form>

@@ -56,7 +56,7 @@
                 </div>
                 
                 <div class="flex items-center gap-4 pointer-events-auto">
-                    <a href="{{ route('admin.live-console.control', $match->id) }}" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold uppercase tracking-widest backdrop-blur-sm transition border border-white/10">
+                    <a href="{{ route('admin.live-console.control', $match->id) }}" class="px-4 py-2 bg-white/10 dark:bg-zinc-900/10 hover:bg-white/20 dark:bg-zinc-900/20 text-white rounded-xl text-xs font-bold uppercase tracking-widest backdrop-blur-sm transition border border-white/10">
                         Open Control Console
                     </a>
                 </div>
@@ -65,34 +65,34 @@
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm">
-            <h3 class="text-xs font-black text-zinc-400 uppercase tracking-widest mb-4">Match Status</h3>
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
+            <h3 class="text-xs font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest mb-4">Match Status</h3>
             <div class="flex items-center gap-4 mb-4">
                 <div class="flex-1 text-center">
                     <img src="{{ $match->homeTeam->logo_url }}" class="w-16 h-16 mx-auto mb-2 object-contain">
-                    <div class="font-black text-primary text-sm uppercase">{{ $match->homeTeam->name }}</div>
+                    <div class="font-black text-primary dark:text-white text-sm uppercase">{{ $match->homeTeam->name }}</div>
                 </div>
-                <div class="text-3xl font-black text-zinc-300">
+                <div class="text-3xl font-black text-zinc-300 dark:text-zinc-500">
                     {{ $match->home_score ?? 0 }} - {{ $match->away_score ?? 0 }}
                 </div>
                 <div class="flex-1 text-center">
                     <img src="{{ $match->awayTeam->logo_url }}" class="w-16 h-16 mx-auto mb-2 object-contain">
-                    <div class="font-black text-primary text-sm uppercase">{{ $match->awayTeam->name }}</div>
+                    <div class="font-black text-primary dark:text-white text-sm uppercase">{{ $match->awayTeam->name }}</div>
                 </div>
             </div>
             <div class="text-center">
-                <span class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $match->status === 'live' ? 'bg-rose-100 text-rose-600' : 'bg-zinc-100 text-zinc-500' }}">
+                <span class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest {{ $match->status === 'live' ? 'bg-rose-100 text-rose-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400' }}">
                     {{ $match->status }}
                 </span>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm md:col-span-2">
+        <div class="bg-white dark:bg-zinc-900 p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm md:col-span-2">
             <form action="{{ route('admin.matches.stream.update', $match->id) }}" method="POST" class="flex items-end gap-4">
                 @csrf
                 <div class="flex-1 space-y-2">
-                    <label class="block text-[10px] font-black text-zinc-400 uppercase tracking-widest">Update Stream URL</label>
-                    <input type="text" name="stream_url" value="{{ $match->stream_url }}" class="w-full bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-bold text-primary focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="Paste YouTube/Twitch URL here to update live...">
+                    <label class="block text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">Update Stream URL</label>
+                    <input type="text" name="stream_url" value="{{ $match->stream_url }}" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-4 rounded-xl font-bold text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="Paste YouTube/Twitch URL here to update live...">
                 </div>
                 <button type="submit" class="bg-primary text-secondary font-black py-4 px-8 rounded-xl hover:bg-primary-light transition uppercase tracking-widest text-xs shadow-lg h-[50px]">
                     Update
@@ -108,12 +108,12 @@
     </div>
 
     @else
-    <div class="bg-white rounded-3xl p-12 text-center border border-zinc-100 shadow-sm">
-        <div class="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-300">
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl p-12 text-center border border-zinc-100 dark:border-zinc-800 shadow-sm">
+        <div class="w-20 h-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-300 dark:text-zinc-500">
             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         </div>
-        <h3 class="text-lg font-black text-primary uppercase mb-2">No Active Stream</h3>
-        <p class="text-zinc-400 text-sm font-bold uppercase tracking-widest">There are no live or upcoming matches with streams available right now.</p>
+        <h3 class="text-lg font-black text-primary dark:text-white uppercase mb-2">No Active Stream</h3>
+        <p class="text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 text-sm font-bold uppercase tracking-widest">There are no live or upcoming matches with streams available right now.</p>
     </div>
     @endif
 

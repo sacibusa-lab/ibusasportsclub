@@ -80,6 +80,23 @@ class StatisticsService
             ->get();
     }
 
+    public function getTopCards($limit = 10, $competitionId = null)
+    {
+        return Player::withCount(['cards' => function($query) use ($competitionId) {
+                $query->whereHas('match', function($q) use ($competitionId) {
+                    $q->where('stage', '!=', 'novelty');
+                    if ($competitionId) {
+                        $q->where('competition_id', $competitionId);
+                    }
+                });
+            }])
+            ->with('team')
+            ->having('cards_count', '>', 0)
+            ->orderBy('cards_count', 'desc')
+            ->take($limit)
+            ->get();
+    }
+
     /**
      * Clean Sheets are calculated by finding all matches where a team conceded 0 
      * and attributing it to their registered Goalkeeper(s) who were in the squad.

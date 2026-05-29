@@ -32,6 +32,7 @@
     </style>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -49,7 +50,7 @@
     </script>
     @stack('styles')
 </head>
-<body x-data="{ mobileMenuOpen: false }" class="antialiased bg-zinc-100 flex min-h-screen">
+<body x-data="{ mobileMenuOpen: false, darkMode: localStorage.getItem('admin_theme') === 'dark' || (!('admin_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches) }" x-init="$watch('darkMode', val => localStorage.setItem('admin_theme', val ? 'dark' : 'light'))" :class="{ 'dark': darkMode }" class="antialiased bg-zinc-100 dark:bg-zinc-950 flex min-h-screen text-zinc-900 dark:text-zinc-100 transition-colors duration-300">
     
     <!-- Sidebar -->
     <aside class="bg-primary text-white w-64 flex flex-col fixed h-full z-50 overflow-hidden transition-all duration-300 ease-in-out border-r border-white/5 shadow-2xl">
@@ -149,50 +150,38 @@
                 <svg :class="openSections.news ? 'rotate-180' : ''" class="w-3 h-3 text-white/20 group-hover:text-white/40 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div x-show="openSections.news" x-transition.opacity.duration.300ms class="space-y-1">
-            <a href="{{ route('admin.news.index') }}" 
-                class="flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.news.index') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}"
-                :class="sidebarCollapsed ? 'justify-center py-3 px-0' : 'px-4 py-3'">
+            <a href="{{ route('admin.news.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.news.index') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
-                <span x-show="!sidebarCollapsed" x-transition.opacity.duration.300ms class="whitespace-nowrap overflow-hidden">All Posts</span>
+                <span>All Posts</span>
             </a>
-            <a href="{{ route('admin.comments.index') }}" 
-                class="flex items-center justify-between rounded-xl transition-all duration-300 {{ request()->routeIs('admin.comments.index') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}"
-                :class="sidebarCollapsed ? 'justify-center py-3 px-0' : 'px-4 py-3'">
+            <a href="{{ route('admin.comments.index') }}" class="flex items-center justify-between px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.comments.index') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
                 <div class="flex items-center gap-3">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
-                    <span x-show="!sidebarCollapsed" x-transition.opacity.duration.300ms class="whitespace-nowrap overflow-hidden">Comments</span>
+                    <span>Comments</span>
                 </div>
                 @if(isset($pendingCommentsCount) && $pendingCommentsCount > 0)
-                <span x-show="!sidebarCollapsed" class="bg-rose-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white/20">{{ $pendingCommentsCount }}</span>
+                <span class="bg-rose-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg border border-white/20">{{ $pendingCommentsCount }}</span>
                 @endif
             </a>
-            <a href="{{ route('admin.news.create') }}" 
-                class="flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.news.create') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}"
-                :class="sidebarCollapsed ? 'justify-center py-3 px-0' : 'px-4 py-3'">
+            <a href="{{ route('admin.news.create') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.news.create') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                <span x-show="!sidebarCollapsed" x-transition.opacity.duration.300ms class="whitespace-nowrap overflow-hidden">Add Post</span>
+                <span>Add Post</span>
             </a>
-            
-            <a href="{{ route('admin.interviews.index') }}" class="flex items-center gap-3 px-8 py-2 rounded-xl transition {{ request()->routeIs('admin.interviews.*') ? 'bg-secondary/10 text-secondary font-bold' : 'hover:bg-primary-light text-zinc-400' }}">
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                <span class="text-xs">Interviews</span>
+            <a href="{{ route('admin.interviews.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.interviews.*') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <span>Interviews</span>
             </a>
-            <a href="{{ route('admin.stories.index') }}" class="flex items-center gap-3 px-8 py-2 rounded-xl transition {{ request()->routeIs('admin.stories.index') ? 'bg-secondary/10 text-secondary font-bold' : 'hover:bg-primary-light text-zinc-400' }}">
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
-                <span class="text-xs">Stories</span>
+            <a href="{{ route('admin.stories.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.stories.index') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+                <span>Stories</span>
             </a>
-
-            <a href="{{ route('admin.news.categories') }}" 
-                class="flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.news.categories') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}"
-                :class="sidebarCollapsed ? 'justify-center py-3 px-0' : 'px-4 py-3'">
+            <a href="{{ route('admin.news.categories') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.news.categories') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                <span x-show="!sidebarCollapsed" x-transition.opacity.duration.300ms class="whitespace-nowrap overflow-hidden">Categories</span>
+                <span>Categories</span>
             </a>
-            <a href="{{ route('admin.news.tags') }}" 
-                class="flex items-center gap-3 rounded-xl transition-all duration-300 {{ request()->routeIs('admin.news.tags') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}"
-                :class="sidebarCollapsed ? 'justify-center py-3 px-0' : 'px-4 py-3'">
+            <a href="{{ route('admin.news.tags') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.news.tags') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                <span x-show="!sidebarCollapsed" x-transition.opacity.duration.300ms class="whitespace-nowrap overflow-hidden">Tags</span>
+                <span>Tags</span>
             </a>
             </div>
 
@@ -225,14 +214,18 @@
         
         <header class="flex items-center justify-between mb-12">
             <div>
-                <h1 class="text-3xl font-black text-primary tracking-tighter uppercase">@yield('title')</h1>
+                <h1 class="text-3xl font-black text-primary dark:text-white tracking-tighter uppercase">@yield('title')</h1>
                 <p class="text-zinc-400 text-sm font-medium">Tournament Management Dashboard</p>
             </div>
             <div class="flex items-center gap-6">
                 <div class="text-right">
-                    <span class="block text-xs font-black text-primary uppercase">{{ auth()->user()->name }}</span>
+                    <span class="block text-xs font-black text-primary dark:text-zinc-200 uppercase">{{ auth()->user()->name }}</span>
                     <span class="block text-[10px] text-zinc-400 font-bold uppercase tracking-widest">{{ auth()->user()->email }}</span>
                 </div>
+                <button @click="darkMode = !darkMode" class="w-10 h-10 bg-white dark:bg-zinc-900 text-zinc-400 dark:text-zinc-300 rounded-xl flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition shadow-sm border border-zinc-100 dark:border-zinc-800" title="Toggle Theme">
+                    <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                    <svg x-cloak x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </button>
                 <form action="{{ route('admin.logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="w-10 h-10 bg-rose-500 text-white rounded-xl flex items-center justify-center hover:bg-rose-600 transition shadow-lg" title="Logout">

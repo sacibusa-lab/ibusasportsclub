@@ -5,17 +5,17 @@
 @section('content')
 <div class="space-y-8">
     <div class="flex justify-between items-center">
-        <h2 class="text-xl font-bold text-primary italic uppercase tracking-tighter">Current Competitions</h2>
-        <a href="{{ route('admin.competitions.create') }}" class="bg-secondary text-primary font-black px-6 py-3 rounded-xl hover:bg-white border-2 border-secondary transition text-xs uppercase tracking-widest flex items-center gap-2 shadow-lg">
+        <h2 class="text-xl font-bold text-primary dark:text-white italic uppercase tracking-tighter">Current Competitions</h2>
+        <a href="{{ route('admin.competitions.create') }}" class="bg-secondary text-primary dark:text-white font-black px-6 py-3 rounded-xl hover:bg-white dark:bg-zinc-900 border-2 border-secondary transition text-xs uppercase tracking-widest flex items-center gap-2 shadow-lg">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             New Competition
         </a>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-100 dark:border-zinc-800 overflow-hidden">
         <table class="w-full text-left">
             <thead>
-                <tr class="bg-zinc-50 text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-100">
+                <tr class="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">
                     <th class="px-6 py-4">Name</th>
                     <th class="px-6 py-4">Type</th>
                     <th class="px-6 py-4">Status</th>
@@ -25,11 +25,11 @@
             </thead>
             <tbody class="divide-y divide-zinc-50">
                 @foreach($competitions as $competition)
-                <tr class="hover:bg-zinc-50/50 transition">
+                <tr class="hover:bg-zinc-50 dark:bg-zinc-800/50/50 transition">
                     <td class="px-6 py-4">
                         <div class="flex flex-col">
-                            <span class="font-extrabold text-primary text-sm uppercase tracking-tighter">{{ $competition->name }}</span>
-                            <span class="text-zinc-400 font-bold text-[9px] uppercase tracking-widest italic">{{ $competition->slug }}</span>
+                            <span class="font-extrabold text-primary dark:text-white text-sm uppercase tracking-tighter">{{ $competition->name }}</span>
+                            <span class="text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 font-bold text-[9px] uppercase tracking-widest italic">{{ $competition->slug }}</span>
                         </div>
                     </td>
                     <td class="px-6 py-4">
@@ -40,13 +40,13 @@
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-2">
                             <span class="inline-block w-2 h-2 rounded-full {{ $competition->is_active ? 'bg-secondary' : 'bg-zinc-300' }}"></span>
-                            <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{{ $competition->is_active ? 'Active' : 'Inactive' }}</span>
+                            <span class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{{ $competition->is_active ? 'Active' : 'Inactive' }}</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-zinc-500 text-[10px] font-black uppercase italic">{{ $competition->created_at->format('M d, Y') }}</td>
+                    <td class="px-6 py-4 text-zinc-500 dark:text-zinc-400 text-[10px] font-black uppercase italic">{{ $competition->created_at->format('M d, Y') }}</td>
                     <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-2 text-zinc-300">
-                            <a href="{{ route('admin.competitions.edit', $competition->id) }}" class="p-2 hover:text-primary transition">
+                        <div class="flex justify-end gap-2 text-zinc-300 dark:text-zinc-500">
+                            <a href="{{ route('admin.competitions.edit', $competition->id) }}" class="p-2 hover:text-primary dark:text-white transition">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </a>
                             <form action="{{ route('admin.competitions.destroy', $competition->id) }}" method="POST" onsubmit="return confirm('Delete this competition? Matches and groups will also be affected.')">

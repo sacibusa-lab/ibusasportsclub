@@ -7,26 +7,26 @@
     <!-- Filter Tabs -->
     <div class="flex gap-2">
         <a href="{{ route('admin.comments.index', ['status' => 'all']) }}" 
-           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'all' ? 'bg-primary text-secondary border-primary' : 'bg-white text-zinc-400 border-zinc-100 hover:bg-zinc-50' }}">
+           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'all' ? 'bg-primary text-secondary border-primary' : 'bg-white dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:bg-zinc-800/50' }}">
             All Comments
         </a>
         <a href="{{ route('admin.comments.index', ['status' => 'pending']) }}" 
-           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'pending' ? 'bg-primary text-secondary border-primary' : 'bg-white text-zinc-400 border-zinc-100 hover:bg-zinc-50' }}">
+           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'pending' ? 'bg-primary text-secondary border-primary' : 'bg-white dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:bg-zinc-800/50' }}">
             Pending
             @if(isset($pendingCommentsCount) && $pendingCommentsCount > 0)
             <span class="ml-2 bg-rose-500 text-white px-1.5 py-0.5 rounded-md text-[8px]">{{ $pendingCommentsCount }}</span>
             @endif
         </a>
         <a href="{{ route('admin.comments.index', ['status' => 'approved']) }}" 
-           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'approved' ? 'bg-primary text-secondary border-primary' : 'bg-white text-zinc-400 border-zinc-100 hover:bg-zinc-50' }}">
+           class="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-sm border {{ $status === 'approved' ? 'bg-primary text-secondary border-primary' : 'bg-white dark:bg-zinc-900 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:bg-zinc-800/50' }}">
             Approved
         </a>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-100 dark:border-zinc-800 overflow-hidden">
         <table class="w-full text-left">
             <thead>
-                <tr class="bg-zinc-50 text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-100">
+                <tr class="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-100 dark:border-zinc-800">
                     <th class="px-6 py-4">Author</th>
                     <th class="px-6 py-4">Comment</th>
                     <th class="px-6 py-4">Post</th>
@@ -37,21 +37,21 @@
             </thead>
             <tbody class="divide-y divide-zinc-50">
                 @foreach($comments as $comment)
-                <tr class="hover:bg-zinc-50/50 transition">
+                <tr class="hover:bg-zinc-50 dark:bg-zinc-800/50/50 transition">
                     <td class="px-6 py-4">
                         <div class="flex flex-col">
-                            <span class="font-extrabold text-primary text-sm uppercase tracking-tighter">{{ $comment->name }}</span>
-                            <span class="text-zinc-400 font-bold text-[9px] uppercase tracking-widest">{{ $comment->email ?? 'Guest' }}</span>
+                            <span class="font-extrabold text-primary dark:text-white text-sm uppercase tracking-tighter">{{ $comment->name }}</span>
+                            <span class="text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 font-bold text-[9px] uppercase tracking-widest">{{ $comment->email ?? 'Guest' }}</span>
                         </div>
                     </td>
                     <td class="px-6 py-4 max-w-xs">
-                        <p class="text-zinc-500 font-bold text-[10px] uppercase tracking-tight line-clamp-2 italic">{{ $comment->comment }}</p>
+                        <p class="text-zinc-500 dark:text-zinc-400 font-bold text-[10px] uppercase tracking-tight line-clamp-2 italic">{{ $comment->comment }}</p>
                     </td>
-                    <td class="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-tighter">
+                    <td class="px-6 py-4 text-xs font-bold text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-tighter">
                         @if($comment->post)
-                        <a href="{{ route('news.show', $comment->post->slug) }}" target="_blank" class="hover:text-primary transition underline decoration-zinc-100">{{ Str::limit($comment->post->title, 30) }}</a>
+                        <a href="{{ route('news.show', $comment->post->slug) }}" target="_blank" class="hover:text-primary dark:text-white transition underline decoration-zinc-100">{{ Str::limit($comment->post->title, 30) }}</a>
                         @else
-                        <span class="text-zinc-300 italic">Deleted Post</span>
+                        <span class="text-zinc-300 dark:text-zinc-500 italic">Deleted Post</span>
                         @endif
                     </td>
                     <td class="px-6 py-4">
@@ -59,11 +59,11 @@
                             @csrf
                             <button type="submit" class="flex items-center gap-2 group">
                                 <span class="inline-block w-2 h-2 rounded-full {{ $comment->is_approved ? 'bg-secondary' : 'bg-red-400' }} group-hover:scale-150 transition"></span>
-                                <span class="text-[9px] font-black text-zinc-400 uppercase tracking-widest">{{ $comment->is_approved ? 'Approved' : 'Pending' }}</span>
+                                <span class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">{{ $comment->is_approved ? 'Approved' : 'Pending' }}</span>
                             </button>
                         </form>
                     </td>
-                    <td class="px-6 py-4 text-zinc-500 text-[10px] font-black uppercase italic">{{ $comment->created_at->format('D j M, H:i') }}</td>
+                    <td class="px-6 py-4 text-zinc-500 dark:text-zinc-400 text-[10px] font-black uppercase italic">{{ $comment->created_at->format('D j M, H:i') }}</td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2">
                             <form action="{{ route('admin.comments.destroy', $comment->id) }}" method="POST" onsubmit="return confirm('Delete this comment?')">
