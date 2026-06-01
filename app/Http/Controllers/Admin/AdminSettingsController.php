@@ -35,6 +35,9 @@ class AdminSettingsController extends Controller
             'cloudinary_cloud_name' => '',
             'cloudinary_api_key' => '',
             'cloudinary_api_secret' => '',
+            'termii_api_key' => '',
+            'termii_sender_id' => '',
+            'termii_channel' => 'dnd',
         ];
 
         foreach ($defaults as $key => $value) {

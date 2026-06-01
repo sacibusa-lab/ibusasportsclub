@@ -202,6 +202,53 @@
         </div>
     </div>
 
+    <!-- Termii SMS Settings -->
+    <div class="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-sm border border-zinc-100 dark:border-zinc-800">
+        <h3 class="text-xs font-black text-primary dark:text-white uppercase tracking-widest mb-8 border-b border-zinc-50 pb-4 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            SMS Gateway (Termii)
+        </h3>
+        <div class="space-y-6">
+            @php
+                $isTermiiEnabled = !empty($settings['termii_api_key']) && 
+                                   !empty($settings['termii_sender_id']) && 
+                                   !empty($settings['termii_channel']);
+            @endphp
+            
+            @if($isTermiiEnabled)
+            <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-emerald-700 text-xs font-bold uppercase tracking-widest">Termii is ACTIVE - Registration codes will be sent via SMS</span>
+            </div>
+            @else
+            <div class="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-center gap-3">
+                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span class="text-amber-700 text-xs font-bold uppercase tracking-widest">Termii is INACTIVE - Fill credentials to enable registration SMS alerts</span>
+            </div>
+            @endif
+            
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest px-1">API Key</label>
+                <input type="text" name="termii_api_key" value="{{ $settings['termii_api_key'] ?? '' }}" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl font-mono text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="TLxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest px-1">Sender ID</label>
+                    <input type="text" name="termii_sender_id" value="{{ $settings['termii_sender_id'] ?? '' }}" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl font-bold text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition text-xs" placeholder="e.g. N-ALERT">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest px-1">Channel</label>
+                    <select name="termii_channel" class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl font-bold text-primary dark:text-white focus:ring-2 focus:ring-primary outline-none transition text-xs">
+                        <option value="dnd" {{ ($settings['termii_channel'] ?? 'dnd') === 'dnd' ? 'selected' : '' }}>DND (Direct Route)</option>
+                        <option value="generic" {{ ($settings['termii_channel'] ?? 'dnd') === 'generic' ? 'selected' : '' }}>Generic (Regular Route)</option>
+                        <option value="whatsapp" {{ ($settings['termii_channel'] ?? 'dnd') === 'whatsapp' ? 'selected' : '' }}>WhatsApp</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
         <div class="flex items-center justify-end gap-4 pt-4 pb-1">
             <button type="submit" class="bg-primary text-secondary font-black px-12 py-5 rounded-2xl hover:bg-primary-light transition uppercase tracking-widest text-xs shadow-xl flex items-center gap-3">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>

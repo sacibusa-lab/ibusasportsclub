@@ -21,7 +21,8 @@ class PublicRegistrationController extends Controller
      */
     protected function getPaystackSecretKey()
     {
-        return env('PAYSTACK_SECRET_KEY');
+        $dbKey = Setting::where('key', 'paystack_secret_key')->value('value');
+        return !empty($dbKey) ? $dbKey : env('PAYSTACK_SECRET_KEY');
     }
 
     /**
@@ -29,7 +30,8 @@ class PublicRegistrationController extends Controller
      */
     protected function getPaystackPublicKey()
     {
-        return env('PAYSTACK_PUBLIC_KEY');
+        $dbKey = Setting::where('key', 'paystack_public_key')->value('value');
+        return !empty($dbKey) ? $dbKey : env('PAYSTACK_PUBLIC_KEY');
     }
 
     /**
@@ -83,11 +85,10 @@ class PublicRegistrationController extends Controller
         $request->validate([
             'competition_id' => 'required|exists:competitions,id',
             'team_name' => 'required|string|max:100',
+            'president_name' => 'required|string|max:100',
             'contact_name' => 'required|string|max:100',
             'contact_email' => 'required|email|max:100',
             'contact_phone' => 'required|string|max:20',
-            'coach_name' => 'nullable|string|max:100',
-            'squad_size_est' => 'required|integer|min:11|max:30',
         ]);
 
         $fee = floatval($settings['registration_phase1_fee'] ?? 5000);
@@ -105,20 +106,22 @@ class PublicRegistrationController extends Controller
             'phase1_payment_status' => 'pending',
             'phase1_payment_ref' => $reference,
             'phase1_data' => [
-                'coach_name' => $request->coach_name,
-                'squad_size_est' => $request->squad_size_est,
+                'president_name' => $request->president_name,
                 'submitted_at' => now()->toDateTimeString(),
             ]
         ]);
 
         if ($fee <= 0) {
             // Free phase 1 registration
+            $code = 'REG-' . Str::upper(Str::random(8));
             $registration->update([
                 'phase1_payment_status' => 'paid',
                 'phase1_paid_at' => now(),
                 'status' => 'phase1_paid',
-                'registration_code' => 'REG-' . Str::upper(Str::random(8))
+                'registration_code' => $code
             ]);
+
+            $this->sendRegistrationSms($registration, $code);
 
             return redirect()->route('registration.callback', ['reference' => $reference]);
         }
@@ -378,12 +381,15 @@ class PublicRegistrationController extends Controller
         // Process successful payment
         if ($isPhase1) {
             if ($registration->phase1_payment_status !== 'paid') {
+                $code = 'REG-' . Str::upper(Str::random(8));
                 $registration->update([
                     'phase1_payment_status' => 'paid',
                     'phase1_paid_at' => now(),
                     'status' => 'phase1_paid',
-                    'registration_code' => 'REG-' . Str::upper(Str::random(8))
+                    'registration_code' => $code
                 ]);
+
+                $this->sendRegistrationSms($registration, $code);
             }
 
             return view('registration::success', [
@@ -503,5 +509,61 @@ class PublicRegistrationController extends Controller
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Send SMS containing registration code to representative via Termii API
+     */
+    protected function sendRegistrationSms(CompetitionRegistration $registration, string $code)
+    {
+        $apiKey = Setting::where('key', 'termii_api_key')->value('value');
+        $senderId = Setting::where('key', 'termii_sender_id')->value('value');
+        $channel = Setting::where('key', 'termii_channel')->value('value') ?: 'dnd';
+
+        if (empty($apiKey) || empty($senderId)) {
+            Log::info("Termii SMS skipped: API key or Sender ID not configured.");
+            return false;
+        }
+
+        $phone = $this->formatPhoneNumber($registration->contact_phone);
+        $siteName = Setting::where('key', 'site_name')->value('value') ?: 'LC Tournament';
+        $message = "Your participation reservation is successful for {$registration->team_name} in {$siteName}. Your Phase 2 registration code is: {$code}";
+
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post('https://api.ng.termii.com/api/sms/send', [
+                'api_key' => $apiKey,
+                'to' => $phone,
+                'from' => $senderId,
+                'sms' => $message,
+                'type' => 'plain',
+                'channel' => $channel,
+            ]);
+
+            $result = $response->json();
+            Log::info('Termii SMS API response', ['response' => $result]);
+
+            return $response->successful() && isset($result['code']) && $result['code'] === 'ok';
+        } catch (\Exception $e) {
+            Log::error('Termii SMS API connection error', ['error' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * Format phone number to international standard for Termii (e.g. 23480...)
+     */
+    protected function formatPhoneNumber($phone)
+    {
+        // Remove all non-digit characters
+        $digits = preg_replace('/\D/', '', $phone);
+
+        // If it starts with 0 and is 11 digits (typical Nigerian format), prefix with 234
+        if (str_starts_with($digits, '0') && strlen($digits) === 11) {
+            $digits = '234' . substr($digits, 1);
+        }
+
+        return $digits;
     }
 }

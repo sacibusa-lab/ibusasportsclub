@@ -56,6 +56,27 @@
                 </div>
             </div>
 
+            <!-- Paystack API Credentials -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-zinc-100 dark:border-zinc-800 pt-6">
+                <div>
+                    <label for="paystack_public_key" class="block text-xs font-black uppercase text-zinc-400 mb-2">Paystack Public Key</label>
+                    <input type="text" name="paystack_public_key" id="paystack_public_key" value="{{ old('paystack_public_key', $settings['paystack_public_key'] ?? '') }}" placeholder="e.g. pk_test_xxxxxx" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3.5 text-xs font-bold text-primary dark:text-white focus:border-secondary outline-none transition">
+                    <span class="text-[9px] text-zinc-400 font-semibold mt-1 block">Leave empty or set to placeholder to run in simulation mode.</span>
+                    @error('paystack_public_key')
+                    <span class="text-rose-500 text-xs mt-1 block font-bold">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="paystack_secret_key" class="block text-xs font-black uppercase text-zinc-400 mb-2">Paystack Secret Key</label>
+                    <input type="text" name="paystack_secret_key" id="paystack_secret_key" value="{{ old('paystack_secret_key', $settings['paystack_secret_key'] ?? '') }}" placeholder="e.g. sk_test_xxxxxx" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-3.5 text-xs font-bold text-primary dark:text-white focus:border-secondary outline-none transition">
+                    <span class="text-[9px] text-zinc-400 font-semibold mt-1 block">Secret token used for server-side verification.</span>
+                    @error('paystack_secret_key')
+                    <span class="text-rose-500 text-xs mt-1 block font-bold">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
             <!-- Active States Toggles -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-zinc-100 dark:border-zinc-800 pt-6">
                 <div>

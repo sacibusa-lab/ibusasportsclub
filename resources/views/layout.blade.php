@@ -136,17 +136,55 @@
                 <nav class="hidden md:flex items-center gap-4 lg:gap-8 text-[14px] lg:text-[15px] font-bold text-primary">
                     <a href="{{ route('home') }}" class="hover:text-secondary transition {{ request()->routeIs('home') ? 'text-secondary' : '' }}">Home</a>
                     <a href="{{ route('fixtures') }}" class="hover:text-secondary transition {{ request()->routeIs('fixtures') ? 'text-secondary' : '' }}">Matches</a>
-                    <a href="{{ route('results') }}" class="hover:text-secondary transition {{ request()->routeIs('results') ? 'text-secondary' : '' }}">Results</a>
+                    
+                    <!-- Results Dropdown -->
+                    <div class="relative group" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                        <button type="button" class="flex items-center gap-1 hover:text-secondary transition font-bold py-2 outline-none {{ request()->routeIs('results', 'knockout') ? 'text-secondary' : '' }}">
+                            Results
+                            <svg class="w-4 h-4 transition duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-150" 
+                             x-transition:enter-start="opacity-0 translate-y-1" 
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100" 
+                             x-transition:leave-start="opacity-100 translate-y-0" 
+                             x-transition:leave-end="opacity-0 translate-y-1" 
+                             class="absolute left-0 mt-0 w-44 bg-white rounded-2xl shadow-xl border border-zinc-100 py-2 z-50"
+                             x-cloak>
+                            <a href="{{ route('results') }}" class="block px-4 py-2 text-[13px] font-bold text-primary hover:bg-zinc-50 hover:text-secondary transition {{ request()->routeIs('results') ? 'bg-zinc-50 text-secondary' : '' }}">Match Results</a>
+                            <a href="{{ route('knockout') }}" class="block px-4 py-2 text-[13px] font-bold text-primary hover:bg-zinc-50 hover:text-secondary transition {{ request()->routeIs('knockout') ? 'bg-zinc-50 text-secondary' : '' }}">Knockout Stage</a>
+                        </div>
+                    </div>
+
                     <a href="{{ route('table') }}" class="hover:text-secondary transition {{ request()->routeIs('table') ? 'text-secondary' : '' }}">Table</a>
                     <a href="{{ route('livestream') }}" class="flex items-center gap-1.5 hover:text-rose-500 transition {{ request()->routeIs('livestream') ? 'text-rose-500' : '' }}">
                         <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
                         Live
                     </a>
-                    <a href="{{ route('knockout') }}" class="hover:text-secondary transition {{ request()->routeIs('knockout') ? 'text-secondary' : '' }}">Knockout</a>
                     <a href="{{ route('stats') }}" class="hover:text-secondary transition {{ request()->routeIs('stats') ? 'text-secondary' : '' }}">Stats</a>
-                    <a href="{{ route('gallery') }}" class="hover:text-secondary transition {{ request()->routeIs('gallery') ? 'text-secondary' : '' }}">Gallery</a>
                     <a href="{{ route('predictor.index') }}" class="hover:text-secondary transition {{ request()->routeIs('predictor.index') ? 'text-secondary' : '' }}">Predictor</a>
-                    <a href="{{ route('news.index') }}" class="hover:text-secondary transition {{ request()->routeIs('news.index') ? 'text-secondary' : '' }}">News</a>
+                    
+                    <!-- News Dropdown -->
+                    <div class="relative group" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false">
+                        <button type="button" class="flex items-center gap-1 hover:text-secondary transition font-bold py-2 outline-none {{ request()->routeIs('news.index', 'news.show', 'gallery') ? 'text-secondary' : '' }}">
+                            News
+                            <svg class="w-4 h-4 transition duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" 
+                             x-transition:enter="transition ease-out duration-150" 
+                             x-transition:enter-start="opacity-0 translate-y-1" 
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100" 
+                             x-transition:leave-start="opacity-100 translate-y-0" 
+                             x-transition:leave-end="opacity-0 translate-y-1" 
+                             class="absolute left-0 mt-0 w-44 bg-white rounded-2xl shadow-xl border border-zinc-100 py-2 z-50"
+                             x-cloak>
+                            <a href="{{ route('news.index') }}" class="block px-4 py-2 text-[13px] font-bold text-primary hover:bg-zinc-50 hover:text-secondary transition {{ request()->routeIs('news.index', 'news.show') ? 'bg-zinc-50 text-secondary' : '' }}">Latest News</a>
+                            <a href="{{ route('gallery') }}" class="block px-4 py-2 text-[13px] font-bold text-primary hover:bg-zinc-50 hover:text-secondary transition {{ request()->routeIs('gallery') ? 'bg-zinc-50 text-secondary' : '' }}">Photo Gallery</a>
+                        </div>
+                    </div>
+
                     <a href="{{ route('teams') }}" class="hover:text-secondary transition {{ request()->routeIs('teams') ? 'text-secondary' : '' }}">Teams</a>
                     <a href="{{ route('registration.instructions') }}" class="hover:text-secondary transition {{ request()->routeIs('registration.*') ? 'text-secondary' : '' }}">Register</a>
                 </nav>
@@ -194,17 +232,39 @@
         <nav class="flex flex-col p-4 gap-2 text-sm font-bold text-primary">
             <a href="{{ route('home') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('home') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Home</a>
             <a href="{{ route('fixtures') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('fixtures') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Matches</a>
-            <a href="{{ route('results') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('results') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Results</a>
+            
+            <!-- Results Accordion -->
+            <div x-data="{ open: {{ request()->routeIs('results', 'knockout') ? 'true' : 'false' }} }">
+                <button type="button" @click="open = !open" class="w-full flex items-center justify-between p-3 hover:bg-zinc-50 rounded-xl transition font-bold text-left {{ request()->routeIs('results', 'knockout') ? 'bg-zinc-50 text-secondary' : '' }}">
+                    <span>Results</span>
+                    <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="open" class="pl-4 py-1 space-y-1" x-cloak>
+                    <a href="{{ route('results') }}" class="block p-2 text-xs hover:bg-zinc-50 rounded-lg transition {{ request()->routeIs('results') ? 'text-secondary font-black' : '' }}">Match Results</a>
+                    <a href="{{ route('knockout') }}" class="block p-2 text-xs hover:bg-zinc-50 rounded-lg transition {{ request()->routeIs('knockout') ? 'text-secondary font-black' : '' }}">Knockout Stage</a>
+                </div>
+            </div>
+
             <a href="{{ route('table') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('table') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Table</a>
             <a href="{{ route('livestream') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition flex items-center gap-2 {{ request()->routeIs('livestream') ? 'bg-zinc-50 text-rose-500 border-l-4 border-rose-500 pl-2' : '' }}">
                 <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
                 Live Stream
             </a>
-            <a href="{{ route('knockout') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('knockout') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Knockout</a>
             <a href="{{ route('stats') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('stats') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Stats</a>
-            <a href="{{ route('gallery') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('gallery') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Gallery</a>
             <a href="{{ route('predictor.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('predictor.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Predictor League</a>
-            <a href="{{ route('news.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('news.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">News</a>
+            
+            <!-- News Accordion -->
+            <div x-data="{ open: {{ request()->routeIs('news.index', 'news.show', 'gallery') ? 'true' : 'false' }} }">
+                <button type="button" @click="open = !open" class="w-full flex items-center justify-between p-3 hover:bg-zinc-50 rounded-xl transition font-bold text-left {{ request()->routeIs('news.index', 'news.show', 'gallery') ? 'bg-zinc-50 text-secondary' : '' }}">
+                    <span>News</span>
+                    <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="open" class="pl-4 py-1 space-y-1" x-cloak>
+                    <a href="{{ route('news.index') }}" class="block p-2 text-xs hover:bg-zinc-50 rounded-lg transition {{ request()->routeIs('news.index', 'news.show') ? 'text-secondary font-black' : '' }}">Latest News</a>
+                    <a href="{{ route('gallery') }}" class="block p-2 text-xs hover:bg-zinc-50 rounded-lg transition {{ request()->routeIs('gallery') ? 'text-secondary font-black' : '' }}">Photo Gallery</a>
+                </div>
+            </div>
+
             <a href="{{ route('teams') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('teams') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Teams</a>
             <a href="{{ route('registration.instructions') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('registration.*') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Register</a>
             <hr class="my-2 border-zinc-100">

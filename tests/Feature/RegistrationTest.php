@@ -62,17 +62,16 @@ class RegistrationTest extends TestCase
         $response = $this->post(route('registration.phase1.submit'), [
             'competition_id' => $competition->id,
             'team_name' => 'Test FC',
-            'contact_name' => 'Coach Smith',
+            'president_name' => 'President Doe',
+            'contact_name' => 'Representative Smith',
             'contact_email' => 'smith@test.com',
             'contact_phone' => '08012345678',
-            'coach_name' => 'Stephen Keshi',
-            'squad_size_est' => 22
         ]);
 
         // Assert record exists in the DB
         $this->assertDatabaseHas('competition_registrations', [
             'team_name' => 'Test FC',
-            'contact_name' => 'Coach Smith',
+            'contact_name' => 'Representative Smith',
             'contact_email' => 'smith@test.com',
             'status' => 'initiated'
         ]);
@@ -236,5 +235,59 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertCount(11, $team->players);
+    }
+
+    /**
+     * Test payment callback triggers Termii SMS when configured.
+     */
+    public function test_phase1_payment_callback_sends_sms_via_termii_when_configured()
+    {
+        // Mock Http facade
+        \Illuminate\Support\Facades\Http::fake([
+            'https://api.ng.termii.com/api/sms/send' => \Illuminate\Support\Facades\Http::response([
+                'code' => 'ok',
+                'message_id' => '1234567890',
+                'status' => 'success'
+            ], 200)
+        ]);
+
+        // Configure Termii settings
+        \App\Models\Setting::updateOrCreate(['key' => 'termii_api_key'], ['value' => 'test-api-key']);
+        \App\Models\Setting::updateOrCreate(['key' => 'termii_sender_id'], ['value' => 'TEST-ID']);
+        \App\Models\Setting::updateOrCreate(['key' => 'termii_channel'], ['value' => 'generic']);
+
+        $competition = Competition::create([
+            'name' => 'Main Competition',
+            'slug' => 'main-competition',
+            'type' => 'league',
+            'is_active' => true
+        ]);
+
+        $registration = CompetitionRegistration::create([
+            'competition_id' => $competition->id,
+            'team_name' => 'Test FC',
+            'contact_name' => 'Representative Smith',
+            'contact_email' => 'smith@test.com',
+            'contact_phone' => '08012345678', // Nigerian number
+            'status' => 'initiated',
+            'phase1_amount' => 5000,
+            'phase1_payment_status' => 'pending',
+            'phase1_payment_ref' => 'REG-P1-SMSREF',
+            'phase1_data' => []
+        ]);
+
+        $response = $this->get(route('registration.callback', ['reference' => 'REG-P1-SMSREF']));
+
+        $response->assertStatus(200);
+
+        // Assert Termii API was called with correct payload
+        \Illuminate\Support\Facades\Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.ng.termii.com/api/sms/send' &&
+                $request['api_key'] === 'test-api-key' &&
+                $request['to'] === '2348012345678' && // formatted number
+                $request['from'] === 'TEST-ID' &&
+                $request['channel'] === 'generic' &&
+                str_contains($request['sms'], 'Phase 2 registration code is:');
+        });
     }
 }

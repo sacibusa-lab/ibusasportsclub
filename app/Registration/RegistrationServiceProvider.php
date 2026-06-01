@@ -39,6 +39,8 @@ class RegistrationServiceProvider extends ServiceProvider
                     'registration_phase2_fee' => '15000',
                     'registration_phase1_active' => '1',
                     'registration_phase2_active' => '1',
+                    'paystack_public_key' => 'pk_test_placeholder_xxxxxx',
+                    'paystack_secret_key' => 'sk_test_placeholder_xxxxxx',
                 ];
 
                 foreach ($defaults as $key => $value) {

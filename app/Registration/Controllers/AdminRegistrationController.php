@@ -66,6 +66,8 @@ class AdminRegistrationController extends Controller
             'registration_phase2_fee' => 'required|numeric|min:0',
             'registration_phase1_active' => 'required|boolean',
             'registration_phase2_active' => 'required|boolean',
+            'paystack_public_key' => 'nullable|string',
+            'paystack_secret_key' => 'nullable|string',
         ]);
 
         $keys = [
@@ -73,13 +75,15 @@ class AdminRegistrationController extends Controller
             'registration_phase1_fee',
             'registration_phase2_fee',
             'registration_phase1_active',
-            'registration_phase2_active'
+            'registration_phase2_active',
+            'paystack_public_key',
+            'paystack_secret_key'
         ];
 
         foreach ($keys as $key) {
             Setting::updateOrCreate(
                 ['key' => $key],
-                ['value' => $request->get($key)]
+                ['value' => $request->get($key, '')]
             );
         }
 

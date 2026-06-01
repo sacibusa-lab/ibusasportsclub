@@ -73,16 +73,10 @@
                         <span>Paid At:</span>
                         <span class="text-primary dark:text-zinc-300">{{ $registration->phase1_paid_at ? $registration->phase1_paid_at->format('M d, Y h:i A') : 'N/A' }}</span>
                     </div>
-                    @if(isset($registration->phase1_data['coach_name']))
+                    @if(isset($registration->phase1_data['president_name']))
                     <div class="flex justify-between border-t border-zinc-100 dark:border-zinc-800 pt-2 mt-2">
-                        <span>Coach Name:</span>
-                        <span class="text-primary dark:text-zinc-300">{{ $registration->phase1_data['coach_name'] }}</span>
-                    </div>
-                    @endif
-                    @if(isset($registration->phase1_data['squad_size_est']))
-                    <div class="flex justify-between">
-                        <span>Est. Squad Size:</span>
-                        <span class="text-primary dark:text-zinc-300">{{ $registration->phase1_data['squad_size_est'] }} Players</span>
+                        <span>Set President:</span>
+                        <span class="text-primary dark:text-zinc-300 font-bold">{{ $registration->phase1_data['president_name'] }}</span>
                     </div>
                     @endif
                 </div>
