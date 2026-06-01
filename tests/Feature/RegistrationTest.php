@@ -311,6 +311,67 @@ class RegistrationTest extends TestCase
     }
 
     /**
+     * Test Phase 2 validation failure retains roster inputs in JavaScript.
+     */
+    public function test_phase2_validation_failure_retains_roster_inputs()
+    {
+        Storage::fake('public');
+
+        $competition = Competition::create([
+            'name' => 'Main Competition',
+            'slug' => 'main-competition',
+            'type' => 'league',
+            'is_active' => true
+        ]);
+        
+        $registration = CompetitionRegistration::create([
+            'competition_id' => $competition->id,
+            'team_name' => 'Raptors FC',
+            'contact_name' => 'Manager Ken',
+            'contact_email' => 'ken@raptors.com',
+            'contact_phone' => '08087654321',
+            'status' => 'phase1_paid',
+            'registration_code' => 'REG-RAPTORS',
+            'phase1_payment_status' => 'paid',
+            'phase1_payment_ref' => 'REG-P1-REF',
+            'phase1_data' => []
+        ]);
+
+        // Submit invalid roster list (less than 11 players)
+        $players = [
+            [
+                'name' => "Player 1",
+                'shirt_number' => 1,
+                'position' => 'Goalkeeper',
+                'dob' => '2000-01-01',
+                'id_card' => UploadedFile::fake()->create("player_1_id.pdf", 100)
+            ]
+        ];
+
+        $response = $this->post(route('registration.phase2.submit', ['code' => 'REG-RAPTORS']), [
+            'contact_name' => 'Manager Ken',
+            'contact_phone' => '08087654321',
+            'contact_email' => 'ken@raptors.com',
+            'coach_name' => 'Coach Keshi',
+            'coach_phone' => '08011112222',
+            'coach_email' => 'keshi@raptors.com',
+            'alumni_letter' => UploadedFile::fake()->create('letter.pdf', 100),
+            'primary_color' => '#123456',
+            'jersey_home' => 'Green stripes',
+            'jersey_away' => 'White stripes',
+            'players' => $players
+        ]);
+
+        $response->assertStatus(302); // Redirects back due to validation failure
+        
+        $formResponse = $this->get(route('registration.phase2.form', ['code' => 'REG-RAPTORS']));
+        $formResponse->assertStatus(200);
+        
+        $html = $formResponse->getContent();
+        $this->assertStringContainsString('players: [{"name":"Player 1"', $html);
+    }
+
+    /**
      * Test payment callback triggers Termii SMS when configured.
      */
     public function test_phase1_payment_callback_sends_sms_via_termii_when_configured()
