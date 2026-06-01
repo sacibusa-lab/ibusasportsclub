@@ -27,7 +27,11 @@ class CompetitionRegistration extends Model
         'phase2_payment_status',
         'phase2_payment_ref',
         'phase2_paid_at',
-        'phase2_data'
+        'phase2_data',
+        'phase2_balance_amount',
+        'phase2_balance_status',
+        'phase2_balance_ref',
+        'phase2_balance_paid_at'
     ];
 
     protected $casts = [
@@ -35,8 +39,10 @@ class CompetitionRegistration extends Model
         'phase2_data' => 'array',
         'phase1_paid_at' => 'datetime',
         'phase2_paid_at' => 'datetime',
+        'phase2_balance_paid_at' => 'datetime',
         'phase1_amount' => 'decimal:2',
         'phase2_amount' => 'decimal:2',
+        'phase2_balance_amount' => 'decimal:2',
     ];
 
     /**

@@ -46,8 +46,8 @@
                 <span class="text-primary font-bold">{{ count($registration->phase2_data['players'] ?? []) }} Players</span>
             </div>
             <div class="flex justify-between border-b border-zinc-200/50 pb-2">
-                <span>Jersey Home:</span>
-                <span class="text-primary font-bold">{{ $registration->phase2_data['jersey_home'] ?? 'N/A' }}</span>
+                <span>Payment Status:</span>
+                <span class="text-emerald-600 font-bold uppercase">{{ $registration->status === 'completed' ? '100% Fully Paid' : '60% Deposit Paid' }}</span>
             </div>
             <div class="flex justify-between">
                 <span>Contact Name:</span>
@@ -56,7 +56,10 @@
         </div>
 
         <div class="space-y-4">
-            <a href="{{ route('home') }}" class="block w-full bg-primary text-white font-black py-4 rounded-xl hover:bg-zinc-950 transition duration-300 text-xs uppercase tracking-widest shadow-lg shadow-primary/10">
+            <a href="{{ route('registration.dashboard', ['code' => $registration->registration_code]) }}" class="block w-full bg-primary text-white font-black py-4 rounded-xl hover:bg-zinc-950 transition duration-300 text-xs uppercase tracking-widest shadow-lg shadow-primary/10">
+                Go to Team Dashboard
+            </a>
+            <a href="{{ route('home') }}" class="block w-full bg-zinc-50 border border-zinc-200 text-zinc-500 hover:text-primary hover:bg-zinc-100 font-bold py-4 rounded-xl transition text-xs uppercase tracking-widest">
                 Go to Tournament Homepage
             </a>
         </div>
@@ -66,7 +69,7 @@
 
         <div class="flex justify-center items-center gap-2 text-zinc-400 text-[10px] font-bold uppercase">
             <span>Reference:</span>
-            <span class="font-mono text-zinc-500">{{ $registration->phase1_payment_ref ?? $registration->phase2_payment_ref }}</span>
+            <span class="font-mono text-zinc-500">{{ $registration->phase2_balance_ref ?? $registration->phase2_payment_ref ?? $registration->phase1_payment_ref }}</span>
         </div>
     </div>
 </div>

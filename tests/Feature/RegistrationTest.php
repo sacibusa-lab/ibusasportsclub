@@ -9,6 +9,8 @@ use App\Models\Team;
 use App\Models\Player;
 use App\Models\CompetitionTeam;
 use App\Registration\Models\CompetitionRegistration;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class RegistrationTest extends TestCase
 {
@@ -155,6 +157,8 @@ class RegistrationTest extends TestCase
      */
     public function test_phase2_submission_and_payment_auto_creates_team_and_players()
     {
+        Storage::fake('public');
+
         $competition = Competition::create([
             'name' => 'Main Competition',
             'slug' => 'main-competition',
@@ -182,11 +186,19 @@ class RegistrationTest extends TestCase
                 'name' => "Player $i",
                 'shirt_number' => $i,
                 'position' => $i === 1 ? 'Goalkeeper' : 'Defender',
-                'dob' => '2000-01-01'
+                'dob' => '2000-01-01',
+                'id_card' => UploadedFile::fake()->create("player_{$i}_id.pdf", 100)
             ];
         }
 
         $response = $this->post(route('registration.phase2.submit', ['code' => 'REG-RAPTORS']), [
+            'contact_name' => 'Manager Ken',
+            'contact_phone' => '08087654321',
+            'contact_email' => 'ken@raptors.com',
+            'coach_name' => 'Coach Keshi',
+            'coach_phone' => '08011112222',
+            'coach_email' => 'keshi@raptors.com',
+            'alumni_letter' => UploadedFile::fake()->create('letter.pdf', 100),
             'primary_color' => '#123456',
             'jersey_home' => 'Green stripes',
             'jersey_away' => 'White stripes',
@@ -199,10 +211,14 @@ class RegistrationTest extends TestCase
         $registration->refresh();
         $this->assertNotNull($registration->phase2_payment_ref);
 
-        // Run the callback to simulate successful payment confirmation
+        // Run the callback to simulate successful payment confirmation (60% deposit)
         $callbackResponse = $this->get(route('registration.callback', ['reference' => $registration->phase2_payment_ref]));
         $callbackResponse->assertStatus(200);
-        $callbackResponse->assertSee('Full tournament registration is complete');
+        $callbackResponse->assertSee('roster is now locked');
+
+        // Check if status is partially_paid
+        $registration->refresh();
+        $this->assertEquals('partially_paid', $registration->status);
 
         // Check if Team and players are synced into the main database!
         $this->assertDatabaseHas('teams', [
@@ -235,6 +251,63 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertCount(11, $team->players);
+    }
+
+    /**
+     * Test Phase 2 balance payment transitions status to completed.
+     */
+    public function test_phase2_balance_payment_transitions_status_to_completed()
+    {
+        Storage::fake('public');
+
+        $competition = Competition::create([
+            'name' => 'Main Competition',
+            'slug' => 'main-competition',
+            'type' => 'league',
+            'is_active' => true
+        ]);
+        
+        $registration = CompetitionRegistration::create([
+            'competition_id' => $competition->id,
+            'team_name' => 'Raptors FC',
+            'contact_name' => 'Manager Ken',
+            'contact_email' => 'ken@raptors.com',
+            'contact_phone' => '08087654321',
+            'status' => 'partially_paid',
+            'registration_code' => 'REG-RAPTORS',
+            'phase1_payment_status' => 'paid',
+            'phase1_payment_ref' => 'REG-P1-REF',
+            'phase2_payment_status' => 'paid',
+            'phase2_payment_ref' => 'REG-P2-REF',
+            'phase1_data' => [],
+            'phase2_data' => [
+                'primary_color' => '#123456',
+                'jersey_home' => 'Green stripes',
+                'jersey_away' => 'White stripes',
+                'coach_name' => 'Coach Keshi',
+                'coach_phone' => '08011112222',
+                'coach_email' => 'keshi@raptors.com',
+                'players' => []
+            ]
+        ]);
+
+        // Submit payment for remaining 40% balance
+        $response = $this->post(route('registration.pay_balance', ['code' => 'REG-RAPTORS']));
+        $response->assertStatus(200);
+        $response->assertSee('Paystack Checkout (Simulation Mode)');
+
+        $registration->refresh();
+        $this->assertNotNull($registration->phase2_balance_ref);
+
+        // Run the callback to simulate successful balance payment confirmation
+        $callbackResponse = $this->get(route('registration.callback', ['reference' => $registration->phase2_balance_ref]));
+        $callbackResponse->assertStatus(200);
+        $callbackResponse->assertSee('balance has been fully paid');
+
+        $registration->refresh();
+        $this->assertEquals('completed', $registration->status);
+        $this->assertEquals('paid', $registration->phase2_balance_status);
+        $this->assertNotNull($registration->phase2_balance_paid_at);
     }
 
     /**

@@ -18,6 +18,10 @@ Route::prefix('tournament/registration')->name('registration.')->middleware(['we
     Route::get('/phase-2/{code}', [PublicRegistrationController::class, 'showPhase2'])->name('phase2.form');
     Route::post('/phase-2/{code}', [PublicRegistrationController::class, 'submitPhase2'])->name('phase2.submit');
     
+    // Registration Dashboard & Balance Payment
+    Route::get('/dashboard/{code}', [PublicRegistrationController::class, 'showDashboard'])->name('dashboard');
+    Route::post('/pay-balance/{code}', [PublicRegistrationController::class, 'payBalance'])->name('pay_balance');
+    
     // Paystack Callback
     Route::get('/callback', [PublicRegistrationController::class, 'paymentCallback'])->name('callback');
 });

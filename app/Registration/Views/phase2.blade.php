@@ -42,8 +42,73 @@
                 </div>
             </div>
 
-            <form action="{{ route('registration.phase2.submit', $registration->registration_code) }}" method="POST" class="space-y-8">
+            <form action="{{ route('registration.phase2.submit', $registration->registration_code) }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                 @csrf
+
+                <!-- Team Manager & Coach Section -->
+                <div>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4">Manager & Coach Information</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-50 rounded-2xl p-6 border border-zinc-100 mb-6">
+                        <!-- Manager Info (Pre-filled from Phase 1 Contact) -->
+                        <div class="space-y-4">
+                            <h4 class="text-[10px] font-black uppercase text-primary tracking-wider border-b border-zinc-200 pb-1">Team Manager (Representative)</h4>
+                            <div>
+                                <label for="contact_name" class="block text-[9px] font-black uppercase text-zinc-400 mb-1">Manager Name *</label>
+                                <input type="text" name="contact_name" id="contact_name" value="{{ old('contact_name', $registration->contact_name) }}" required class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-secondary outline-none transition">
+                                @error('contact_name')
+                                <span class="text-rose-500 text-[10px] mt-1 block font-bold">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label for="contact_phone" class="block text-[9px] font-black uppercase text-zinc-400 mb-1">Phone *</label>
+                                    <input type="text" name="contact_phone" id="contact_phone" value="{{ old('contact_phone', $registration->contact_phone) }}" required class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-secondary outline-none transition">
+                                </div>
+                                <div>
+                                    <label for="contact_email" class="block text-[9px] font-black uppercase text-zinc-400 mb-1">Email *</label>
+                                    <input type="email" name="contact_email" id="contact_email" value="{{ old('contact_email', $registration->contact_email) }}" required class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-secondary outline-none transition">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coach Info -->
+                        <div class="space-y-4">
+                            <h4 class="text-[10px] font-black uppercase text-primary tracking-wider border-b border-zinc-200 pb-1">Head Coach Details</h4>
+                            <div>
+                                <label for="coach_name" class="block text-[9px] font-black uppercase text-zinc-400 mb-1">Coach Name *</label>
+                                <input type="text" name="coach_name" id="coach_name" value="{{ old('coach_name') }}" required placeholder="e.g. Stephen Keshi" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-secondary outline-none transition">
+                                @error('coach_name')
+                                <span class="text-rose-500 text-[10px] mt-1 block font-bold">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label for="coach_phone" class="block text-[9px] font-black uppercase text-zinc-400 mb-1">Phone *</label>
+                                    <input type="text" name="coach_phone" id="coach_phone" value="{{ old('coach_phone') }}" required placeholder="e.g. +234..." class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-secondary outline-none transition">
+                                </div>
+                                <div>
+                                    <label for="coach_email" class="block text-[9px] font-black uppercase text-zinc-400 mb-1">Email *</label>
+                                    <input type="email" name="coach_email" id="coach_email" value="{{ old('coach_email') }}" required placeholder="e.g. coach@alumni.com" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-secondary outline-none transition">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alumni Verification Letter Section -->
+                <div>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4">Official Verification</h3>
+                    
+                    <div class="bg-zinc-50 rounded-2xl p-6 border border-zinc-100 mb-6">
+                        <label for="alumni_letter" class="block text-[10px] font-black uppercase text-zinc-400 mb-2">Upload Official Alumni Verification Letter *</label>
+                        <input type="file" name="alumni_letter" id="alumni_letter" required accept="image/*,application/pdf" class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-secondary outline-none transition">
+                        <span class="text-[9px] text-zinc-400 font-semibold mt-1 block">Upload a PDF or Image (max 5MB). This must be signed by your class/set representative.</span>
+                        @error('alumni_letter')
+                        <span class="text-rose-500 text-[10px] mt-1 block font-bold">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
 
                 <!-- Colors & Uniform Section -->
                 <div>
@@ -130,6 +195,12 @@
                                     <input type="date" :name="`players[${index}][dob]`" x-model="player.dob" required class="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2 text-xs font-bold text-primary focus:border-secondary outline-none transition">
                                 </div>
 
+                                <!-- Identification -->
+                                <div class="w-full md:w-44">
+                                    <label class="block text-[9px] font-black uppercase text-zinc-400 mb-1 md:hidden">ID Document/Photo *</label>
+                                    <input type="file" :name="`players[${index}][id_card]`" required accept="image/*,application/pdf" class="w-full bg-white border border-zinc-200 rounded-lg px-2 py-1.5 text-[10px] font-bold text-primary focus:border-secondary outline-none transition">
+                                </div>
+
                                 <!-- Action -->
                                 <div class="shrink-0">
                                     <button type="button" @click="removePlayer(index)" :disabled="players.length <= 1" class="w-8 h-8 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-600 flex items-center justify-center font-bold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition">
@@ -157,25 +228,29 @@
             <div class="bg-zinc-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
                 <span class="text-[9px] font-black uppercase text-secondary tracking-widest">Order Summary</span>
                 <div class="text-3xl font-black tracking-tight mt-2">
-                    ₦{{ number_format(floatval($settings['registration_phase2_fee'] ?? 15000)) }}
+                    ₦{{ number_format(floatval($settings['registration_phase2_fee'] ?? 15000) * 0.60) }}
                 </div>
                 <p class="text-zinc-400 text-[11px] mt-2 leading-relaxed">
-                    Full tournament registration fee. Roster lock is validated automatically upon payment success.
+                    60% of the Phase 2 fee is due now upon registration. The remaining 40% must be paid before tournament kickoff.
                 </p>
                 <hr class="my-4 border-white/5">
                 <div class="space-y-2 text-xs">
                     <div class="flex justify-between">
-                        <span class="text-zinc-500 font-medium">Tournament Fee</span>
+                        <span class="text-zinc-500 font-medium">Total Phase 2 Fee</span>
                         <span class="font-bold">₦{{ number_format(floatval($settings['registration_phase2_fee'] ?? 15000)) }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-zinc-500 font-medium">Roster Processing</span>
-                        <span class="font-bold">₦0.00</span>
+                    <div class="flex justify-between text-emerald-400 font-bold">
+                        <span>Due Now (60%)</span>
+                        <span>₦{{ number_format(floatval($settings['registration_phase2_fee'] ?? 15000) * 0.60) }}</span>
+                    </div>
+                    <div class="flex justify-between text-zinc-500">
+                        <span>Due Before Kickoff (40%)</span>
+                        <span>₦{{ number_format(floatval($settings['registration_phase2_fee'] ?? 15000) * 0.40) }}</span>
                     </div>
                     <hr class="border-white/5 my-2">
                     <div class="flex justify-between text-sm">
-                        <span class="text-zinc-400 font-bold">Total Due</span>
-                        <span class="text-secondary font-black">₦{{ number_format(floatval($settings['registration_phase2_fee'] ?? 15000)) }}</span>
+                        <span class="text-zinc-400 font-bold">Pay Now</span>
+                        <span class="text-secondary font-black">₦{{ number_format(floatval($settings['registration_phase2_fee'] ?? 15000) * 0.60) }}</span>
                     </div>
                 </div>
             </div>

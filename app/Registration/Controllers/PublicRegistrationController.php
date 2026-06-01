@@ -10,6 +10,7 @@ use App\Models\Team;
 use App\Models\CompetitionTeam;
 use App\Models\Player;
 use App\Models\Setting;
+use App\Services\ImageService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -193,9 +194,8 @@ class PublicRegistrationController extends Controller
             return back()->withInput()->with('error', 'This team has not completed Phase 1 payment yet.');
         }
 
-        if ($reg->status === 'completed') {
-            return redirect()->route('registration.instructions')
-                ->with('success', 'Your registration is already completed! Welcome to the tournament.');
+        if ($reg->status === 'partially_paid' || $reg->status === 'completed') {
+            return redirect()->route('registration.dashboard', ['code' => $reg->registration_code]);
         }
 
         return redirect()->route('registration.phase2.form', ['code' => $reg->registration_code]);
@@ -227,7 +227,7 @@ class PublicRegistrationController extends Controller
     /**
      * Submit Phase 2 and initialize payment
      */
-    public function submitPhase2(Request $request, $code)
+    public function submitPhase2(Request $request, $code, ImageService $imageService)
     {
         $settings = Setting::all()->pluck('value', 'key')->toArray();
         $isActive = ($settings['registration_phase2_active'] ?? '1') === '1';
@@ -245,6 +245,13 @@ class PublicRegistrationController extends Controller
         }
 
         $request->validate([
+            'contact_name' => 'required|string|max:100',
+            'contact_phone' => 'required|string|max:20',
+            'contact_email' => 'required|email|max:100',
+            'coach_name' => 'required|string|max:100',
+            'coach_phone' => 'required|string|max:20',
+            'coach_email' => 'required|email|max:100',
+            'alumni_letter' => 'required|file|mimes:jpeg,png,pdf|max:5120',
             'primary_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'jersey_home' => 'required|string|max:50',
             'jersey_away' => 'required|string|max:50',
@@ -253,30 +260,59 @@ class PublicRegistrationController extends Controller
             'players.*.shirt_number' => 'required|integer|min:1|max:99',
             'players.*.position' => 'required|string|in:Goalkeeper,Defender,Midfielder,Forward',
             'players.*.dob' => 'required|date|before:today',
+            'players.*.id_card' => 'required|file|mimes:jpeg,png,pdf|max:5120',
         ]);
 
-        $fee = floatval($settings['registration_phase2_fee'] ?? 15000);
+        $fullFee = floatval($settings['registration_phase2_fee'] ?? 15000);
+        $depositFee = $fullFee * 0.60;
         $reference = 'REG-P2-' . Str::upper(Str::random(10));
+
+        // Process File Uploads
+        $alumniLetterUrl = $imageService->upload($request->file('alumni_letter'), 'verification');
+
+        $playersData = [];
+        foreach ($request->players as $index => $player) {
+            $idFile = $request->file("players.{$index}.id_card");
+            $idUrl = $imageService->upload($idFile, 'player_ids');
+            
+            $playersData[] = [
+                'name' => $player['name'],
+                'shirt_number' => $player['shirt_number'],
+                'position' => $player['position'],
+                'dob' => $player['dob'],
+                'id_url' => $idUrl
+            ];
+        }
 
         // Save layout parameters and players list inside the record
         $registration->update([
-            'phase2_amount' => $fee,
+            'contact_name' => $request->contact_name,
+            'contact_phone' => $request->contact_phone,
+            'contact_email' => $request->contact_email,
+            'phase2_amount' => $fullFee,
             'phase2_payment_status' => 'pending',
             'phase2_payment_ref' => $reference,
             'phase2_data' => [
                 'primary_color' => $request->primary_color,
                 'jersey_home' => $request->jersey_home,
                 'jersey_away' => $request->jersey_away,
-                'players' => $request->players,
+                'coach_name' => $request->coach_name,
+                'coach_phone' => $request->coach_phone,
+                'coach_email' => $request->coach_email,
+                'alumni_letter_url' => $alumniLetterUrl,
+                'players' => $playersData,
                 'submitted_at' => now()->toDateTimeString(),
             ]
         ]);
 
-        if ($fee <= 0) {
+        if ($fullFee <= 0) {
             // Free phase 2
             $registration->update([
                 'phase2_payment_status' => 'paid',
                 'phase2_paid_at' => now(),
+                'phase2_balance_amount' => 0,
+                'phase2_balance_status' => 'paid',
+                'phase2_balance_paid_at' => now(),
                 'status' => 'completed'
             ]);
 
@@ -286,13 +322,13 @@ class PublicRegistrationController extends Controller
             return redirect()->route('registration.callback', ['reference' => $reference]);
         }
 
-        // Initialize Paystack payment
+        // Initialize Paystack payment for 60% deposit
         if ($this->isSimulationActive()) {
             return view('registration::mock_gateway', [
                 'reference' => $reference,
                 'email' => $registration->contact_email,
-                'amount' => $fee,
-                'purpose' => 'Phase 2 - Full Tournament Registration'
+                'amount' => $depositFee,
+                'purpose' => 'Phase 2 Deposit (60%) - Full Tournament Registration'
             ]);
         }
 
@@ -302,7 +338,7 @@ class PublicRegistrationController extends Controller
                 'Content-Type' => 'application/json',
             ])->post('https://api.paystack.co/transaction/initialize', [
                 'email' => $registration->contact_email,
-                'amount' => intval($fee * 100), // in kobo
+                'amount' => intval($depositFee * 100), // in kobo
                 'callback_url' => route('registration.callback'),
                 'reference' => $reference,
                 'metadata' => [
@@ -339,6 +375,7 @@ class PublicRegistrationController extends Controller
         // Find the registration by reference
         $registration = CompetitionRegistration::where('phase1_payment_ref', $reference)
             ->orWhere('phase2_payment_ref', $reference)
+            ->orWhere('phase2_balance_ref', $reference)
             ->first();
 
         if (!$registration) {
@@ -398,22 +435,40 @@ class PublicRegistrationController extends Controller
                 'message' => 'Your slot has been reserved successfully! Please save the registration code below.'
             ]);
         } else {
-            if ($registration->phase2_payment_status !== 'paid') {
-                $registration->update([
-                    'phase2_payment_status' => 'paid',
-                    'phase2_paid_at' => now(),
-                    'status' => 'completed'
+            if ($registration->phase2_payment_ref === $reference) {
+                // Phase 2 Deposit (60%)
+                if ($registration->phase2_payment_status !== 'paid') {
+                    $registration->update([
+                        'phase2_payment_status' => 'paid',
+                        'phase2_paid_at' => now(),
+                        'status' => 'partially_paid'
+                    ]);
+
+                    // Create resources inside main database automatically
+                    $this->createTeamFromRegistration($registration);
+                }
+
+                return view('registration::success', [
+                    'registration' => $registration,
+                    'phase' => 2,
+                    'message' => 'Congratulations! Your 60% deposit has been paid, and your roster is now locked.'
                 ]);
+            } else {
+                // Phase 2 Balance (40%)
+                if ($registration->phase2_balance_status !== 'paid') {
+                    $registration->update([
+                        'phase2_balance_status' => 'paid',
+                        'phase2_balance_paid_at' => now(),
+                        'status' => 'completed'
+                    ]);
+                }
 
-                // Create resources inside main database automatically
-                $this->createTeamFromRegistration($registration);
+                return view('registration::success', [
+                    'registration' => $registration,
+                    'phase' => 'balance',
+                    'message' => 'Congratulations! The remaining 40% balance has been fully paid. Your team is cleared for the tournament!'
+                ]);
             }
-
-            return view('registration::success', [
-                'registration' => $registration,
-                'phase' => 2,
-                'message' => 'Congratulations! Full tournament registration is complete. Your roster is locked.'
-            ]);
         }
     }
 
@@ -498,7 +553,7 @@ class PublicRegistrationController extends Controller
                         'team_id' => $team->id,
                         'position' => $positionMap[$pData['position']] ?? 'GK',
                         'shirt_number' => $pData['shirt_number'],
-                        'image_url' => null,
+                        'image_url' => $pData['id_url'] ?? null,
                         'full_image_url' => null
                     ]);
                 }
@@ -508,6 +563,90 @@ class PublicRegistrationController extends Controller
                 'registration_id' => $registration->id,
                 'error' => $e->getMessage()
             ]);
+        }
+    }
+
+    /**
+     * Show registered team dashboard
+     */
+    public function showDashboard($code)
+    {
+        $registration = CompetitionRegistration::where('registration_code', $code)->firstOrFail();
+
+        if (!in_array($registration->status, ['partially_paid', 'completed'])) {
+            return redirect()->route('registration.instructions')
+                ->with('error', 'Access denied. Roster not uploaded yet.');
+        }
+
+        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        return view('registration::dashboard', compact('registration', 'settings'));
+    }
+
+    /**
+     * Pay the remaining 40% balance for Phase 2
+     */
+    public function payBalance($code)
+    {
+        $registration = CompetitionRegistration::where('registration_code', $code)->firstOrFail();
+
+        if ($registration->status !== 'partially_paid') {
+            return redirect()->route('registration.dashboard', ['code' => $code])
+                ->with('error', 'Invalid registration status to pay balance.');
+        }
+
+        $settings = Setting::all()->pluck('value', 'key')->toArray();
+        $balanceFee = floatval($settings['registration_phase2_fee'] ?? 15000) * 0.40;
+        $reference = 'REG-BAL-' . Str::upper(Str::random(10));
+
+        $registration->update([
+            'phase2_balance_ref' => $reference,
+        ]);
+
+        if ($balanceFee <= 0) {
+            $registration->update([
+                'phase2_balance_amount' => 0,
+                'phase2_balance_status' => 'paid',
+                'phase2_balance_paid_at' => now(),
+                'status' => 'completed'
+            ]);
+            return redirect()->route('registration.callback', ['reference' => $reference]);
+        }
+
+        if ($this->isSimulationActive()) {
+            return view('registration::mock_gateway', [
+                'reference' => $reference,
+                'email' => $registration->contact_email,
+                'amount' => $balanceFee,
+                'purpose' => 'Remaining 40% Balance - Full Tournament Registration'
+            ]);
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->getPaystackSecretKey(),
+                'Content-Type' => 'application/json',
+            ])->post('https://api.paystack.co/transaction/initialize', [
+                'email' => $registration->contact_email,
+                'amount' => intval($balanceFee * 100), // in kobo
+                'callback_url' => route('registration.callback'),
+                'reference' => $reference,
+                'metadata' => [
+                    'registration_id' => $registration->id,
+                    'phase' => 'balance'
+                ]
+            ]);
+
+            $result = $response->json();
+
+            if ($response->successful() && isset($result['status']) && $result['status'] === true) {
+                return redirect($result['data']['authorization_url']);
+            }
+
+            Log::error('Paystack balance initialization failed', ['response' => $result]);
+            return back()->with('error', 'Paystack payment initialization failed: ' . ($result['message'] ?? 'Unknown error'));
+        } catch (\Exception $e) {
+            Log::error('Paystack connection exception', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Could not connect to payment gateway. Please try again.');
         }
     }
 
