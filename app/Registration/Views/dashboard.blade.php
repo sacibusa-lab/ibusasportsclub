@@ -3,7 +3,7 @@
 @section('title', 'Registration Dashboard | ' . ($siteSettings['site_name'] ?? 'LC'))
 
 @section('content')
-<div class="max-w-6xl mx-auto my-12 px-4">
+<div class="max-w-7xl mx-auto my-12 px-4">
     <!-- Header Hero Banner -->
     <div class="hero-gradient text-white rounded-3xl p-8 md:p-12 shadow-2xl mb-12 relative overflow-hidden">
         <div class="absolute inset-0 bg-black/10"></div>

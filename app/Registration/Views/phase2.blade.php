@@ -3,7 +3,7 @@
 @section('title', 'Phase 2: Roster & Roster Lock | ' . ($siteSettings['site_name'] ?? 'LC'))
 
 @section('content')
-<div class="max-w-5xl mx-auto my-12" x-data="rosterForm">
+<div class="max-w-7xl mx-auto my-12" x-data="rosterForm">
 
     <!-- Back Navigation -->
     <a href="{{ route('registration.phase2.access') }}" class="inline-flex items-center gap-2 text-zinc-500 hover:text-primary transition font-bold text-xs uppercase mb-6">
