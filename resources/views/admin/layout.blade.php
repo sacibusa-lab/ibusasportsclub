@@ -77,6 +77,7 @@
             openSections: {
                 analytics: {{ request()->routeIs('admin.analytics.*', 'admin.stats.*', 'admin.predictor.*') ? 'true' : 'false' }},
                 news: {{ request()->routeIs('admin.news.*', 'admin.comments.*', 'admin.interviews.*', 'admin.stories.*') ? 'true' : 'false' }},
+                registrations: {{ request()->routeIs('admin.registrations.*') ? 'true' : 'false' }},
                 settings: {{ request()->routeIs('admin.settings.*', 'admin.sponsors.*') ? 'true' : 'false' }}
             }
         }" class="flex-1 min-h-0 px-4 py-6 space-y-1 overflow-y-auto admin-nav-scrollbar">
@@ -183,6 +184,22 @@
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                 <span>Tags</span>
             </a>
+            </div>
+
+            <!-- Registrations Section -->
+            <button @click="openSections.registrations = !openSections.registrations" class="w-full flex items-center justify-between pt-6 pb-2 px-4 group outline-none">
+                <span class="text-[10px] font-black text-white/30 group-hover:text-white/60 transition uppercase tracking-widest text-left">Registrations</span>
+                <svg :class="openSections.registrations ? 'rotate-180' : ''" class="w-3 h-3 text-white/20 group-hover:text-white/40 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div x-show="openSections.registrations" x-transition.opacity.duration.300ms class="space-y-1" x-cloak>
+                <a href="{{ route('admin.registrations.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.registrations.index', 'admin.registrations.show') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                    All Registrations
+                </a>
+                <a href="{{ route('admin.registrations.settings') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.registrations.settings') ? 'bg-secondary text-primary font-bold' : 'hover:bg-primary-light text-zinc-300' }}">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                    Settings
+                </a>
             </div>
 
             <!-- Site Settings Section -->

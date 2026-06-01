@@ -148,6 +148,7 @@
                     <a href="{{ route('predictor.index') }}" class="hover:text-secondary transition {{ request()->routeIs('predictor.index') ? 'text-secondary' : '' }}">Predictor</a>
                     <a href="{{ route('news.index') }}" class="hover:text-secondary transition {{ request()->routeIs('news.index') ? 'text-secondary' : '' }}">News</a>
                     <a href="{{ route('teams') }}" class="hover:text-secondary transition {{ request()->routeIs('teams') ? 'text-secondary' : '' }}">Teams</a>
+                    <a href="{{ route('registration.instructions') }}" class="hover:text-secondary transition {{ request()->routeIs('registration.*') ? 'text-secondary' : '' }}">Register</a>
                 </nav>
             </div>
 
@@ -205,6 +206,7 @@
             <a href="{{ route('predictor.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('predictor.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Predictor League</a>
             <a href="{{ route('news.index') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('news.index') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">News</a>
             <a href="{{ route('teams') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('teams') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Teams</a>
+            <a href="{{ route('registration.instructions') }}" class="p-3 hover:bg-zinc-50 rounded-xl transition {{ request()->routeIs('registration.*') ? 'bg-zinc-50 text-secondary border-l-4 border-secondary pl-2' : '' }}">Register</a>
             <hr class="my-2 border-zinc-100">
             @auth
             <div class="p-3 flex items-center justify-between">
