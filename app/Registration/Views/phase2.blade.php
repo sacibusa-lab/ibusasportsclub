@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto my-12" x-data="{
-    players: @json(old('players', [['name' => '', 'shirt_number' => '', 'position' => 'Goalkeeper', 'dob' => '']])),
+    players: {!! json_encode(old('players', [['name' => '', 'shirt_number' => '', 'position' => 'Goalkeeper', 'dob' => '']])) !!},
     addPlayer() {
         this.players.push({ name: '', shirt_number: '', position: 'Defender', dob: '' });
     },
@@ -15,7 +15,7 @@
     }
 }">
     <!-- Back Navigation -->
-    <a href="{{ route('registration.access') }}" class="inline-flex items-center gap-2 text-zinc-500 hover:text-primary transition font-bold text-xs uppercase mb-6">
+    <a href="{{ route('registration.phase2.access') }}" class="inline-flex items-center gap-2 text-zinc-500 hover:text-primary transition font-bold text-xs uppercase mb-6">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         Back to verification
     </a>

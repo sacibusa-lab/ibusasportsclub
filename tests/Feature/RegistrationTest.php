@@ -290,4 +290,36 @@ class RegistrationTest extends TestCase
                 str_contains($request['sms'], 'Phase 2 registration code is:');
         });
     }
+
+    /**
+     * Test Phase 2 form loads and renders successfully.
+     */
+    public function test_phase2_form_loads_and_renders_successfully()
+    {
+        $competition = Competition::create([
+            'name' => 'Main Competition',
+            'slug' => 'main-competition',
+            'type' => 'league',
+            'is_active' => true
+        ]);
+
+        $registration = CompetitionRegistration::create([
+            'competition_id' => $competition->id,
+            'team_name' => 'Test FC',
+            'contact_name' => 'Representative Smith',
+            'contact_email' => 'smith@test.com',
+            'contact_phone' => '08012345678',
+            'status' => 'phase1_paid',
+            'registration_code' => 'REG-VAL12345',
+            'phase1_payment_status' => 'paid',
+            'phase1_payment_ref' => 'REG-P1-TESTREF123',
+            'phase1_data' => []
+        ]);
+
+        $response = $this->get(route('registration.phase2.form', ['code' => 'REG-VAL12345']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Phase 2: Roster');
+        $response->assertSee('Test FC');
+    }
 }
