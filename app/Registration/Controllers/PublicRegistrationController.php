@@ -481,11 +481,9 @@ class PublicRegistrationController extends Controller
             // 1. Find or create a default group for this team (since group_id is a non-nullable foreign key in teams table)
             $group = \App\Models\Group::where('competition_id', $registration->competition_id)->first();
             if (!$group) {
-                $group = \App\Models\Group::where('name', 'Friendly')->first();
-            }
-            if (!$group) {
+                $compName = $registration->competition->name ?? 'League';
                 $group = \App\Models\Group::create([
-                    'name' => 'Friendly',
+                    'name' => $compName,
                     'competition_id' => $registration->competition_id
                 ]);
             }
